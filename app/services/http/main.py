@@ -1,22 +1,23 @@
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
 from fastapi import FastAPI
+from fastapi.routing import APIRoute
+from starlette.middleware.cors import CORSMiddleware
 
-app = FastAPI()
-
-@app.get("/tools/health")
-async def root():
-    return {"message": "All good"}
+from app.services.http.api.router import router
+from app.services.http.core.config import settings
 
 
-from fastapi import APIRouter
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+)
 
-from app.api.routes import items, login, private, users, utils
-from app.core.config import settings
+if settings.all_cors_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.all_cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
-api_router = APIRouter()
-api_router.include_router(login.router)
-api_router.include_router(users.router)
-api_router.include_router(utils.router)
-api_router.include_router(items.router)
-api_router.include_router(private.router)
+app.include_router(router, prefix=settings.API_V1_STR)
