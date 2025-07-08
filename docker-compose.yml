@@ -1,0 +1,25 @@
+services:
+  fastapi:
+    container_name: ${FASTAPI_CONTAINER_NAME:-fastapi}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - postgres_net
+    ports:
+      - "8000:80"
+    env_file:
+      - .env
+      - .env.local
+    volumes:
+      - ./app:/code/app
+      - ./requirements.txt:/code/requirements.txt
+
+
+networks:
+  postgres_net:
+    external: true
+
+volumes:
+  fast_data:
