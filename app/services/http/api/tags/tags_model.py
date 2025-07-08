@@ -2,24 +2,24 @@ from typing import List
 from typing import Optional
 from pydantic import BaseModel, Field
 
-class TagsBase(BaseModel):
+class TagsBaseModel(BaseModel):
     name: str = Field(..., min_length=3, max_length=255)
     source_address: str = Field(..., min_length=3)
     description: Optional[str] = None
 
-class TagsCreate(TagsBase):
+class TagsCreateModel(TagsBaseModel):
     pass
 
-class TagsUpdate(BaseModel):
+class TagsUpdateModel(BaseModel):
     name: Optional[str] = Field(default=None, min_length=3, max_length=255)
     source_address: Optional[str] = Field(default=None, min_length=3)
     description: Optional[str] = None
 
-class Tags(TagsBase):
+class TagsModel(TagsBaseModel):
     id: int
 
-class PaginatedTags(BaseModel):
-    data: List[Tags]
+class PaginatedTagsModel(BaseModel):
+    data: List[TagsModel]
     count: int
     offset: int
     limit: int
