@@ -1,4 +1,4 @@
-FROM python:3.12.11-slim-bookworm
+FROM python:3.11.13-slim-bookworm
 
 WORKDIR /code
 
@@ -11,5 +11,3 @@ COPY ./app /code/app
 EXPOSE 80
 
 CMD ["fastapi", "run", "./app/services/http/main.py", "--port", "80", "--reload"]
-
-
