@@ -23,5 +23,3 @@ class PaginatedTagsModel(BaseModel):
     count: int
     offset: int
     limit: int
-
-

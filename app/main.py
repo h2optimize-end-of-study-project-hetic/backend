@@ -4,9 +4,9 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from starlette.middleware.cors import CORSMiddleware
 
-from app.services.http.api.router import router
-from app.services.http.core.config import settings
-from app.services.http.core.open_api_tags import OpenApiTags
+from app.src.presentation.api.router import router
+from app.src.presentation.core.config import settings
+from app.src.presentation.core.open_api_tags import OpenApiTags
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -44,15 +44,3 @@ app.add_middleware(
 )
 
 app.include_router(router, prefix=settings.API_V1_STR)
-
-
-# @app.get("/")
-# async def root():
-#     return {"message": "Hello Bigger Applications!"}
-
-# @app.exception_handler(404)
-# async def custom_404_handler():
-#     return ({
-#         "status_code":404,
-#         "content":{"detail": "Route demandée non trouvée"}
-#     })
