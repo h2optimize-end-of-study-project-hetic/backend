@@ -44,15 +44,3 @@ app.add_middleware(
 )
 
 app.include_router(router, prefix=settings.API_V1_STR)
-
-
-# @app.get("/")
-# async def root():
-#     return {"message": "Hello Bigger Applications!"}
-
-# @app.exception_handler(404)
-# async def custom_404_handler():
-#     return ({
-#         "status_code":404,
-#         "content":{"detail": "Route demandée non trouvée"}
-#     })
