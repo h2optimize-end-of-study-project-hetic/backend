@@ -7,6 +7,4 @@ class GetTagByIdUseCase:
 
     def execute(self, tag_id: int) -> Tag:
         value = self.tag_repository.select_tag_by_id(tag_id)
-        print(value)
-        
         return value

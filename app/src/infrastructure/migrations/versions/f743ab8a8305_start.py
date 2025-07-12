@@ -15,7 +15,6 @@ down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-
 def upgrade() -> None:
     op.execute("""
     CREATE OR REPLACE FUNCTION set_updated_at()
@@ -73,6 +72,13 @@ def upgrade() -> None:
         sa.Column('name', sa.Text),
         sa.Column('description', sa.Text),
         sa.Column('room_count', sa.Integer),
+        sa.Column('street_number', sa.Text),
+        sa.Column('street_name', sa.Text),
+        sa.Column('postal_code', sa.Text),
+        sa.Column('city', sa.Text),
+        sa.Column('country', sa.Text),
+        sa.Column('latitude', sa.Numeric(9, 6)),
+        sa.Column('longitude', sa.Numeric(9, 6)),
         sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column('updated_at', sa.TIMESTAMP(timezone=True))
     )

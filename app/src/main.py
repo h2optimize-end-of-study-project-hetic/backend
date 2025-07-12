@@ -1,14 +1,24 @@
+import logging
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.middleware.cors import CORSMiddleware
 
+from app.src.common.logging import setup_logging
 from app.src.presentation.api.router import router
 from app.src.presentation.core.config import settings
 from app.src.presentation.core.open_api_tags import OpenApiTags
 
+setup_logging()
+logger = logging.getLogger(__name__)
+
 app = FastAPI(
     debug=settings.is_debug,
-    title=settings.PROJECT_NAME,
+    redoc_url=None,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    title=settings.PROJECT_NAME,
+    swagger_favicon_url="/static/favicon.ico",
     description=settings.DESCRIPTION,
     version=settings.VERSION,
     contact={
@@ -29,8 +39,7 @@ app = FastAPI(
             "description": "Gérer les utilisateurs (création, modification, suppression).",
         }
     ],
-    redoc_url=None,
-    servers=settings.SERVERS
+    servers=settings.SERVERS,
 )
 
 origins = ["*"]
@@ -45,6 +54,7 @@ app.add_middleware(
 
 app.include_router(router, prefix=settings.API_V1_STR)
 
+app.mount("/static", StaticFiles(directory="app/src/presentation/static"), name="static")
 
 @app.get("/")
 async def root():

@@ -1,4 +1,4 @@
-from typing import Literal, List
+from typing import Literal, List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import (EmailStr, HttpUrl, PostgresDsn, computed_field)
 
@@ -11,7 +11,8 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["development", "production"] = "development"
 
     DEBUG: bool = False
-    LOG_LEVEL: str = "test"
+    LOG_LEVEL: str = "DEBUG"
+    LOG_FILE_PATH: Optional[str] = None
 
     @property
     def is_debug(self) -> bool:
@@ -36,7 +37,7 @@ class Settings(BaseSettings):
 
     FRONTEND_HOST: HttpUrl = "http://localhost:5173"
 
-    POSTGRES_HOST: str = "localhost"
+    POSTGRES_HOST: str = "postgres"
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = "app"
     POSTGRES_USER: str = "admin"
@@ -44,14 +45,14 @@ class Settings(BaseSettings):
 
     @computed_field
     @property
-    def database_url(self) -> PostgresDsn:
+    def database_url(self) -> str:
         return PostgresDsn.build(
-            scheme="postgresql",
-            user=self.POSTGRES_USER,
+            scheme="postgresql+psycopg2",
+            username=self.POSTGRES_USER,
             password=self.POSTGRES_PASSWORD,
             host=self.POSTGRES_HOST,
-            port=str(self.POSTGRES_PORT),
-            path=f"/{self.POSTGRES_DB}"
+            port=self.POSTGRES_PORT,
+            path=self.POSTGRES_DB
         )
 
 settings = Settings()

@@ -1,10 +1,11 @@
+from typing import Annotated
+from fastapi import HTTPException
 from fastapi import APIRouter, Path, Depends
 
-from app.src.presentation.deps import get_tag_repository
+from app.src.presentation.api.tag.tags_model import TagsModel
 from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.use_cases.tag.get_tag_by_id import GetTagByIdUseCase
-from app.src.domain.interface_repositories.tag_repository import TagRepository
-from app.src.presentation.api.tag.tags_model import TagsModel
+from app.src.presentation.dependencies import get_tag_by_id_use_case
 
 
 tag_router = APIRouter(prefix="/tags", tags=[OpenApiTags.tags])
@@ -27,13 +28,16 @@ tag_router = APIRouter(prefix="/tags", tags=[OpenApiTags.tags])
     deprecated=False,
 )
 async def read_tag(
-    tag_id : int = Path(..., ge=0, description="ID du tag, entier positif"),
-    repo : TagRepository = Depends(get_tag_repository)
+    use_case: Annotated[GetTagByIdUseCase, Depends(get_tag_by_id_use_case)], 
+    tag_id: int = Path(..., ge=0, description="ID du tag, entier positif"),
 ):
     """
     Get a tag by its ID.
 
     - **tag_id**: ID du tag doit être un entier positif
     """
-    use_case = GetTagByIdUseCase(repo)
-    return use_case.execute(tag_id)
+    try: 
+        tag_entity = use_case.execute(tag_id)
+        return TagsModel(**tag_entity.to_dict())
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail="Tag not found")
