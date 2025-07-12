@@ -7,6 +7,7 @@ class TagModel(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
+    test: str
     description: Optional[str] = None
     source_address: str = Field(unique=True)
     created_at: Optional[datetime] = Field(default_factory=datetime.now)

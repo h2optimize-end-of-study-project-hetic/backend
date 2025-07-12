@@ -1,34 +1,57 @@
-import secrets
-import warnings
-from typing import Annotated, Any, Literal
-
-from pydantic import (
-    AnyUrl,
-    BeforeValidator,
-    EmailStr,
-    HttpUrl,
-    PostgresDsn,
-    computed_field,
-    model_validator,
-)
+from typing import Literal, List
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing_extensions import Self
-
-
+from pydantic import (EmailStr, HttpUrl, PostgresDsn, computed_field)
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(
+        env_file=(".env", ".env.local"),
+        env_file_encoding="utf-8"
+    )
+
+    ENVIRONMENT: Literal["development", "production"] = "development"
+
+    DEBUG: bool = False
+    LOG_LEVEL: str = "test"
+
+    @property
+    def is_debug(self) -> bool:
+        return self.DEBUG or self.ENVIRONMENT == "development"
+
+    BACKEND_EXT_PORT: int = 8000
+    BACKEND_INT_PORT: int = 80
 
     PROJECT_NAME: str = "H2Optimize"
     DESCRIPTION: str = "Manage the rooms use"
     VERSION: str = "0.0.1"
-    CONTACT_NAME: str = "H2Optimize" 
-    CONTACT_EMAIL: str = "contact@hoptimize.fr"
+    CONTACT_NAME: str = "H2Optimize"
+    CONTACT_URL: HttpUrl =  "https://github.com/h2optimize-end-of-study-project-hetic"
+    CONTACT_EMAIL: EmailStr = "contact@hoptimize.fr"
     LICENCE_NAME: str = "MIT"
     API_V1_STR: str = "/api/v1"
 
-    FRONTEND_HOST: str = "http://localhost:5173"
-    
+    SERVERS : List =[
+        {"url": f"http://localhost:{BACKEND_EXT_PORT}", "description": "Local development server"},
+        {"url": "https://11.hetic.arcplex.dev:443", "description": "Production server"},
+    ]
 
+    FRONTEND_HOST: HttpUrl = "http://localhost:5173"
+
+    POSTGRES_HOST: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DB: str = "app"
+    POSTGRES_USER: str = "admin"
+    POSTGRES_PASSWORD: str = "Changeme!1"
+
+    @computed_field
+    @property
+    def database_url(self) -> PostgresDsn:
+        return PostgresDsn.build(
+            scheme="postgresql",
+            user=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+            host=self.POSTGRES_HOST,
+            port=str(self.POSTGRES_PORT),
+            path=f"/{self.POSTGRES_DB}"
+        )
 
 settings = Settings()
