@@ -13,7 +13,11 @@ class TagRepository(ABC):
         pass
 
     @abstractmethod
-    def select_tag_by_id(self, tag_id: int) -> Tag:
+    def count_all_tags(self) -> int:
+        pass
+
+    @abstractmethod
+    def select_tag_by_id(self, tag_id: int) -> Optional[Tag]:
         pass
 
     @abstractmethod
@@ -27,3 +31,8 @@ class TagRepository(ABC):
     @abstractmethod
     def delete_tag(self, tag_id: int) -> bool:
         pass
+
+    @abstractmethod
+    def get_tag_by_position(self, position: int) -> Optional[Tag]:
+        pass
+

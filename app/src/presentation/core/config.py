@@ -17,6 +17,13 @@ class Settings(BaseSettings):
     @property
     def is_debug(self) -> bool:
         return self.DEBUG or self.ENVIRONMENT == "development"
+    
+    @property
+    def openapi_url(self) -> str:
+        if self.ENVIRONMENT != "development":
+            return None
+        else : 
+            return f"{settings.API_V1_STR}/openapi.json"
 
     BACKEND_EXT_PORT: int = 8000
     BACKEND_INT_PORT: int = 80

@@ -15,13 +15,20 @@ class Tag:
 
     @staticmethod
     def from_dict(data: Dict) -> "Tag":
+        def safe_parse(value):
+            if isinstance(value, datetime):
+                return value
+            if isinstance(value, str):
+                return parse_datetime(value)
+            return None
+
         return Tag(
             id=data.get("id"),
             name=data["name"],
             description=data.get("description"),
             source_address=data["source_address"],
-            created_at=parse_datetime(data["created_at"]) if data.get("created_at") else None,
-            updated_at=parse_datetime(data["updated_at"]) if data.get("updated_at") else None,
+            created_at=safe_parse(data.get("created_at")),
+            updated_at=safe_parse(data.get("updated_at")),
         )
 
     def to_dict(self) -> Dict:
