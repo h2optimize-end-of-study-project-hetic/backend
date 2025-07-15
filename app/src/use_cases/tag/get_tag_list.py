@@ -1,32 +1,33 @@
-from dataclasses import dataclass
 import math
-from typing import List, Optional
+from dataclasses import dataclass
 
 from app.src.domain.entities.tag import Tag
-from app.src.common.utils import encode, decode
+from app.src.common.utils import decode, encode
 from app.src.domain.interface_repositories.tag_repository import TagRepository
+
 
 @dataclass
 class PaginatedTag:
-    tags: List[Tag]
+    tags: list[Tag]
     total: int
     chunk_size: int
     chunk_count: int
-    current_cursor: Optional[str]
-    first_cursor: Optional[str]
-    last_cursor: Optional[str]
-    next_cursor: Optional[str]
+    current_cursor: str | None
+    first_cursor: str | None
+    last_cursor: str | None
+    next_cursor: str | None
+
 
 class GetTagListUseCase:
     def __init__(self, tag_repository: TagRepository):
         self.tag_repository = tag_repository
 
-    def execute(self, cursor: Optional[str], limit: Optional[int] = None) -> PaginatedTag:
+    def execute(self, cursor: str | None, limit: int | None = None) -> PaginatedTag:
         limit = limit or 20
 
         decoded_cursor = None
         if cursor:
-            decoded_cursor = decode(cursor, 'Tag pagination cursor')
+            decoded_cursor = decode(cursor, "Tag pagination cursor")
             decoded_cursor = decoded_cursor.get("id") if decoded_cursor else None
 
         tags = self.tag_repository.select_tags(decoded_cursor, (limit + 1))
@@ -37,9 +38,9 @@ class GetTagListUseCase:
 
         total = self.tag_repository.count_all_tags()
         chunk_count = math.ceil(total / limit) if limit else 1
-        
-        first_tag:Optional[Tag] = self.tag_repository.get_tag_by_position(0)
-        last_tag:Optional[Tag] = self.tag_repository.get_tag_by_position(max((-1 * limit), (-1 * total)))
+
+        first_tag: Tag | None = self.tag_repository.get_tag_by_position(0)
+        last_tag: Tag | None = self.tag_repository.get_tag_by_position(max((-1 * limit), (-1 * total)))
 
         first_cursor = {"id": first_tag.id} if first_tag else None
         last_cursor = {"id": last_tag.id} if last_tag else None
@@ -51,7 +52,7 @@ class GetTagListUseCase:
             chunk_size=len(tags),
             chunk_count=chunk_count,
             current_cursor=cursor if cursor else encode(first_cursor) if first_cursor else None,
-            first_cursor=encode(first_cursor)if first_cursor else None ,
+            first_cursor=encode(first_cursor) if first_cursor else None,
             last_cursor=encode(last_cursor) if last_cursor else None,
             next_cursor=encode(next_cursor) if next_cursor else None,
         )

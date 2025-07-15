@@ -10,25 +10,30 @@ from app.src.infrastructure.db.repositories.tag_repository_sql import SQLTagRepo
 from app.src.infrastructure.db.repositories.room_repository_sql import SQLRoomRepository
 from app.src.use_cases.tag.get_tag_list import GetTagListUseCase
 
-def tag_repository(session: Session = Depends(get_session)) -> TagRepository:
+get_session_dep = Depends(get_session)
+
+
+def tag_repository(session: Session = get_session_dep) -> TagRepository:
     return SQLTagRepository(session)
 
-def room_repository(session: Session = Depends(get_session)) -> RoomRepository:
+
+def room_repository(session: Session = get_session_dep) -> RoomRepository:
     return SQLRoomRepository(session)
 
-def get_tag_by_id_use_case(
-    tag_repository: TagRepository = Depends(tag_repository)
-) -> GetTagByIdUseCase:
+
+tag_repo_dep = Depends(tag_repository)
+room_repo_dep = Depends(room_repository)
+
+
+def get_tag_by_id_use_case(tag_repository: TagRepository = tag_repo_dep) -> GetTagByIdUseCase:
     return GetTagByIdUseCase(tag_repository)
 
-def get_tag_list_use_case(
-    tag_repository: TagRepository = Depends(tag_repository)
-) -> GetTagListUseCase:
+
+def get_tag_list_use_case(tag_repository: TagRepository = tag_repo_dep) -> GetTagListUseCase:
     return GetTagListUseCase(tag_repository)
 
+
 def create_tag_use_case(
-    tag_repository: TagRepository = Depends(tag_repository),
-    room_repository: RoomRepository = Depends(room_repository)
+    tag_repository: TagRepository = tag_repo_dep, room_repository: RoomRepository = room_repo_dep
 ) -> CreateTagUseCase:
     return CreateTagUseCase(tag_repository, room_repository)
-

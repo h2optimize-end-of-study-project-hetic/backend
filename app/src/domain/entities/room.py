@@ -1,26 +1,28 @@
+from typing import Any
 from datetime import datetime
-from typing import Optional, Any, Dict
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
+
 from dateutil.parser import parse as parse_datetime
+
 
 @dataclass
 class Room:
-    id: Optional[int]
-    name: Optional[str]
-    description: Optional[str]
-    room_count: Optional[int]
-    street_number: Optional[str]
-    street_name: Optional[str]
-    postal_code: Optional[str]
-    city: Optional[str]
-    country: Optional[str]
-    latitude: Optional[float]
-    longitude: Optional[float]
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime] = None
+    id: int | None
+    name: str | None
+    description: str | None
+    room_count: int | None
+    street_number: str | None
+    street_name: str | None
+    postal_code: str | None
+    city: str | None
+    country: str | None
+    latitude: float | None
+    longitude: float | None
+    created_at: datetime | None
+    updated_at: datetime | None = None
 
     @staticmethod
-    def from_dict(data: Dict[str, Any]) -> "Room":
+    def from_dict(data: dict[str, Any]) -> "Room":
         return Room(
             id=data.get("id"),
             name=data.get("name"),
@@ -37,7 +39,7 @@ class Room:
             updated_at=parse_datetime(data["updated_at"]) if data.get("updated_at") else None,
         )
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         data = asdict(self)
         for field in ["created_at", "updated_at"]:
             if data[field]:

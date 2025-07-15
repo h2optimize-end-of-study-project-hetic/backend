@@ -1,27 +1,30 @@
-import logging
-import sys
 import json
-from datetime import datetime, timezone
+import logging
+from typing import ClassVar
+from datetime import UTC, datetime
+
 from app.src.presentation.core.config import settings
+
 
 class JsonFormatter(logging.Formatter):
     def format(self, record):
         log_record = {
-            "timestamp": datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat(),
+            "timestamp": datetime.fromtimestamp(record.created, tz=UTC).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "module": record.module,
             "file": record.pathname,
             "line": record.lineno,
-            "message": record.getMessage()
+            "message": record.getMessage(),
         }
 
         if record.exc_info:
             log_record["exception"] = self.formatException(record.exc_info)
         return json.dumps(log_record)
-    
+
+
 class ColorFormatter(logging.Formatter):
-    COLORS = {
+    COLORS: ClassVar[dict[str, str]] = {
         "DEBUG": "\033[104m\033[30m",
         "INFO": "\033[102m\033[30m",
         "WARNING": "\033[103m\033[30m",
@@ -39,7 +42,7 @@ class ColorFormatter(logging.Formatter):
 
         formatted = super().format(record)
 
-        record.levelname = original_levelname 
+        record.levelname = original_levelname
         return formatted
 
 
@@ -63,7 +66,8 @@ if settings.LOG_FILE_PATH:
         "maxBytes": 10485760,
         "backupCount": 5,
     }
-    
+
+
 log_config = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -75,20 +79,13 @@ log_config = {
         "color": {
             "()": ColorFormatter,
             "format": "%(asctime)s %(levelname)s %(name)s: %(message)s",
-            "datefmt": "%H:%M:%S %z"
+            "datefmt": "%H:%M:%S %z",
         },
-        "json": {
-            "()": JsonFormatter
-        }
-
+        "json": {"()": JsonFormatter},
     },
     "handlers": log_handlers,
     "loggers": {
-        "app": {
-            "handlers": handlers,
-            "level": settings.LOG_LEVEL,
-            "propagate": False
-        },
+        "app": {"handlers": handlers, "level": settings.LOG_LEVEL, "propagate": False},
         "uvicorn": {
             "handlers": handlers,
             "level": settings.LOG_LEVEL,

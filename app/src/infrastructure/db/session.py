@@ -1,5 +1,5 @@
-from typing import Generator
-from contextlib import contextmanager
+from collections.abc import Generator
+
 from sqlmodel import Session, create_engine
 
 from app.src.presentation.core.config import settings

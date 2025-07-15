@@ -1,28 +1,27 @@
-from typing import Literal, List, Optional
+from typing import Literal
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import (EmailStr, HttpUrl, PostgresDsn, computed_field)
+from pydantic import EmailStr, HttpUrl, PostgresDsn, computed_field
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=(".env", ".env.local"),
-        env_file_encoding="utf-8"
-    )
+    model_config = SettingsConfigDict(env_file=(".env", ".env.local"), env_file_encoding="utf-8")
 
     ENVIRONMENT: Literal["development", "production"] = "development"
 
     DEBUG: bool = False
     LOG_LEVEL: str = "DEBUG"
-    LOG_FILE_PATH: Optional[str] = None
+    LOG_FILE_PATH: str | None = None
 
     @property
     def is_debug(self) -> bool:
         return self.DEBUG or self.ENVIRONMENT == "development"
-    
+
     @property
     def openapi_url(self) -> str:
         if self.ENVIRONMENT != "development":
             return None
-        else : 
+        else:
             return f"{settings.API_V1_STR}/openapi.json"
 
     BACKEND_EXT_PORT: int = 8000
@@ -32,12 +31,12 @@ class Settings(BaseSettings):
     DESCRIPTION: str = "Manage the rooms use"
     VERSION: str = "0.0.1"
     CONTACT_NAME: str = "H2Optimize"
-    CONTACT_URL: HttpUrl =  "https://github.com/h2optimize-end-of-study-project-hetic"
+    CONTACT_URL: HttpUrl = "https://github.com/h2optimize-end-of-study-project-hetic"
     CONTACT_EMAIL: EmailStr = "contact@hoptimize.fr"
     LICENCE_NAME: str = "MIT"
     API_V1_STR: str = "/api/v1"
 
-    SERVERS : List =[
+    SERVERS: list = [
         {"url": f"http://localhost:{BACKEND_EXT_PORT}", "description": "Local development server"},
         {"url": "https://11.hetic.arcplex.dev:443", "description": "Production server"},
     ]
@@ -59,7 +58,8 @@ class Settings(BaseSettings):
             password=self.POSTGRES_PASSWORD,
             host=self.POSTGRES_HOST,
             port=self.POSTGRES_PORT,
-            path=self.POSTGRES_DB
+            path=self.POSTGRES_DB,
         )
+
 
 settings = Settings()

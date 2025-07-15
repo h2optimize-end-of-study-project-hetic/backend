@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Role(str, Enum):
     ADMIN = "admin"
     STAFF = "staff"
@@ -7,6 +8,5 @@ class Role(str, Enum):
     INTERN = "intern"
     GUEST = "guest"
 
+
 role: Role
-
-

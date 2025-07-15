@@ -1,20 +1,20 @@
 from datetime import datetime
-from typing import Optional, Dict
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
+
 from dateutil.parser import parse as parse_datetime
 
 
 @dataclass
 class Tag:
-    id: Optional[int]
+    id: int | None
     name: str
-    description: Optional[str]
+    description: str | None
     source_address: str
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None
+    updated_at: datetime | None = None
 
     @staticmethod
-    def from_dict(data: Dict) -> "Tag":
+    def from_dict(data: dict) -> "Tag":
         def safe_parse(value):
             if isinstance(value, datetime):
                 return value
@@ -31,10 +31,9 @@ class Tag:
             updated_at=safe_parse(data.get("updated_at")),
         )
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         data = asdict(self)
         for field in ["created_at", "updated_at"]:
             if data[field]:
                 data[field] = data[field].isoformat()
         return data
-

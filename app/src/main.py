@@ -1,8 +1,6 @@
 import logging
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.middleware.cors import CORSMiddleware
 
 from app.src.common.logging import setup_logging
@@ -37,7 +35,7 @@ app = FastAPI(
         {
             "name": OpenApiTags.users,
             "description": "Gérer les utilisateurs (création, modification, suppression).",
-        }
+        },
     ],
     servers=settings.SERVERS,
 )
@@ -56,12 +54,14 @@ app.include_router(router, prefix=settings.API_V1_STR)
 
 app.mount("/static", StaticFiles(directory="app/src/presentation/static"), name="static")
 
+
 @app.get("/")
 async def root():
-    return {
-        "title":settings.PROJECT_NAME,
-        "version":settings.VERSION,
-        "env":settings.ENVIRONMENT,
-        "log_level":settings.LOG_LEVEL,
-        "debug": app.debug
-    }
+    if 1:
+        return {
+            "title": settings.PROJECT_NAME,
+            "version": settings.VERSION,
+            "env": settings.ENVIRONMENT,
+            "log_level": settings.LOG_LEVEL,
+            "debug": app.debug,
+        }

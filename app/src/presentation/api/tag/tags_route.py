@@ -1,25 +1,32 @@
 import logging
-from typing import Annotated, List, Optional
-from fastapi import Body, APIRouter, Path, Depends, HTTPException, Query, status
+from typing import Annotated
+
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
 from app.src.domain.entities.tag import Tag
 from app.src.use_cases.tag.create_tag import CreateTagUseCase
 from app.src.presentation.core.open_api_tags import OpenApiTags
-from app.src.use_cases.tag.get_tag_by_id import GetTagByIdUseCase
 from app.src.use_cases.tag.get_tag_list import GetTagListUseCase
-from app.src.presentation.api.tag.tags_model import PaginatedModel, PaginationMetadataModel, TagsModel, TagsCreateModel
+from app.src.use_cases.tag.get_tag_by_id import GetTagByIdUseCase
+from app.src.common.exception import AlreadyExistsError, CreationFailedError, NotFoundError
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig, generate_responses
-from app.src.common.exception import AlreadyExistsException, CreationFailedException, NotFoundException
-from app.src.presentation.dependencies import get_tag_by_id_use_case, create_tag_use_case, get_tag_list_use_case
+from app.src.presentation.dependencies import create_tag_use_case, get_tag_by_id_use_case, get_tag_list_use_case
+from app.src.presentation.api.tag.tags_model import PaginatedModel, PaginationMetadataModel, TagsCreateModel, TagsModel
 
 tag_not_found = OpenApiErrorResponseConfig(code=404, description="Tag not found", detail="Tag with ID '123' not found")
-room_not_found = OpenApiErrorResponseConfig(code=404, description="Room not found", detail="Room with ID '14' not found")
-tag_already_exist = OpenApiErrorResponseConfig(code=409, description="Tag already exists", detail="Tag with source_address '18458426' already exists")
+room_not_found = OpenApiErrorResponseConfig(
+    code=404, description="Room not found", detail="Room with ID '14' not found"
+)
+tag_already_exist = OpenApiErrorResponseConfig(
+    code=409, description="Tag already exists", detail="Tag with source_address '18458426' already exists"
+)
 creation_error = OpenApiErrorResponseConfig(code=406, description="Creation fails", detail="Unable to create the tag")
 unexpected_error = OpenApiErrorResponseConfig(code=500, description="Unexpected error", detail="Internal server error")
 
+
 logger = logging.getLogger(__name__)
 tag_router = APIRouter(prefix="/tags", tags=[OpenApiTags.tags])
+
 
 @tag_router.post(
     "",
@@ -48,27 +55,28 @@ async def create_tag(
             description=tag.description,
             source_address=tag.source_address,
             created_at=None,
-            updated_at=None
+            updated_at=None,
         )
 
-        new_tag:Tag = use_case.execute(tag_entity, tag.room_id)
-            
+        new_tag: Tag = use_case.execute(tag_entity, tag.room_id)
+
         return TagsModel(**new_tag.to_dict())
-    
-    except NotFoundException as e:
-        logger.debug(e)
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    
-    except CreationFailedException as e:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Unable to create the tag")
-    
-    except AlreadyExistsException  as e:
-        logger.debug(e)
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
-    
+
+    except NotFoundError as e:
+        logger.error(e)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+
+    except CreationFailedError as e:
+        logger.error(e)
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Unable to create the tag") from e
+
+    except AlreadyExistsError as e:
+        logger.error(e)
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
+
     except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
+        logger.error(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error") from e
 
 
 @tag_router.get(
@@ -80,9 +88,9 @@ async def create_tag(
     deprecated=False,
 )
 async def read_tag_list(
-    use_case: Annotated[GetTagListUseCase, Depends(get_tag_list_use_case)], 
-    cursor: Optional[str] = Query(None, description="Pagination cursor"),
-    limit: Optional[int] = Query(20, ge=1, description="Number of elements return"),
+    use_case: Annotated[GetTagListUseCase, Depends(get_tag_list_use_case)],
+    cursor: str | None = Query(None, description="Pagination cursor"),
+    limit: int | None = Query(20, ge=1, description="Number of elements return"),
 ):
     """
     Retrieve a list of tags
@@ -105,16 +113,13 @@ async def read_tag_list(
             next_cursor=result.next_cursor,
         )
 
-        response = PaginatedModel(
-            data=tag_models,
-            metadata=metadata
-        )
+        response = PaginatedModel(data=tag_models, metadata=metadata)
 
         return response
-    
+
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error") from e
 
 
 @tag_router.get(
@@ -126,7 +131,7 @@ async def read_tag_list(
     deprecated=False,
 )
 async def read_tag(
-    use_case: Annotated[GetTagByIdUseCase, Depends(get_tag_by_id_use_case)], 
+    use_case: Annotated[GetTagByIdUseCase, Depends(get_tag_by_id_use_case)],
     tag_id: int = Path(..., ge=1, description="The tag ID (positive integer)"),
 ):
     """
@@ -138,9 +143,9 @@ async def read_tag(
         tag_entity: Tag = use_case.execute(tag_id)
 
         return TagsModel(**tag_entity.to_dict())
-    except NotFoundException as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    
+    except NotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error") from e

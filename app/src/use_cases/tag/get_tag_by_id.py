@@ -1,6 +1,7 @@
 from app.src.domain.entities.tag import Tag
 from app.src.domain.interface_repositories.tag_repository import TagRepository
 
+
 class GetTagByIdUseCase:
     def __init__(self, tag_repository: TagRepository):
         self.tag_repository = tag_repository
