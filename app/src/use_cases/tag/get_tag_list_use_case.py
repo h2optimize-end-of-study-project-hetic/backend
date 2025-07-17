@@ -30,17 +30,13 @@ class GetTagListUseCase:
             decoded_cursor = decode(cursor, "Tag pagination cursor")
             decoded_cursor = decoded_cursor.get("id") if decoded_cursor else None
 
-        tags = self.tag_repository.select_tags(decoded_cursor, (limit + 1))
+        tags, total, first_tag, last_tag = self.tag_repository.paginate_tags(decoded_cursor, (limit + 1))
 
         next_tag = None
         if len(tags) == (limit + 1):
             next_tag = tags.pop(-1)
 
-        total = self.tag_repository.count_all_tags()
         chunk_count = math.ceil(total / limit) if limit else 1
-
-        first_tag: Tag | None = self.tag_repository.get_tag_by_position(0)
-        last_tag: Tag | None = self.tag_repository.get_tag_by_position(max((-1 * limit), (-1 * total)))
 
         first_cursor = {"id": first_tag.id} if first_tag else None
         last_cursor = {"id": last_tag.id} if last_tag else None

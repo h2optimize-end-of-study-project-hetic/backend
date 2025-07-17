@@ -29,11 +29,11 @@ app = FastAPI(
     },
     openapi_tags=[
         {
-            "name": OpenApiTags.tags,
+            "name": OpenApiTags.tag,
             "description": "Les tags sont les capteurs matériels qui mesurent des valeurs dans le système.",
         },
         {
-            "name": OpenApiTags.users,
+            "name": OpenApiTags.user,
             "description": "Gérer les utilisateurs (création, modification, suppression).",
         },
     ],

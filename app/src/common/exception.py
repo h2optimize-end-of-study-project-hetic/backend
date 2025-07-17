@@ -1,6 +1,7 @@
 class CustomError(Exception):
     pass
 
+
 class NotFoundError(CustomError):
     """
     Exception raised when a requested resource is not found
@@ -43,7 +44,37 @@ class CreationFailedError(CustomError):
     """
 
     def __init__(self, resource: str, reason: str = "Unknown error"):
-        super().__init__(f"Failed to create {resource}: {reason}")
+        super().__init__(f"Failed to create {resource}")
+        self.resource = resource
+        self.reason = reason
+
+
+class UpdateFailedError(CustomError):
+    """
+    Exception raised when a resource update fails unexpectedly.
+
+    Attributes:
+        resource (str): The name of the resource
+        reason (str): Optional detail about why the update failed
+    """
+
+    def __init__(self, resource: str, reason: str = "Unknown error"):
+        super().__init__(f"Failed to update {resource}")
+        self.resource = resource
+        self.reason = reason
+
+
+class DeletionFailedError(CustomError):
+    """
+    Exception raised when a resource deletion fails unexpectedly.
+
+    Attributes:
+        resource (str): The name of the resource
+        reason (str): Optional detail about why the deletion failed
+    """
+
+    def __init__(self, resource: str, reason: str = "Unknown error"):
+        super().__init__(f"Failed to delete {resource}")
         self.resource = resource
         self.reason = reason
 
@@ -58,6 +89,20 @@ class DecodedFailedError(CustomError):
     """
 
     def __init__(self, resource: str, reason: str = "Unknown decoding error"):
-        super().__init__(f"Failed to decode {resource}: {reason}")
+        super().__init__(f"Failed to decode {resource}")
         self.resource = resource
         self.reason = reason
+
+
+class ForeignKeyConstraintError(CustomError):
+    """
+    Exception raised when trying to violates foreign key constraint
+    """
+
+    def __init__(self, resource: str, constraint_name: str | None = None, table_name: str | None = None):
+        msg = f"Failed to execute request on {resource}"
+        if constraint_name:
+            msg += f", foreign key constraint violated : {constraint_name} from table {table_name}"
+        super().__init__(msg)
+        self.resource = resource
+        self.constraint_name = constraint_name

@@ -1,11 +1,22 @@
 from abc import ABC, abstractmethod
 
 from app.src.domain.entities.tag import Tag
+from app.src.domain.interface_repositories.room_repository import RoomRepository
 
 
 class TagRepository(ABC):
+    room_repository: RoomRepository
+
     @abstractmethod
     def create_tag(self, tag: Tag) -> Tag:
+        pass
+
+    @abstractmethod
+    def create_tag_with_room(self, tag: Tag, room_id: int | None) -> Tag:
+        pass
+
+    @abstractmethod
+    def paginate_tags(self, cursor: int | None, limit: int) -> tuple[list[Tag], int, Tag | None, Tag | None]:
         pass
 
     @abstractmethod
@@ -25,7 +36,7 @@ class TagRepository(ABC):
         pass
 
     @abstractmethod
-    def update_tag(self, tag_id: int) -> Tag:
+    def update_tag(self, tag_id: int, tag_data: dict) -> Tag:
         pass
 
     @abstractmethod
