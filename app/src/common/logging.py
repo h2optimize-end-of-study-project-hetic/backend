@@ -1,5 +1,6 @@
 import json
 import logging
+import logging.config 
 from typing import ClassVar
 from datetime import UTC, datetime
 
@@ -78,7 +79,7 @@ log_config = {
         },
         "color": {
             "()": ColorFormatter,
-            "format": "%(asctime)s %(levelname)s %(name)s: %(message)s",
+            "format": "{ %(asctime)s } %(name)s\n%(levelname)s %(message)s\n",
             "datefmt": "%H:%M:%S %z",
         },
         "json": {"()": JsonFormatter},
@@ -106,8 +107,8 @@ log_config = {
             "level": settings.LOG_LEVEL,
             "propagate": False,
         },
-        "sqlalchemy.engine": {
-            "handlers": ["console"],
+        "asyncio": {
+            "handlers": handlers,
             "level": settings.LOG_LEVEL,
             "propagate": False,
         },

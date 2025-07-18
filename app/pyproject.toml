@@ -64,14 +64,12 @@ section-order = [
 
 [tool.pytest.ini_options]
 minversion = "8.4"
-addopts = "-ra --import-mode=importlib --cov=app/src --cov-report=term-missing"
-testpaths = ["app/tests"]
+addopts = ""
 asyncio_mode = "auto"
 pythonpath = ["/code"]
 
 [tool.coverage.run]
 branch = true
-source = ["app/src"]
 
 [tool.coverage.report]
 show_missing = true

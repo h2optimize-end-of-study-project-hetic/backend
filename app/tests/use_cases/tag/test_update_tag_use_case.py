@@ -17,28 +17,14 @@ def use_case(mock_tag_repo):
     return UpdateTagUseCase(tag_repository=mock_tag_repo)
 
 
-@pytest.fixture
-def fake_tag():
-    return Tag(
-        id=1,
-        name="original name",
-        description="original description",
-        source_address="source",
-        created_at="2025-07-17T20:14:19.947Z",
-        updated_at="2025-07-17T20:14:19.947Z",
-    )
-
-
-def test_update_tag_use_case_start():
-    print("\n\n- Update Tag usecase")
-
-
 def test_update_tag_use_case_build(use_case, mock_tag_repo):
     assert use_case is not None
     assert use_case.tag_repository == mock_tag_repo
 
 
-def test_update_tag_use_case_execute_success(use_case, mock_tag_repo, fake_tag):
+def test_update_tag_use_case_execute_success(use_case, mock_tag_repo, sample_tags_factory):
+    fake_tag = sample_tags_factory(1, 2)[0]
+
     tag_id = 1
     tag_data = {"name": "updated name", "description": "updated description"}
 
@@ -57,3 +43,7 @@ def test_update_tag_use_case_execute_success(use_case, mock_tag_repo, fake_tag):
 
     mock_tag_repo.update_tag.assert_called_once_with(tag_id, tag_data)
     assert result == updated_tag
+
+
+def test_end():
+    print("\n\nEnd => Update Tag usecase\n")

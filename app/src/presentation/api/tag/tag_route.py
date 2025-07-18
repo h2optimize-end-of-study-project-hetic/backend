@@ -35,9 +35,6 @@ from app.src.common.exception import (
 )
 
 tag_not_found = OpenApiErrorResponseConfig(code=404, description="Tag not found", detail="Tag with ID '123' not found")
-room_not_found = OpenApiErrorResponseConfig(
-    code=404, description="Room not found", detail="Room with ID '14' not found"
-)
 tag_already_exist = OpenApiErrorResponseConfig(
     code=409, description="Tag already exists", detail="Tag with source_address '18458426' already exists"
 )
@@ -50,7 +47,7 @@ unexpected_error = OpenApiErrorResponseConfig(code=500, description="Unexpected 
 logger = logging.getLogger(__name__)
 tag_router = APIRouter(
     prefix="/tag", tags=[OpenApiTags.tag]
-)  # tags and OpenApiTags are not bind to the entity tag. It's  just the param of APIRouter
+)  # tags and OpenApiTags are not bind to the entity tag. It's just the param of APIRouter
 
 
 @tag_router.post(
@@ -58,7 +55,7 @@ tag_router = APIRouter(
     summary="Create a new tag",
     response_model=TagModelResponse,
     response_description="Details of the created tag",
-    responses=generate_responses([tag_already_exist, creation_error, room_not_found, unexpected_error]),
+    responses=generate_responses([tag_already_exist, creation_error, unexpected_error]),
     deprecated=False,
 )
 async def create_tag(
@@ -85,10 +82,6 @@ async def create_tag(
         new_tag: Tag = use_case.execute(tag_entity)
 
         return TagModelResponse(**new_tag.to_dict())
-
-    except NotFoundError as e:
-        logger.error(e)
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
     except CreationFailedError as e:
         logger.error(e)

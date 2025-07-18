@@ -7,7 +7,7 @@ from pydantic import EmailStr, HttpUrl, PostgresDsn, computed_field
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=(".env", ".env.local"), env_file_encoding="utf-8")
 
-    ENVIRONMENT: Literal["development", "production"] = "development"
+    ENVIRONMENT: Literal["development", "production", "testing"] = "development"
 
     DEBUG: bool = False
     LOG_LEVEL: str = "DEBUG"
@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     @property
     def is_debug(self) -> bool:
-        return self.DEBUG or self.ENVIRONMENT == "development"
+        return self.DEBUG or self.ENVIRONMENT in ("development", "testing")
 
     @property
     def openapi_url(self) -> str:

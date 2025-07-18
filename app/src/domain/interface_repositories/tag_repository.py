@@ -11,9 +11,6 @@ class TagRepository(ABC):
     def create_tag(self, tag: Tag) -> Tag:
         pass
 
-    @abstractmethod
-    def create_tag_with_room(self, tag: Tag, room_id: int | None) -> Tag:
-        pass
 
     @abstractmethod
     def paginate_tags(self, cursor: int | None, limit: int) -> tuple[list[Tag], int, Tag | None, Tag | None]:

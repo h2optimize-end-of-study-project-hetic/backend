@@ -17,28 +17,6 @@ def use_case(mock_tag_repo):
     return GetTagListUseCase(tag_repository=mock_tag_repo)
 
 
-@pytest.fixture
-def sample_tags_factory():
-    def _factory(start: int, end: int):
-        return [
-            Tag(
-                id=i,
-                name=f"Tag {i}",
-                description="desc",
-                source_address="addr",
-                created_at="2025-07-17T20:14:19.947Z",
-                updated_at="2025-07-17T20:14:19.947Z",
-            )
-            for i in range(start, end)
-        ]
-
-    return _factory
-
-
-def test_get_tag_list_use_case_start():
-    print("\n\n- Get Tag list usecase")
-
-
 def test_get_tag_list_use_case_build(use_case, mock_tag_repo):
     assert use_case is not None
     assert use_case.tag_repository == mock_tag_repo
@@ -175,3 +153,7 @@ def test_get_tag_list_use_case_next_cursor(use_case, mock_tag_repo, sample_tags_
     assert isinstance(result.tags, list)
     assert result.tags == sample_tags[:2]
     assert len(result.tags) == 2
+
+
+def test_end():
+    print("\n\nEnd => Get Tag list usecase\n")

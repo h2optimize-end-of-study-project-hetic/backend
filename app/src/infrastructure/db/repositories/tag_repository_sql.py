@@ -50,35 +50,6 @@ class SQLTagRepository(TagRepository):
 
         return Tag.from_dict(tag_model.model_dump())
 
-    def create_tag_with_room(self, tag: Tag, room_id: int | None) -> Tag:
-        try:
-            # if room_id:
-            # room = self.room_repository.select_room_by_id(room_id)
-            # if not room:
-            #     raise NotFoundError("Room", room_id)
-
-            tag_model = TagModel(
-                name=tag.name,
-                description=tag.description,
-                source_address=tag.source_address,
-            )
-            self.session.add(tag_model)
-            self.session.flush()
-            self.session.commit()
-            self.session.refresh(tag_model)
-        except IntegrityError as e:
-            self.session.rollback()
-            if isinstance(e.orig, errors.UniqueViolation):
-                raise AlreadyExistsError("Tag", "source_address", tag_model.source_address) from e
-            logger.error(e)
-            raise
-        except Exception as e:
-            self.session.rollback()
-            logging.error(e)
-            raise CreationFailedError("Tag", str(e)) from e
-
-        return Tag.from_dict(tag_model.model_dump())
-
     def paginate_tags(self, cursor: int | None, limit: int) -> tuple[list[Tag], int, Tag | None, Tag | None]:
         self.session.exec(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"))
 

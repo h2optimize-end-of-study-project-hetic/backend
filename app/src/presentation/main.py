@@ -57,11 +57,10 @@ app.mount("/static", StaticFiles(directory="app/src/presentation/static"), name=
 
 @app.get("/")
 async def root():
-    if 1:
-        return {
-            "title": settings.PROJECT_NAME,
-            "version": settings.VERSION,
-            "env": settings.ENVIRONMENT,
-            "log_level": settings.LOG_LEVEL,
-            "debug": app.debug,
-        }
+    return {
+        "title": settings.PROJECT_NAME,
+        "version": settings.VERSION,
+        "env": settings.ENVIRONMENT,
+        "log_level": settings.LOG_LEVEL,
+        "debug": app.debug,
+    }

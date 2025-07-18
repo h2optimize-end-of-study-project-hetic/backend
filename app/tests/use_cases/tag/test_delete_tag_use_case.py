@@ -16,10 +16,6 @@ def use_case(mock_tag_repo):
     return DeleteTagUseCase(tag_repository=mock_tag_repo)
 
 
-def test_delete_tag_use_case_start():
-    print("\n\n- Delete Tag usecase")
-
-
 def test_delete_tag_use_case_build(use_case, mock_tag_repo):
     assert use_case is not None
     assert use_case.tag_repository == mock_tag_repo
@@ -43,3 +39,7 @@ def test_delete_tag_use_case_execute_failure(use_case, mock_tag_repo):
 
     mock_tag_repo.delete_tag.assert_called_once_with(tag_id)
     assert result is False
+
+
+def test_end():
+    print("\n\nEnd => Delete Tag usecase\n")

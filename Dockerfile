@@ -25,7 +25,19 @@ COPY ./app /code/app
 
 EXPOSE 80
 
-CMD ["/code/app/init_db.sh", "uvicorn", "app.src.presentation.main:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
+CMD ["/code/app/init_db.sh", "uvicorn", "app.src.presentation.main:app", "--host", "0.0.0.0", "--port", "80", "--reload", "--reload-dir", "/code/app/src"]
+
+
+
+FROM base AS testing
+
+RUN pip install -e ".[dev]"
+
+COPY ./app /code/app
+
+EXPOSE 80
+
+CMD ["/code/app/init_db.sh", "uvicorn", "app.src.presentation.main:app", "--host", "0.0.0.0", "--port", "80"]
 
 
 
