@@ -51,35 +51,36 @@ ascii:
 help:
 	$(MAKE) ascii
 	@echo -e "\e[1;34m#  Commandes principales pour lancer le projet\e[0m"
-	@echo -e "\e[36m  make build         \e[0m => Build + start projet avec rebuild"
-	@echo -e "\e[36m  make buildd        \e[0m => Build + start projet en mode detache"
-	@echo -e "\e[36m  make start         \e[0m => Demarrage rapide (up --build)"
-	@echo -e "\e[36m  make startd        \e[0m => Demarre en detache + logs"
-	@echo -e "\e[36m  make logs          \e[0m => Logs en temps reel (backend)"
+	@echo -e "\e[36m  make build              \e[0m => Build + start projet avec rebuild"
+	@echo -e "\e[36m  make buildd             \e[0m => Build + start projet en mode detache"
+	@echo -e "\e[36m  make start              \e[0m => Demarrage rapide (up --build)"
+	@echo -e "\e[36m  make startd             \e[0m => Demarre en detache + logs"
+	@echo -e "\e[36m  make logs               \e[0m => Logs en temps reel (backend)"
 
 	@echo ""
 	@echo -e "\e[1;32m#  Backend\e[0m"
-	@echo -e "\e[36m  make buildback     \e[0m => Build image backend vers GHCR"
-	@echo -e "\e[36m  make runback       \e[0m => Run image backend localement"
-	@echo -e "\e[36m  make pushback      \e[0m => Push image backend vers GHCR"
+	@echo -e "\e[36m  make buildback          \e[0m => Build image backend vers GHCR"
+	@echo -e "\e[36m  make runback            \e[0m => Run image backend localement"
+	@echo -e "\e[36m  make pushback           \e[0m => Push image backend vers GHCR"
 	@echo -e "\e[36m  make pipinstall LIB=pkg \e[0m => Installer une lib Python dans le conteneur"
+	@echo -e "\e[0m                               /!\ METTRE A JOUR 'app\pyproject.toml'"
 
 	@echo ""
 	@echo -e "\e[1;31m#  Maintenance\e[0m"
-	@echo -e "\e[36m  make cleanall      \e[0m => Supprime containers + volumes"
-	@echo -e "\e[36m  make restartd      \e[0m => Clean + Build + Logs"
+	@echo -e "\e[36m  make cleanall           \e[0m => Supprime containers + volumes"
+	@echo -e "\e[36m  make restartd           \e[0m => Clean + Build + Logs"
 	
 	@echo ""
 	@echo -e "\e[35m-------------------------------------------------------------------------------\e[0m"
 	@echo -e "\e[1;31m NEXT STEP RECOMMAND : make startd\e[0m"
 	@echo -e ""
-	@echo -e "\e[34m API :               \e[0m\e[32mhttp://localhost:$(BACKEND_EXT_PORT)\e[0m"
-	@echo -e "\e[34m API Documentation : \e[0m\e[32mhttp://localhost:$(BACKEND_EXT_PORT)/docs\e[0m"
+	@echo -e "\e[34m API :                    \e[0m\e[32mhttp://localhost:$(BACKEND_EXT_PORT)\e[0m"
+	@echo -e "\e[34m API Documentation :      \e[0m\e[32mhttp://localhost:$(BACKEND_EXT_PORT)/docs\e[0m"
 	@echo -
 
 
 start :
-	docker compose --env-file $(ENV_FILE) --env-file $(ENV_LOCAL_FILE) up
+	docker compose --env-file $(ENV_FILE) --env-file $(ENV_LOCAL_FILE) up -d
 
 logs : 
 	docker compose logs -f
@@ -107,10 +108,11 @@ restartd:
 	$(MAKE) logs
 
 pipinstall:
-	docker compose exec backend sh -c "pip install $(LIB) && pip freeze > /code/requirements.txt"
+	@echo -e "\e[1;31m/!\ METTRE A JOUR 'app\pyproject.toml'\e[0m"
+	docker compose exec backend sh -c "pip install $(LIB) && pip freeze > /code/app/requirements.txt"
 
 lint:
-	docker compose exec backend sh -c "ruff check /code/app/src/"
+	docker compose exec backend sh -c "ruff check"
 
 buildback :
 	docker build --build-arg BACKEND_INT_PORT=$(BACKEND_INT_PORT) --build-arg ENVIRONMENT=$(ENVIRONMENT) -t ghcr.io/$(GHCR_LOCATION)/$(BACKEND_PACKAGE_NAME):v$(BACKEND_PACKAGE_VERSION) -f ./Dockerfile
@@ -120,5 +122,12 @@ runback :
 
 pushback :
 	docker push ghcr.io/$(GHCR_LOCATION)/$(BACKEND_PACKAGE_NAME):v$(BACKEND_PACKAGE_VERSION)
+
+
+test:
+	docker compose exec backend sh -c "ptw . -vvs"
+
+coverage:
+	docker compose exec backend sh -c "pytest -v --cov=app/src --cov-report=term-missing --cov-report=html"
 
 

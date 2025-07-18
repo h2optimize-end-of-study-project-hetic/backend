@@ -1,0 +1,88 @@
+[project]
+name = "H2Optimize"
+version = "0.0.1"
+description = "API backend for H2Optimize"
+requires-python = ">=3.11"
+dependencies = [
+    "alembic",
+    "email_validator",
+    "fastapi",
+    "gunicorn",
+    "psycopg2-binary",
+    "pydantic",
+    "pydantic-settings",
+    "python-dateutil",
+    "python-dotenv",
+    "sqlalchemy",
+    "sqlmodel",
+    "uvicorn[standard]"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "httpx",
+    "pytest-cov",
+    "pytest-watcher",
+    "ruff"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app/src"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+src = ["app"]
+exclude = ["venv", ".venv", "__pycache__", "migrations", ".ruff_cache"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "T20", "RUF"]
+ignore = ["E501", "I001"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint.isort]
+known-third-party = ["fastapi", "pydantic", "sqlalchemy", "uvicorn", "sqlmodel"]
+known-first-party = ["app"]
+combine-as-imports = true
+force-sort-within-sections = false
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder"]
+
+
+[tool.pytest.ini_options]
+minversion = "8.4"
+addopts = "-ra --import-mode=importlib --cov=app/src --cov-report=term-missing"
+testpaths = ["app/tests"]
+asyncio_mode = "auto"
+pythonpath = ["/code"]
+
+[tool.coverage.run]
+branch = true
+source = ["app/src"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "/code/app/.coverage"
+title = "Rapport Coverage H2Optimize"
+show_contexts = true
+
+[tool.pytest-watcher]
+now = true
+delay = 0.1
+patterns = ["*.py"]

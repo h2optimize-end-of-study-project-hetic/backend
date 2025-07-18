@@ -15,7 +15,7 @@ services:
       - .env.local
     volumes:
       - ./app:/code/app
-      - ./requirements.txt:/code/requirements.txt
+      - ./app/requirements.txt:/code/app/requirements.txt
 
 networks:
   postgres_net:

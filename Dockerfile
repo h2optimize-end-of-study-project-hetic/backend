@@ -1,42 +1,42 @@
 FROM python:3.11-slim-bookworm AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
 WORKDIR /code
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc libpq-dev curl \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gcc libpq-dev curl build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ./requirements.txt /code/requirements.txt
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt 
+RUN pip install --upgrade pip
+
+COPY /app/pyproject.toml /code/
+RUN pip install .
+
+
+
+FROM base AS development
+
+RUN pip install -e ".[dev]"
 
 COPY ./app /code/app
 
-RUN adduser --disabled-password --no-create-home appuser
-
-
-
-# Development
-FROM base AS development
-
-RUN chmod +x /code/app/src/init_db.sh
-
 EXPOSE 80
 
-CMD ["/code/app/src/init_db.sh", "uvicorn", "app.src.main:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
+CMD ["/code/app/init_db.sh", "uvicorn", "app.src.presentation.main:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
 
 
 
-# Production
 FROM base AS production
 
-RUN chmod +x /code/app/src/init_db.sh
+RUN adduser --disabled-password --no-create-home appuser
 
-EXPOSE 80
+COPY --chown=appuser:appuser ./app /code/app
 
 USER appuser
 
-CMD ["/code/app/src/init_db.sh", "gunicorn", "app.src.main:app", "-c", "/code/app/src/gunicorn.conf.py"]
+EXPOSE 80
+
+CMD ["/code/app/init_db.sh", "gunicorn", "app.src.presentation.main:app", "-c", "/code/app/gunicorn.conf.py"]

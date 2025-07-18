@@ -28,7 +28,7 @@ class TagRepository(ABC):
         pass
 
     @abstractmethod
-    def select_tag_by_id(self, tag_id: int) -> Tag | None:
+    def select_tag_by_id(self, tag_id: int) -> Tag:
         pass
 
     @abstractmethod
@@ -44,5 +44,5 @@ class TagRepository(ABC):
         pass
 
     @abstractmethod
-    def get_tag_by_position(self, position: int) -> Tag | None:
+    def get_tag_by_position(self, position: int) -> Tag:
         pass

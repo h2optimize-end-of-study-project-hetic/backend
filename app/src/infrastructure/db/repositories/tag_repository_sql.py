@@ -85,7 +85,13 @@ class SQLTagRepository(TagRepository):
         tags = self.select_tags(cursor, limit)
         total = self.count_all_tags()
         first_tag = self.get_tag_by_position(0)
-        last_tag = self.get_tag_by_position(max((-1 * limit), (-1 * total)))
+        last_page_offset = (
+            (total // (limit - 1)) * (limit - 1)
+            if total % (limit - 1) != 0
+            else ((total // (limit - 1)) - 1) * (limit - 1)
+        )
+
+        last_tag = self.get_tag_by_position(last_page_offset)
 
         return tags, total, first_tag, last_tag
 
@@ -111,14 +117,12 @@ class SQLTagRepository(TagRepository):
         result = self.session.exec(statement).first()
         return Tag(**result.model_dump()) if result else None
 
-    def select_tag_by_id(self, tag_id: int) -> Tag | None:
-        statement = select(TagModel).where(TagModel.id == tag_id)
-        result = self.session.exec(statement).first()
+    def select_tag_by_id(self, tag_id: int) -> Tag:
+        tag_model = self.session.get(TagModel, tag_id)
+        if not tag_model:
+            raise NotFoundError("Tag", tag_id)
 
-        if not result:
-            return None
-
-        return Tag(**result.model_dump())
+        return Tag(**tag_model.model_dump())
 
     def update_tag(self, tag_id: int, tag_data: dict) -> Tag:
         try:
@@ -187,9 +191,9 @@ class SQLTagRepository(TagRepository):
 
     def select_tag_by_src_address(self, tag_src_address: str) -> Tag:
         statement = select(TagModel).where(TagModel.source_address == tag_src_address)
-        result = self.session.exec(statement).first()
+        tag_model = self.session.exec(statement).first()
 
-        if not result:
-            return None
+        if not tag_model:
+            raise NotFoundError("Tag", tag_src_address, "source_address")
 
-        return Tag(**result.model_dump())
+        return Tag(**tag_model.model_dump())

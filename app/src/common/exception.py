@@ -8,13 +8,15 @@ class NotFoundError(CustomError):
 
     Attributes:
         resource (str): The name of the resource (Tag, User, Room)
-        identifier (str | int): The ID of the missing resource
+        value (str | int): The value of the missing resource
+        key (str): The name of the key to compare ("source_address")
     """
 
-    def __init__(self, resource: str, identifier: str | int):
-        super().__init__(f"{resource} with ID '{identifier}' not found")
+    def __init__(self, resource: str, value: str | int, key: str | int = "ID"):
+        super().__init__(f"{resource} with {key} '{value}' not found")
         self.resource = resource
-        self.identifier = identifier
+        self.key = key
+        self.value = value
 
 
 class AlreadyExistsError(CustomError):
