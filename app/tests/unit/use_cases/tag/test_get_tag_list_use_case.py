@@ -2,7 +2,6 @@ import pytest
 
 from unittest.mock import Mock
 
-from app.src.domain.entities.tag import Tag
 from app.src.common.exception import DecodedFailedError
 from app.src.use_cases.tag.get_tag_list_use_case import GetTagListUseCase, PaginatedTag
 

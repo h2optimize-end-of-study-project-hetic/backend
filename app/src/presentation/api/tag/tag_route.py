@@ -46,7 +46,7 @@ unexpected_error = OpenApiErrorResponseConfig(code=500, description="Unexpected 
 
 logger = logging.getLogger(__name__)
 tag_router = APIRouter(
-    prefix="/tag", tags=[OpenApiTags.tag]
+    prefix=f"/{OpenApiTags.tag.value}", tags=[OpenApiTags.tag]
 )  # tags and OpenApiTags are not bind to the entity tag. It's just the param of APIRouter
 
 
@@ -83,13 +83,13 @@ async def create_tag(
 
         return TagModelResponse(**new_tag.to_dict())
 
-    except CreationFailedError as e:
-        logger.error(e)
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=str(e)) from e
-
     except AlreadyExistsError as e:
         logger.error(e)
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
+
+    except CreationFailedError as e:
+        logger.error(e)
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=str(e)) from e
 
     except Exception as e:
         logger.error(e)

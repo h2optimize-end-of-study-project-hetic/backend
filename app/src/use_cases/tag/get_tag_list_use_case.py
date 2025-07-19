@@ -1,3 +1,4 @@
+import logging
 import math
 from dataclasses import dataclass
 
@@ -5,13 +6,14 @@ from app.src.domain.entities.tag import Tag
 from app.src.common.utils import decode, encode
 from app.src.domain.interface_repositories.tag_repository import TagRepository
 
+logger = logging.getLogger(__name__)
 
 @dataclass
 class PaginatedTag:
     tags: list[Tag]
-    total: int
-    chunk_size: int
-    chunk_count: int
+    total: int| None
+    chunk_size: int| None
+    chunk_count: int | None
     current_cursor: str | None
     first_cursor: str | None
     last_cursor: str | None
@@ -47,7 +49,7 @@ class GetTagListUseCase:
             total=total,
             chunk_size=len(tags),
             chunk_count=chunk_count,
-            current_cursor=cursor if cursor else encode(first_cursor) if first_cursor else None,
+            current_cursor=encode({"id": decoded_cursor}) if decoded_cursor else encode(first_cursor) if first_cursor else None,
             first_cursor=encode(first_cursor) if first_cursor else None,
             last_cursor=encode(last_cursor) if last_cursor else None,
             next_cursor=encode(next_cursor) if next_cursor else None,

@@ -36,6 +36,10 @@ app = FastAPI(
             "name": OpenApiTags.user,
             "description": "Gérer les utilisateurs (création, modification, suppression).",
         },
+        {
+            "name": OpenApiTags.tool,
+            "description": "Données relatif au service",
+        },
     ],
     servers=settings.SERVERS,
 )
@@ -54,13 +58,3 @@ app.include_router(router, prefix=settings.API_V1_STR)
 
 app.mount("/static", StaticFiles(directory="app/src/presentation/static"), name="static")
 
-
-@app.get("/")
-async def root():
-    return {
-        "title": settings.PROJECT_NAME,
-        "version": settings.VERSION,
-        "env": settings.ENVIRONMENT,
-        "log_level": settings.LOG_LEVEL,
-        "debug": app.debug,
-    }

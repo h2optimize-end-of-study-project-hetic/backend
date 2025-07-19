@@ -8,7 +8,6 @@ from sqlalchemy.exc import IntegrityError
 from app.src.domain.entities.tag import Tag
 from app.src.infrastructure.db.models.tag_model import TagModel
 from app.src.domain.interface_repositories.tag_repository import TagRepository
-from app.src.domain.interface_repositories.room_repository import RoomRepository
 from app.src.common.exception import (
     AlreadyExistsError,
     CreationFailedError,
@@ -22,9 +21,8 @@ logger = logging.getLogger(__name__)
 
 
 class SQLTagRepository(TagRepository):
-    def __init__(self, session: Session, room_repository: RoomRepository):
+    def __init__(self, session: Session):
         self.session = session
-        self.room_repository = room_repository
 
     def create_tag(self, tag: Tag) -> Tag:
         try:
@@ -45,7 +43,7 @@ class SQLTagRepository(TagRepository):
             raise
         except Exception as e:
             self.session.rollback()
-            logging.error(e)
+            logger.error(e)
             raise CreationFailedError("Tag", str(e)) from e
 
         return Tag.from_dict(tag_model.model_dump())
@@ -121,7 +119,7 @@ class SQLTagRepository(TagRepository):
         except IntegrityError as e:
             self.session.rollback()
             if isinstance(e.orig, errors.UniqueViolation):
-                raise AlreadyExistsError("Tag", "source_address", tag_model.source_address) from e
+                raise AlreadyExistsError("Tag", "source_address", tag_data["source_address"]) from e
             elif isinstance(e.orig, errors.ForeignKeyViolation):
                 constraint_name = getattr(e.orig.diag, "constraint_name", None)
                 table_name = getattr(e.orig.diag, "table_name", None)
@@ -130,7 +128,7 @@ class SQLTagRepository(TagRepository):
             raise
         except Exception as e:
             self.session.rollback()
-            logging.error(e)
+            logger.error(e)
             raise UpdateFailedError("Tag", str(e)) from e
 
     def delete_tag(self, tag_id: int) -> bool:

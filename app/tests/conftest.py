@@ -1,5 +1,6 @@
 import logging
 import pytest
+import builtins
 
 from fastapi.testclient import TestClient
 from dateutil.parser import parse as parse_datetime
@@ -8,7 +9,18 @@ from app.src.presentation.main import app
 from app.src.domain.entities.tag import Tag
 from app.src.presentation.core.config import settings
 
+
 logger = logging.getLogger(__name__)
+
+original_print = print
+
+def print(*args, **kwargs):  # noqa: A001
+    text = " ".join(str(arg) for arg in args)
+    colored_text = f"\033[1;34m{text}\033[0m"
+    original_print(colored_text, **kwargs)
+
+
+builtins.print = print
 
 @pytest.fixture(autouse=True, scope="session")
 def disable_info_logs_for_tests():
@@ -22,10 +34,13 @@ def disable_info_logs_for_tests():
 
     for logger_name in logging.root.manager.loggerDict:
         logging.getLogger(logger_name).setLevel(logging.WARNING)
-        
+
 
 @pytest.fixture(scope="session")
 def client():
+    """
+    Fournit un client TestClient FastAPI lié à la base de test.
+    """
     with TestClient(app) as c:
         yield c
 
@@ -34,8 +49,9 @@ def client():
 def sample_tags_factory():
     """
     Factory pour générer une liste de Tags de test.
-    Utilisation : sample_tags_factory(start, end)
+    Usage : sample_tags_factory(start, end)
     """
+
     def _factory(start: int, end: int):
         return [
             Tag(
@@ -48,4 +64,5 @@ def sample_tags_factory():
             )
             for i in range(start, end)
         ]
+
     return _factory

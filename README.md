@@ -82,26 +82,83 @@ docker compose exec backend sh -c "pip install $(LIB) && pip freeze > /code/app/
 Permet seulement d’installer la dépendance dans le conteneur et de mettre à jour le `requirements.txt`, mais ce n’est **pas suffisant** pour gérer proprement les dépendances du projet.
 
 
-## Test
+## Migrations
+
+### Configuration 
+
+```ini
+[alembic]
+
+script_location = %(here)s/src/infrastructure/migrations
+prepend_sys_path = %(here)s/../.
+path_separator = os
+sqlalchemy.url = postgresql://admin:Changeme!1@postgres/app
+
+...
+```
+
+Configurer app/src/infrastructure/migrations/env.py pour qu’il puisse générer automatiquement les migrations
+
+```py
+# app/src/infrastructure/migrations/env.py
+# Importer les models
+from app.src.infrastructure.db.models.tag_model import TagModel
+# Cibler les metadata
+target_metadata = SQLModel.metadata
+```
+
+Générer automatiquement un fichier de migration a partir de SQLModel
+
+```
+root@708b091e98e1:/code/app # alembic revision --autogenerate -m'test'
+>>> INFO  [alembic.autogenerate.compare] Detected type change from TIMESTAMP(timezone=True) to DateTime() on 'tag.updated_at'
+>>> Generating
+>>> /code/app/src/infrastructure/migrations/versions/30ccca2a5199_test.py ...  done
+```
 
 
+## Tests
+
+**Executer tout les tests**
+
+```bash
 pytest app/tests -vvs
+```
 
-pytest app/tests -ra -vvs --cov=app 
+**Executer les tests d'intégration**
 
+```bash
+pytest app/tests/integration -vvs
+```
 
-pytest app/tests -ra -vvs --cov=app --cov-branch --cov-report=term-missing --cov-report=html
+**Executer les tests unitaire**
 
+```bash
+pytest app/tests/unit -vvs
+```
 
-pytest --cov=app/src --cov-report=term-missing
+### Couverture
 
+**Executer tout les tests avec la couverture**
 
-pytest app/tests/presentation/test_tag_route.py
+```bash
+pytest app/tests -vvs --cov=app 
+```
 
+**Executer tout les tests avec la couverture et le rapport**
 
-ptw . -vvs
+```bash
+pytest app/tests -vvs --cov=app --cov-report=html
+```
 
-pytest -vv --cov=app/src --cov-branch --cov-report=term-missing --cov-report=html
+### Watch mode
+
+Remplacer `pytest` par `ptw`
+
+Disclaimer : pytest-watcher est aussi observateur que Daredevil
+
+---
+
 
 
 Lancement du projet sans docker 
