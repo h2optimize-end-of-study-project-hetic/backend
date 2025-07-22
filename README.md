@@ -79,7 +79,7 @@ make startd
 
 ---
 
-### 📖 Autres commandes utiles
+### Autres commandes utiles
 
 ```bash
 make help
