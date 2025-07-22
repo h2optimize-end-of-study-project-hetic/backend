@@ -1,5 +1,7 @@
 from enum import Enum
 
+
 class OpenApiTags(Enum):
-    tags = "Tags"
-    users = "Users"
+    tag = "tag"
+    user = "user"
+    tool = "tool"

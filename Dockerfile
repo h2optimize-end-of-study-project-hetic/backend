@@ -1,15 +1,54 @@
-FROM python:3.11.13-slim-bookworm
+FROM python:3.11-slim-bookworm AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
 WORKDIR /code
 
-COPY ./requirements.txt /code/requirements.txt
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gcc libpq-dev curl build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN pip install --upgrade pip
+
+COPY /app/pyproject.toml /code/
+RUN pip install .
+
+
+
+FROM base AS development
+
+RUN pip install -e ".[dev]"
 
 COPY ./app /code/app
 
 EXPOSE 80
 
-CMD ["fastapi", "run", "./app/main.py", "--port", "80", "--reload"]
+CMD ["/code/app/init_db.sh", "uvicorn", "app.src.presentation.main:app", "--host", "0.0.0.0", "--port", "80", "--reload", "--reload-dir", "/code/app/src"]
 
 
+
+FROM base AS testing
+
+RUN pip install -e ".[dev]"
+
+COPY ./app /code/app
+
+EXPOSE 80
+
+CMD ["/code/app/init_db.sh", "uvicorn", "app.src.presentation.main:app", "--host", "0.0.0.0", "--port", "80"]
+
+
+
+FROM base AS production
+
+RUN adduser --disabled-password --no-create-home appuser
+
+COPY --chown=appuser:appuser ./app /code/app
+
+USER appuser
+
+EXPOSE 80
+
+CMD ["/code/app/init_db.sh", "gunicorn", "app.src.presentation.main:app", "-c", "/code/app/gunicorn.conf.py"]

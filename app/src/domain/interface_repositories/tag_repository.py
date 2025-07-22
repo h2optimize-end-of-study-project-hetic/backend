@@ -1,7 +1,7 @@
-from typing import List, Optional
 from abc import ABC, abstractmethod
 
 from app.src.domain.entities.tag import Tag
+
 
 class TagRepository(ABC):
     @abstractmethod
@@ -9,7 +9,15 @@ class TagRepository(ABC):
         pass
 
     @abstractmethod
-    def select_tags(self, offset: Optional[int] = None, limit: Optional[int] = None) -> List[Optional[Tag]]:
+    def paginate_tags(self, cursor: int | None, limit: int) -> tuple[list[Tag], int, Tag | None, Tag | None]:
+        pass
+
+    @abstractmethod
+    def select_tags(self, offset: int | None = None, limit: int | None = None) -> list[Tag | None]:
+        pass
+
+    @abstractmethod
+    def count_all_tags(self) -> int:
         pass
 
     @abstractmethod
@@ -21,9 +29,13 @@ class TagRepository(ABC):
         pass
 
     @abstractmethod
-    def update_tag(self, tag_id: int) -> Tag:
+    def update_tag(self, tag_id: int, tag_data: dict) -> Tag:
         pass
 
     @abstractmethod
     def delete_tag(self, tag_id: int) -> bool:
+        pass
+
+    @abstractmethod
+    def get_tag_by_position(self, position: int) -> Tag:
         pass

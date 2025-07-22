@@ -1,13 +1,15 @@
-from typing import Optional
 from datetime import datetime
-from sqlmodel import SQLModel, Field
+
+from sqlalchemy import text
+from sqlmodel import Field, SQLModel
+
 
 class TagModel(SQLModel, table=True):
     __tablename__ = "tag"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str
-    description: Optional[str] = None
-    source_address: str = Field(unique=True)
-    created_at: Optional[datetime] = Field(default_factory=datetime.now)
-    updated_at: Optional[datetime] = None
+    id: int | None = Field(default=None, primary_key=True)
+    name: str | None = Field(default=None)
+    description: str | None = Field(default=None)
+    source_address: str | None = Field(default=None, unique=True)
+    created_at: datetime | None = Field(default=None, nullable=True, sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")})
+    updated_at: datetime | None = Field(default=None, nullable=True)

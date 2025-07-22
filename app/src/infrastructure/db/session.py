@@ -1,13 +1,11 @@
-from contextlib import contextmanager
+from collections.abc import Generator
+
 from sqlmodel import Session, create_engine
 
+from app.src.presentation.core.config import settings
 
-DATABASE_URL = "postgresql+psycopg2://admin:Changeme!1@postgres:5432/app"
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(settings.database_url.encoded_string(), echo=True)
 
-def get_session():
-    session = Session(engine)
-    try:
+def get_session() -> Generator[Session, None, None]:
+    with Session(engine) as session:
         yield session
-    finally:
-        session.close()
