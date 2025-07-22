@@ -1,7 +1,6 @@
 import pytest
 from unittest.mock import Mock
 
-from app.src.domain.entities.tag import Tag
 from app.src.use_cases.tag.get_tag_by_id_use_case import GetTagByIdUseCase
 from app.src.domain.interface_repositories.tag_repository import TagRepository
 

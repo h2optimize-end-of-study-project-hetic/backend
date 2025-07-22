@@ -38,3 +38,4 @@ def update_tag_use_case(tag_repository: TagRepository = tag_repo_dep) -> UpdateT
 
 def delete_tag_use_case(tag_repository: TagRepository = tag_repo_dep) -> DeleteTagUseCase:
     return DeleteTagUseCase(tag_repository)
+
