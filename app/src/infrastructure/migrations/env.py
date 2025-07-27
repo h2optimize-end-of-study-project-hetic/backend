@@ -7,6 +7,8 @@ from sqlmodel import SQLModel
 from alembic import context
 
 from app.src.infrastructure.db.models.tag_model import TagModel
+from app.src.infrastructure.db.models.room_model import RoomModel
+from app.src.infrastructure.db.models.building_model import BuildingModel 
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
