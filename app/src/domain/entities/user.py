@@ -48,4 +48,5 @@ class User:
         for field in ["created_at", "updated_at", "deleted_at"]:
             if data[field]:
                 data[field] = data[field].isoformat()
+        
         return data
