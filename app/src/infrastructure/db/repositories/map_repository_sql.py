@@ -28,7 +28,7 @@ class SQLMapRepository(MapRepository):
         try:
             map_model = MapModel(
                 building_id=map.building_id,
-                filename=map.filename,
+                file_name=map.file_name,
                 path=map.path,
                 width=map.width,
                 length=map.length,
@@ -53,8 +53,8 @@ class SQLMapRepository(MapRepository):
     def paginate_maps(self, cursor: int | None, limit: int) -> tuple[list[Map], int, Map | None, Map | None]:
         self.session.exec(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"))
 
-        maps = self.select_mapss(cursor, limit)
-        total = self.count_all_mapss()
+        maps = self.select_maps(cursor, limit)
+        total = self.count_all_maps()
         first_map = self.get_map_by_position(0)
         last_page_offset = (
             (total // (limit - 1)) * (limit - 1)
@@ -160,11 +160,12 @@ class SQLMapRepository(MapRepository):
             logger.error(e)
             raise DeletionFailedError("Map", str(e)) from e
 
-    # def select_map_by_src_address(self, map_src_address: str) -> Map:
-    #     statement = select(MapModel).where(MapModel.source_address == map_src_address)
-    #     map_model = self.session.exec(statement).first()
+    def select_map_by_src_address(self, map_src_address: str) -> Map:
+        pass
+        # statement = select(MapModel).where(MapModel.source_address == map_src_address)
+        # map_model = self.session.exec(statement).first()
 
-    #     if not map_model:
-    #         raise NotFoundError("Map", map_src_address, "source_address")
+        # if not map_model:
+        #     raise NotFoundError("Map", map_src_address, "source_address")
 
-    #     return Map(**map_model.model_dump())
+        # return Map(**map_model.model_dump())

@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import text
 from sqlmodel import Field, SQLModel
+from sqlalchemy import Column, TIMESTAMP, JSON, text
 
 
 class MapModel(SQLModel, table=True):
@@ -9,7 +10,7 @@ class MapModel(SQLModel, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     building_id: int |None = Field(default=None)
-    filename: str | None = Field(default=None)
+    file_name: str | None = Field(default=None)
     path: str | None = Field(default=None)
     width: int | None = Field(default=None)
     length: int | None = Field(default=None)

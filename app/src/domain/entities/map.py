@@ -7,7 +7,7 @@ from dateutil.parser import parse as parse_datetime
 class Map:
     id: int | None
     building_id : int | None
-    filename: str
+    file_name: str
     path: str
     width: int | None
     length : int | None
@@ -26,7 +26,7 @@ class Map:
         return Map(
             id=data.get("id"),
             building_id=data.get("building_id"),
-            filename=data["filename"],
+            file_name=data["file_name"],
             path=data.get("path"),
             width=data.get("width"),
             length=data.get("length"),
