@@ -159,13 +159,3 @@ class SQLMapRepository(MapRepository):
             self.session.rollback()
             logger.error(e)
             raise DeletionFailedError("Map", str(e)) from e
-
-    def select_map_by_src_address(self, map_src_address: str) -> Map:
-        pass
-        # statement = select(MapModel).where(MapModel.source_address == map_src_address)
-        # map_model = self.session.exec(statement).first()
-
-        # if not map_model:
-        #     raise NotFoundError("Map", map_src_address, "source_address")
-
-        # return Map(**map_model.model_dump())

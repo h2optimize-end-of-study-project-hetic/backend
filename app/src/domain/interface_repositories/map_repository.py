@@ -25,10 +25,6 @@ class MapRepository(ABC):
         pass
 
     @abstractmethod
-    def select_map_by_src_address(self, map_src_address: str) -> Map:
-        pass
-
-    @abstractmethod
     def update_map(self, map_id: int, map_data: dict) -> Map:
         pass
 
