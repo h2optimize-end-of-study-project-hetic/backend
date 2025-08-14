@@ -1,23 +1,61 @@
 from datetime import datetime
+from typing import Optional
+from sqlmodel import SQLModel, Field
+from sqlalchemy import Column, TIMESTAMP, text, Enum as PgEnum
+import enum
 
-from app.src.domain.entities.role import Role
-from sqlalchemy import text
-from sqlmodel import Field, SQLModel
+class RoleEnum(str, enum.Enum):
+    admin = "admin"
+    staff = "staff"
+    technician = "technician"
+    intern = "intern"
+    guest = "guest"
 
 class UserModel(SQLModel, table=True):
-    __tablename__ = "user"
+    tablename = "user"
 
-    id: int | None = Field(default=None, primary_key=True)
-    email: str = Field(index=True, unique=True)
-    password: str
-    salt: str
-    secret_2fa: str | None = Field(default=None)
-    firstname: str
-    lastname: str
-    role: str = Field(default=Role.GUEST)
-    phone_number: str | None = Field(default=None)
-    is_active: bool = Field(default=True)
-    is_delete: bool = Field(default=False)
-    created_at: datetime | None = Field(default=None, nullable=True, sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")})
-    updated_at: datetime | None = Field(default=None, nullable=True)
-    deleted_at: datetime | None = Field(default=None, nullable=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    email: str = Field(..., unique=True, nullable=False)
+    salt: str = Field(..., nullable=False)
+    password: str = Field(..., nullable=False)
+    secret_2fa: Optional[str] = Field(default=None)
+
+    role: RoleEnum = Field(
+        sa_column=Column(
+            PgEnum(RoleEnum, name="role", create_type=False),
+            server_default="guest",
+            nullable=False
+        )
+    )
+
+    firstname: str = Field(..., nullable=False)
+    lastname: str = Field(..., nullable=False)
+    phone_number: Optional[str] = Field(default=None)
+    is_active: bool = Field(default=True, nullable=False)
+    is_delete: bool = Field(default=False, nullable=False)
+
+    created_at: datetime = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=True),
+            server_default=text("CURRENT_TIMESTAMP"),
+            nullable=False,
+        ),
+    )
+
+    updated_at: Optional[datetime] = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=True),
+            nullable=True,
+        ),
+    )
+
+    deleted_at: Optional[datetime] = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=True),
+            nullable=True,
+        ),
+    )
