@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 tool_router = APIRouter(prefix=f"/{OpenApiTags.tool.value}", tags=[OpenApiTags.tool])
 
-
 @tool_router.get(
     "",
     summary="Retrieve a list of info",
