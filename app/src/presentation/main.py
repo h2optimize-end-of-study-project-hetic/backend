@@ -40,6 +40,10 @@ app = FastAPI(
             "name": OpenApiTags.tool,
             "description": "Données relatif au service",
         },
+        {
+            "name": OpenApiTags.room,
+            "description": "Gestion des salle au sein des organisations",
+        },
     ],
     servers=settings.SERVERS,
 )
