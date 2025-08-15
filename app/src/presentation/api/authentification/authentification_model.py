@@ -1,38 +1,32 @@
 from datetime import datetime
-from typing import Optional
-from app.src.infrastructure.db.models.user_model import RoleEnum
 from pydantic import BaseModel
+
+from app.src.domain.entities.role import Role
 
 class Token(BaseModel):
     access_token: str
     token_type: str
 
-# class User(BaseModel):
-#     id: int
-#     firstname: str
-#     lastname: str
-#     email: str
-#     role: str
-#     disabled: bool
-
-class UserInDB(User):
-    hashed_password: str
 
 class User(BaseModel):
     id: int
     email: str
     firstname: str
     lastname: str
-    phone_number: Optional[str] = None
-    role: RoleEnum
+    phone_number: str | None = None
+    role: Role = Role.guest.value
     is_active: bool
     is_delete: bool
     created_at: datetime
-    updated_at: Optional[datetime] = None
-    deleted_at: Optional[datetime] = None
-    password: Optional[str] = None
-    salt: Optional[str] = None
+    updated_at: datetime | None = None
+    deleted_at: datetime | None = None
+    password: str | None = None # Na pas renvoyer cette valeurs
+    salt: str | None = None # Ne pas cette valeurs
 
 
     class Config:
         from_attributes = True  # permet de créer à partir d'un SQLModel/ORM
+    
+
+class UserInDB(User):
+    hashed_password: str

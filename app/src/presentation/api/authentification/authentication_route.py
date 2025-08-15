@@ -39,9 +39,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 #     )
 #     return {"access_token": access_token, "token_type": "bearer"}
 
-@auth_router.get("/api/me", response_model=User)
 
+@auth_router.get("/api/me", response_model=User)
 async def read_users_me(
     use_case: Annotated[GetCurrentUserUseCase, Depends(get_current_user_use_case)]
 ):
-    return use_case.execute("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30")
+    return use_case.execute("ewogICJhbGciOiAiSFMyNTYiLAogICJ0eXAiOiAiSldUIgp9.ewogICJzdWIiOiAiMiIsCiAgIm5hbWUiOiAiSm9obiBEb2UiLAogICJpYXQiOiAxNzU1MjQ2NTE2Cn0.sHp1auH3Bn2-GiOnTxTGeQas4rvUTpCAJvXNrqChoZw")

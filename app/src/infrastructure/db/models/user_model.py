@@ -1,37 +1,30 @@
 from datetime import datetime
-from typing import Optional
 from sqlmodel import SQLModel, Field
 from sqlalchemy import Column, TIMESTAMP, text, Enum as PgEnum
-import enum
+from app.src.domain.entities.role import Role
 
-class RoleEnum(str, enum.Enum):
-    admin = "admin"
-    staff = "staff"
-    technician = "technician"
-    intern = "intern"
-    guest = "guest"
 
 class UserModel(SQLModel, table=True):
-    tablename = "user"
+    __tablename__ = "user"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
 
     email: str = Field(..., unique=True, nullable=False)
     salt: str = Field(..., nullable=False)
     password: str = Field(..., nullable=False)
-    secret_2fa: Optional[str] = Field(default=None)
+    secret_2fa: str | None = Field(default=None)
 
-    role: RoleEnum = Field(
+    role: Role = Field(
         sa_column=Column(
-            PgEnum(RoleEnum, name="role", create_type=False),
-            server_default="guest",
+            PgEnum(Role, name="role", create_type=False),
+            server_default=Role.guest.value,
             nullable=False
         )
     )
 
     firstname: str = Field(..., nullable=False)
     lastname: str = Field(..., nullable=False)
-    phone_number: Optional[str] = Field(default=None)
+    phone_number: str | None = Field(default=None)
     is_active: bool = Field(default=True, nullable=False)
     is_delete: bool = Field(default=False, nullable=False)
 
@@ -44,7 +37,7 @@ class UserModel(SQLModel, table=True):
         ),
     )
 
-    updated_at: Optional[datetime] = Field(
+    updated_at: datetime | None = Field(
         default=None,
         sa_column=Column(
             TIMESTAMP(timezone=True),
@@ -52,7 +45,7 @@ class UserModel(SQLModel, table=True):
         ),
     )
 
-    deleted_at: Optional[datetime] = Field(
+    deleted_at: datetime | None = Field(
         default=None,
         sa_column=Column(
             TIMESTAMP(timezone=True),

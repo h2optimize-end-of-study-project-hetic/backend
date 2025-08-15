@@ -37,7 +37,7 @@ class SQLUserRepository(UserRepository):
 
 
     def select_user_by_id(self, user_id: int) -> User:
-        user_model = self.session.get(UserModel, 1) # to remove
+        user_model = self.session.get(UserModel, user_id) # to remove
         if not user_model:
             raise NotFoundError("User", user_id)
 

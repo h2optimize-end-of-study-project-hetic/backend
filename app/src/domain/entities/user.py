@@ -12,13 +12,12 @@ class User:
     salt: str
     firstname: str
     lastname: str
-    secret_2fa: str | None = None
-    role: Role = Role.GUEST
-    phone_number: str | None = None
-    group: str | None = None
+    secret_2fa: str | None
+    phone_number: str | None
+    created_at: datetime | None
+    role: Role = Role.guest.value
     is_active: bool = True
     is_delete: bool = False
-    created_at: datetime | None = None
     updated_at: datetime | None = None
     deleted_at: datetime | None = None
 
