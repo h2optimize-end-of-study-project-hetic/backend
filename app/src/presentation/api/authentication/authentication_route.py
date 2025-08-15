@@ -1,6 +1,6 @@
 from typing import Annotated
 from app.src.presentation.dependencies import get_current_user_use_case
-from app.src.use_cases.authentification.get_current_user_use_case import GetCurrentUserUseCase
+from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
@@ -10,9 +10,9 @@ from app.src.presentation.core.config import settings
 from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig, generate_responses
 import logging
-from app.src.presentation.api.authentification.authentification_model import User
-from app.src.presentation.api.authentification.authentification_model import Token
-from app.src.presentation.api.authentification.authentification_model import UserInDB
+from app.src.presentation.api.authentication.authentication_model import User
+from app.src.presentation.api.authentication.authentication_model import Token
+from app.src.presentation.api.authentication.authentication_model import UserInDB
 
 unexpected_error = OpenApiErrorResponseConfig(code=500, description="Unexpected error", detail="Internal server error")
 
@@ -24,7 +24,7 @@ auth_router = APIRouter(prefix=f"/{OpenApiTags.auth.value}", tags=[OpenApiTags.a
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 
-# @auth_router.post("/api/login", response_model=Token)
+# @auth_router.post("/login", response_model=Token)
 # async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 #     user = authenticate_user(form_data.username, form_data.password)
 #     if not user:
@@ -40,8 +40,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 #     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@auth_router.get("/api/me", response_model=User)
+@auth_router.get("/me",
+    summary="Retrieve tag by ID",
+    response_model=User,
+    response_description="Detailed information of the requested tag"
+    )
 async def read_users_me(
+    token: Annotated[str, Depends(oauth2_scheme)],
     use_case: Annotated[GetCurrentUserUseCase, Depends(get_current_user_use_case)]
 ):
-    return use_case.execute("ewogICJhbGciOiAiSFMyNTYiLAogICJ0eXAiOiAiSldUIgp9.ewogICJzdWIiOiAiMiIsCiAgIm5hbWUiOiAiSm9obiBEb2UiLAogICJpYXQiOiAxNzU1MjQ2NTE2Cn0.sHp1auH3Bn2-GiOnTxTGeQas4rvUTpCAJvXNrqChoZw")
+    return use_case.execute(token)
+

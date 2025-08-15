@@ -7,7 +7,6 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-
 class User(BaseModel):
     id: int
     email: str
@@ -19,14 +18,7 @@ class User(BaseModel):
     is_delete: bool
     created_at: datetime
     updated_at: datetime | None = None
-    deleted_at: datetime | None = None
-    password: str | None = None # Na pas renvoyer cette valeurs
-    salt: str | None = None # Ne pas cette valeurs
-
-
-    class Config:
-        from_attributes = True  # permet de créer à partir d'un SQLModel/ORM
-    
+    deleted_at: datetime | None = None    
 
 class UserInDB(User):
     hashed_password: str

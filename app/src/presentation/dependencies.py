@@ -1,6 +1,6 @@
 from app.src.domain.interface_repositories.user_repository import UserRepository
-from app.src.infrastructure.db.repositories.user_repository import SQLUserRepository
-from app.src.use_cases.authentification.get_current_user_use_case import GetCurrentUserUseCase
+from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
+from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
 from fastapi import Depends
 from sqlmodel import Session
 

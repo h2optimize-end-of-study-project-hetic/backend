@@ -4,7 +4,7 @@ from app.src.presentation.api.map.map_route import map_router
 from app.src.presentation.api.tool.tool_route import tool_router
 from app.src.presentation.api.user.users_route import user_router
 from app.src.presentation.api.room.room_route import room_router
-from app.src.presentation.api.authentification.authentication_route import auth_router
+from app.src.presentation.api.authentication.authentication_route import auth_router
 
 router = APIRouter()
 router.include_router(tag_router)
