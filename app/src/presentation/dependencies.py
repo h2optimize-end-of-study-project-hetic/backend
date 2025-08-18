@@ -1,6 +1,7 @@
 from app.src.domain.interface_repositories.user_repository import UserRepository
 from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
+from app.src.use_cases.authentication.verify_user_use_case import VerifyUserUseCase
 from fastapi import Depends
 from sqlmodel import Session
 
@@ -53,6 +54,9 @@ user_repo_dep = Depends(user_repository)
 
 def get_current_user_use_case(user_repository: UserRepository = user_repo_dep) -> GetCurrentUserUseCase:
     return GetCurrentUserUseCase(user_repository)
+
+def get_verify_user_use_case(user_repository: UserRepository = user_repo_dep) -> VerifyUserUseCase:
+    return VerifyUserUseCase(user_repository)
 
 def get_tag_by_id_use_case(tag_repository: TagRepository = tag_repo_dep) -> GetTagByIdUseCase:
     return GetTagByIdUseCase(tag_repository)
