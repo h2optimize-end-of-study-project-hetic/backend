@@ -2,10 +2,9 @@ import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status, UploadFile, File, Form
-
-from datetime import datetime
 import shutil, os
 
+from app.src.presentation.utils.image_format import process_image
 from app.src.domain.entities.map import Map
 from app.src.presentation.core.open_api_maps import OpenApiMaps
 from app.src.use_cases.map.delete_map_use_case import DeleteMapUseCase
@@ -63,10 +62,7 @@ map_router = APIRouter(
 )
 async def create_map(
     use_case: Annotated[CreateMapUseCase, Depends(create_map_use_case)],
-    # map: Annotated[MapCreateModelRequest, Body(embed=True)],
     building_id: int = Form(...),
-    width: int = Form(...),
-    length: int = Form(...),
     file: UploadFile = File(...),
 ):
     """
@@ -81,23 +77,26 @@ async def create_map(
         # save map image
         file_name = file.filename
 
+        image_info = process_image(file)
+
+        # save in app/ folder
         PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../"))  
         maps_dir = os.path.join(PROJECT_ROOT, "maps")
-        os.makedirs(maps_dir, exist_ok=True)
+        os.makedirs(maps_dir, exist_ok=True) # create maps/ if not exist
 
         save_path = os.path.join(maps_dir, file_name)
-        print("Fichier sauvegardé dans :", save_path)
         with open(save_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
+
 
         # create entity
         map_entity = Map(
             id=None,
             building_id=building_id,
             file_name=file_name,
-            path="/code/app/maps",
-            width=width,
-            length=length,
+            path=save_path,
+            width=image_info.width,
+            length=image_info.length,
             created_at=None,
             updated_at=None,
         )
