@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status, UploadFile, File, Form
 import shutil, os
 
-from app.src.presentation.utils.image_format import process_image
+from app.src.presentation.utils.image_management import process_image, handle_map_image
 from app.src.domain.entities.map import Map
 from app.src.presentation.core.open_api_maps import OpenApiMaps
 from app.src.use_cases.map.delete_map_use_case import DeleteMapUseCase
@@ -85,6 +85,8 @@ async def create_map(
         os.makedirs(maps_dir, exist_ok=True) # create maps/ if not exist
 
         save_path = os.path.join(maps_dir, file_name)
+
+        file.file.seek(0)
         with open(save_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
@@ -198,12 +200,17 @@ async def read_map(
 )
 async def update_map(
     use_case: Annotated[UpdateMapUseCase, Depends(update_map_use_case)],
-    map: Annotated[MapUpdateModelRequest, Body(embed=True)],
+    file: Annotated[UploadFile | None, File()] = None,
     map_id: int = Path(..., ge=1, description="ID of the map to update"),
 ):
     try:
-        update_data = map.model_dump(exclude_unset=True)
-        updated_map = use_case.execute(map_id, update_data)
+        existing_map = use_case.get(map_id)
+
+        file.file.seek(0)
+        image_update = await handle_map_image(file, existing_map)
+        print(type(image_update), image_update)
+
+        updated_map = use_case.execute(map_id, image_update)
 
         return MapModelResponse(**updated_map.to_dict())
 

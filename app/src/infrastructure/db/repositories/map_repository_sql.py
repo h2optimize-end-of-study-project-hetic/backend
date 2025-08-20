@@ -159,3 +159,7 @@ class SQLMapRepository(MapRepository):
             self.session.rollback()
             logger.error(e)
             raise DeletionFailedError("Map", str(e)) from e
+
+
+    def get_map(self, map_id: int) -> Map:
+        return self.session.query(Map).filter(Map.id == map_id).first()

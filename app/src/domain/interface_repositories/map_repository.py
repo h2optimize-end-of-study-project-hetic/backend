@@ -35,3 +35,7 @@ class MapRepository(ABC):
     @abstractmethod
     def get_map_by_position(self, position: int) -> Map:
         pass
+
+    @abstractmethod
+    def get_map(self, position: int) -> Map:
+        pass

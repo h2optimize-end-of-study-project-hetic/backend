@@ -8,3 +8,8 @@ class UpdateMapUseCase:
 
     def execute(self, map_id: int, map_data: dict) -> Map:
         return self.map_repository.update_map(map_id, map_data)
+
+    def get(self, map_id: int) -> Map:
+        map = self.map_repository.select_map_by_id(map_id)
+
+        return map
