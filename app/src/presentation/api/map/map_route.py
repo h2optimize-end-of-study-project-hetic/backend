@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status, UploadFile, File, Form
 import shutil, os
+from fastapi.responses import FileResponse
 
 from app.src.presentation.utils.image_management import process_image, handle_map_image
 from app.src.domain.entities.map import Map
@@ -165,12 +166,40 @@ async def read_map_list(
 
 @map_router.get(
     "/{map_id}",
-    summary="Retrieve map by ID",
+    summary="Retrieve map info by ID",
     response_model=MapModelResponse,
     response_description="Detailed information of the requested map",
     responses=generate_responses([map_not_found, unexpected_error]),
     deprecated=False,
 )
+
+@map_router.get(
+    "/img/{map_id}",
+    summary="Retrieve image by ID",
+    responses=generate_responses([map_not_found, unexpected_error]),
+)
+async def get_map_image(
+    map_id: int,
+    use_case: Annotated[GetMapByIdUseCase, Depends(get_map_by_id_use_case)]
+):
+    try:
+        map_entity = use_case.execute(map_id)
+        if not map_entity or not os.path.exists(map_entity.path):
+            raise HTTPException(status_code=404, detail="Image not found")
+
+        return FileResponse(
+            path=map_entity.path,
+            media_type="image/png",
+            headers={"Content-Disposition": "inline"}  # browser display
+        )
+
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+
+
 async def read_map(
     use_case: Annotated[GetMapByIdUseCase, Depends(get_map_by_id_use_case)],
     map_id: int = Path(..., ge=1, description="The map ID (positive integer)"),
