@@ -30,10 +30,10 @@ async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     verify_user: VerifyUserUseCase = Depends(get_verify_user_use_case),
 ):
-
     try:
         result = verify_user.execute(email=form_data.username, password=form_data.password)
         return {"access_token": result["access_token"], "token_type": "bearer"}
+    
     except VerifyUserError as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
     except Exception:
