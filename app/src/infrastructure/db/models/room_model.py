@@ -1,6 +1,7 @@
 from datetime import datetime
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, TIMESTAMP, JSON, text
+
 
 
 class RoomModel(SQLModel, table=True):
@@ -9,22 +10,21 @@ class RoomModel(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(..., nullable=False)
     description: str | None = Field(default=None)
-    floor: int = Field(..., nullable=False)
+    floor: int = Field(..., nullable=True)
     building_id: int = Field(..., foreign_key="building.id", nullable=False)
-    area: float = Field(..., nullable=False)
-    shape: list[list[float]] = Field(..., sa_column=Column(JSON, nullable=False))
-    capacity: int = Field(..., nullable=False)
+    area: float | None = Field(default=None, nullable=True)
+    shape: list[list[float]] | None = Field(default=None, sa_column=Column(JSON, nullable=True))
+    capacity: int | None = Field(default=None, nullable=True)
 
-    start_at: datetime | None = Field(
+    start_at: datetime| None = Field(
         default=None,
-        sa_column=Column(TIMESTAMP(timezone=True), nullable=True),
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=False),
     )
     end_at: datetime | None = Field(
         default=None,
         sa_column=Column(TIMESTAMP(timezone=True), nullable=True),
     )
     created_at: datetime | None = Field(
-        default=None,
         sa_column=Column(
             TIMESTAMP(timezone=True),
             server_default=text("CURRENT_TIMESTAMP"),
@@ -38,3 +38,4 @@ class RoomModel(SQLModel, table=True):
             nullable=True,
         ),
     )
+    building: 'BuildingModel' = Relationship(back_populates="rooms")

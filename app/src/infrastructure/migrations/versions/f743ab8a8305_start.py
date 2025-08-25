@@ -105,22 +105,24 @@ def upgrade() -> None:
         sa.Column('updated_at', sa.TIMESTAMP(timezone=True))
     )
 
+
     op.create_table(
         'room',
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('name', sa.Text, nullable=False),
         sa.Column('description', sa.Text, nullable=True),
-        sa.Column('floor', sa.Integer, nullable=False),
+        sa.Column('floor', sa.Integer, nullable=True), 
         sa.Column('building_id', sa.Integer, sa.ForeignKey('building.id'), nullable=False),
-        sa.Column('area', sa.Float, nullable=False),
-        sa.Column('shape', postgresql.JSONB, nullable=False),
-        sa.Column('capacity', sa.Integer, nullable=False),
+        sa.Column('area', sa.Float, nullable=True),
+        sa.Column('shape', postgresql.JSONB, nullable=True),
+        sa.Column('capacity', sa.Integer, nullable=True),
         sa.Column('start_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('end_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
         sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.CheckConstraint('end_at IS NULL OR start_at IS NULL OR end_at > start_at', name='ck_room_start_end')
     )
+
 
     op.create_table(
         'user',

@@ -156,6 +156,8 @@ docker compose exec backend sh -c "pip install $(LIB) && pip freeze > /code/app/
 
 Installe une dépendance dans le conteneur et met à jour le `requirements.txt`, mais ce n’est **pas suffisant** pour gérer proprement les dépendances du projet.
 
+![alt text](./doc/images/pyproject.png)
+
 ---
 
 ## Migrations
@@ -195,6 +197,15 @@ root@708b091e98e1:/code/app # alembic revision --autogenerate -m 'test'
 ---
 
 ## Tests
+
+### Commandes Make 
+
+`make test` => run tout les tests avec la couverture 
+
+`make coverage` => run tout les tests avec la couverture et génére le rapport
+
+⚠️ Le container doit être en marche pour que les tests puissent s'éxécuter
+
 
 ### Lancer tous les tests
 
@@ -236,7 +247,7 @@ pytest app/tests -vvs --cov=app --cov-report=html
 
 Remplacer `pytest` par `ptw`.
 
-*Disclaimer : pytest-watcher est aussi observateur que Daredevil.*
+*Disclaimer : pytest-watcher est aussi observateur que Daredevil*
 
 ### Référence
 

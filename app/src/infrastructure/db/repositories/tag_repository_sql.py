@@ -24,6 +24,7 @@ class SQLTagRepository(TagRepository):
     def __init__(self, session: Session):
         self.session = session
 
+
     def create_tag(self, tag: Tag) -> Tag:
         try:
             tag_model = TagModel(
@@ -40,13 +41,14 @@ class SQLTagRepository(TagRepository):
             if isinstance(e.orig, errors.UniqueViolation):
                 raise AlreadyExistsError("Tag", "source_address", tag_model.source_address) from e
             logger.error(e)
-            raise
+            raise CreationFailedError("Tag", "Integrity error") from e
         except Exception as e:
             self.session.rollback()
             logger.error(e)
             raise CreationFailedError("Tag", str(e)) from e
 
         return Tag.from_dict(tag_model.model_dump())
+
 
     def paginate_tags(self, cursor: int | None, limit: int) -> tuple[list[Tag], int, Tag | None, Tag | None]:
         self.session.exec(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"))
@@ -64,6 +66,7 @@ class SQLTagRepository(TagRepository):
 
         return tags, total, first_tag, last_tag
 
+
     def select_tags(self, cursor: int | None, limit: int) -> list[Tag]:
         statement = select(TagModel).order_by(TagModel.id)
         if cursor:
@@ -73,9 +76,11 @@ class SQLTagRepository(TagRepository):
         results = self.session.exec(statement).all()
         return [Tag(**tag.model_dump()) for tag in results]
 
+
     def count_all_tags(self) -> int:
         total = self.session.exec(select(func.count()).select_from(TagModel)).one()
         return total
+
 
     def get_tag_by_position(self, position: int) -> Tag | None:
         if position >= 0:
@@ -86,12 +91,14 @@ class SQLTagRepository(TagRepository):
         result = self.session.exec(statement).first()
         return Tag(**result.model_dump()) if result else None
 
+
     def select_tag_by_id(self, tag_id: int) -> Tag:
         tag_model = self.session.get(TagModel, tag_id)
         if not tag_model:
             raise NotFoundError("Tag", tag_id)
 
         return Tag(**tag_model.model_dump())
+
 
     def update_tag(self, tag_id: int, tag_data: dict) -> Tag:
         try:
@@ -102,6 +109,8 @@ class SQLTagRepository(TagRepository):
             updated_fields = 0
 
             for key, value in tag_data.items():
+                if not hasattr(tag_model, key):
+                    continue 
                 current_value = getattr(tag_model, key, None)  # optimise : win 0.00025s
                 if current_value != value:
                     setattr(tag_model, key, value)
@@ -125,11 +134,12 @@ class SQLTagRepository(TagRepository):
                 table_name = getattr(e.orig.diag, "table_name", None)
                 raise ForeignKeyConstraintError("Tag", constraint_name, table_name) from e
             logger.error(e)
-            raise
+            raise UpdateFailedError("Tag", "Integrity error") from e
         except Exception as e:
             self.session.rollback()
             logger.error(e)
             raise UpdateFailedError("Tag", str(e)) from e
+
 
     def delete_tag(self, tag_id: int) -> bool:
         try:
@@ -157,6 +167,7 @@ class SQLTagRepository(TagRepository):
             self.session.rollback()
             logger.error(e)
             raise DeletionFailedError("Tag", str(e)) from e
+
 
     def select_tag_by_src_address(self, tag_src_address: str) -> Tag:
         statement = select(TagModel).where(TagModel.source_address == tag_src_address)

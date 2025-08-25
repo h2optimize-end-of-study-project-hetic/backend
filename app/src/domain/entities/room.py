@@ -3,17 +3,16 @@ from datetime import datetime
 
 from dateutil.parser import parse as parse_datetime
 
-
 @dataclass
 class Room:
     id: int | None
     name: str
     description: str | None
-    floor: int
+    floor: int| None
     building_id: int
-    area: float
+    area: float| None
     shape: list[list[float]]
-    capacity: int
+    capacity: int| None
     start_at: datetime | None
     end_at: datetime | None
     created_at: datetime | None
@@ -32,11 +31,11 @@ class Room:
             id=data.get("id"),
             name=data["name"],
             description=data.get("description"),
-            floor=int(data["floor"]),
+            floor=int(data["floor"]) if data["floor"] else None,
             building_id=int(data["building_id"]),
-            area=float(data["area"]),
+            area=float(data["area"]) if data["area"] else None,
             shape=data.get("shape", []),
-            capacity=int(data["capacity"]),
+            capacity=int(data["capacity"])if data["capacity"] else None,
             start_at=safe_parse(data.get("start_at")),
             end_at=safe_parse(data.get("end_at")),
             created_at=safe_parse(data.get("created_at")),
