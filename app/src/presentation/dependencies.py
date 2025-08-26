@@ -113,10 +113,7 @@ def delete_map_use_case(map_repository: MapRepository = map_repo_dep) -> DeleteM
     return DeleteMapUseCase(map_repository)
 
 
-
-def user_repository(session: Session = get_session_dep) -> UserRepository:
-    return SQLUserRepository(session)
-
+# user
 
 def user_repository(session: Session = get_session_dep) -> UserRepository:
     return SQLUserRepository(session)
@@ -171,6 +168,8 @@ def update_room_use_case(room_repository: RoomRepository = room_repo_dep) -> Upd
 def delete_room_use_case(room_repository: RoomRepository = room_repo_dep) -> DeleteRoomUseCase:
     return DeleteRoomUseCase(room_repository) 
 
+
+# event
 
 def event_repository(session: Session = get_session_dep) -> EventRepository:
     return SQLEventRepository(session)
