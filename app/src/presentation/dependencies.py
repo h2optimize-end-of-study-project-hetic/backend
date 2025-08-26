@@ -18,6 +18,14 @@ from app.src.use_cases.map.get_map_by_id_use_case import GetMapByIdUseCase
 from app.src.domain.interface_repositories.map_repository import MapRepository
 from app.src.infrastructure.db.repositories.map_repository_sql import SQLMapRepository
 
+from app.src.use_cases.user.create_user_use_case import CreateUserUseCase
+from app.src.use_cases.user.delete_user_use_case import DeleteUserUseCase
+from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase
+from app.src.use_cases.user.get_user_by_list_use_case import GetUserListUseCase
+from app.src.use_cases.user.get_user_by_id_use_case import GetUserByIdUseCase
+from app.src.domain.interface_repositories.user_repository import UserRepository
+from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
+
 get_session_dep = Depends(get_session)
 
 
@@ -75,3 +83,30 @@ def update_map_use_case(map_repository: MapRepository = map_repo_dep) -> UpdateM
 def delete_map_use_case(map_repository: MapRepository = map_repo_dep) -> DeleteMapUseCase:
     return DeleteMapUseCase(map_repository)
 
+
+
+def user_repository(session: Session = get_session_dep) -> UserRepository:
+    return SQLUserRepository(session)
+
+
+user_repo_dep = Depends(user_repository)
+
+
+def get_user_by_id_use_case(user_repository: UserRepository = user_repo_dep) -> GetUserByIdUseCase:
+    return GetUserByIdUseCase(user_repository)
+
+
+def get_user_list_use_case(user_repository: UserRepository = user_repo_dep) -> GetUserListUseCase:
+    return GetUserListUseCase(user_repository)
+
+
+def create_user_use_case(user_repository: UserRepository = user_repo_dep) -> CreateUserUseCase:
+    return CreateUserUseCase(user_repository)
+
+
+def update_user_use_case(user_repository: UserRepository = user_repo_dep) -> UpdateUserUseCase:
+    return UpdateUserUseCase(user_repository)
+
+
+def delete_user_use_case(user_repository: UserRepository = user_repo_dep) -> DeleteUserUseCase:
+    return DeleteUserUseCase(user_repository)
