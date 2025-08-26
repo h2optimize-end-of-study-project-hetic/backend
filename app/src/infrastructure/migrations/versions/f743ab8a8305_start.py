@@ -86,11 +86,11 @@ def upgrade() -> None:
     op.create_table(
         'tag',
         sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('name', sa.Text),
-        sa.Column('description', sa.Text),
-        sa.Column('source_address', sa.Text, unique=True),
-        sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP')),
-        sa.Column('updated_at', sa.TIMESTAMP(timezone=True))
+        sa.Column('name', sa.Text, nullable=True),
+        sa.Column('description', sa.Text, nullable=True),
+        sa.Column('source_address', sa.Text, unique=True, nullable=False),
+        sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+        sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=True)
     )
 
     op.create_table(
@@ -105,22 +105,24 @@ def upgrade() -> None:
         sa.Column('updated_at', sa.TIMESTAMP(timezone=True))
     )
 
+
     op.create_table(
         'room',
         sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('name', sa.Text),
-        sa.Column('description', sa.Text),
-        sa.Column('floor', sa.Integer),
-        sa.Column('building_id', sa.Integer, sa.ForeignKey('building.id')),
-        sa.Column('area', sa.Float),
-        sa.Column('shape', postgresql.JSONB),
-        sa.Column('capacity', sa.Integer),
-        sa.Column('start_at', sa.TIMESTAMP(timezone=True)),
-        sa.Column('end_at', sa.TIMESTAMP(timezone=True)),
-        sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP')),
-        sa.Column('updated_at', sa.TIMESTAMP(timezone=True)),
-        sa.CheckConstraint('end_at IS NULL OR start_at IS NULL OR end_at > start_at')
+        sa.Column('name', sa.Text, nullable=False),
+        sa.Column('description', sa.Text, nullable=True),
+        sa.Column('floor', sa.Integer, nullable=True), 
+        sa.Column('building_id', sa.Integer, sa.ForeignKey('building.id'), nullable=False),
+        sa.Column('area', sa.Float, nullable=True),
+        sa.Column('shape', postgresql.JSONB, nullable=True),
+        sa.Column('capacity', sa.Integer, nullable=True),
+        sa.Column('start_at', sa.TIMESTAMP(timezone=True), nullable=True),
+        sa.Column('end_at', sa.TIMESTAMP(timezone=True), nullable=True),
+        sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+        sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=True),
+        sa.CheckConstraint('end_at IS NULL OR start_at IS NULL OR end_at > start_at', name='ck_room_start_end')
     )
+
 
     op.create_table(
         'user',

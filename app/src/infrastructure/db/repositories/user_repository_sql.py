@@ -1,7 +1,6 @@
 import datetime
 from sqlmodel import Session, select
 from sqlalchemy import func
-from typing import List, Optional
 from app.src.domain.entities.user import User
 from app.src.infrastructure.db.models.user_model import UserModel
 from app.src.domain.interface_repositories.user_repository import UserRepository
@@ -46,7 +45,7 @@ class SQLUserRepository(UserRepository):
             deleted_at=user_model.deleted_at,
         )
 
-    def select_users(self, offset: Optional[int] = None, limit: Optional[int] = None) -> List[Optional[User]]:
+    def select_users(self, offset: int | None = None, limit: int | None = None) -> list[User | None]:
         statement = select(UserModel)
         if offset is not None:
             statement = statement.offset(offset)
@@ -183,7 +182,7 @@ class SQLUserRepository(UserRepository):
             deleted_at=user_model.deleted_at,
         )        
     
-    def paginate_users(self, cursor: Optional[int], limit: int):
+    def paginate_users(self, cursor: int | None, limit: int):
         statement = select(UserModel)
         if cursor is not None:
             statement = statement.where(UserModel.id >= cursor)

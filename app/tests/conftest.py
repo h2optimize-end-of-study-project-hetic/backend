@@ -5,6 +5,7 @@ import builtins
 from fastapi.testclient import TestClient
 from dateutil.parser import parse as parse_datetime
 
+from app.src.domain.entities.room import Room
 from app.src.presentation.main import app
 from app.src.domain.entities.tag import Tag
 from app.src.presentation.core.config import settings
@@ -61,6 +62,36 @@ def sample_tags_factory():
                 source_address=f"addr_{i}",
                 created_at=parse_datetime("2025-07-17T20:14:19.947"),
                 updated_at=parse_datetime("2025-07-17T20:14:19.947"),
+            )
+            for i in range(start, end)
+        ]
+
+    return _factory
+
+
+
+@pytest.fixture
+def sample_rooms_factory():
+    """
+    Factory pour générer une liste de Rooms de test.
+    Usage : sample_rooms_factory(start, end)
+    """
+
+    def _factory(start: int, end: int):
+        return [
+            Room(
+                id=i,
+                name=f"Room {i}",
+                description="desc",
+                floor=i,
+                building_id=1,
+                area=i,
+                shape=[[i*2], [i*1]],
+                capacity=i,
+                created_at=parse_datetime("2025-07-17T20:14:19.947"),
+                updated_at=parse_datetime("2025-07-17T20:14:19.947"),
+                start_at=parse_datetime("2025-07-17T20:14:19.947"),
+                end_at=parse_datetime("2025-07-17T21:14:19.947"),
             )
             for i in range(start, end)
         ]
