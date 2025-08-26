@@ -10,7 +10,6 @@ from app.src.use_cases.tag.get_tag_by_id_use_case import GetTagByIdUseCase
 from app.src.domain.interface_repositories.tag_repository import TagRepository
 from app.src.infrastructure.db.repositories.tag_repository_sql import SQLTagRepository
 
-<<<<<<< HEAD
 from app.src.use_cases.map.create_map_use_case import CreateMapUseCase
 from app.src.use_cases.map.delete_map_use_case import DeleteMapUseCase
 from app.src.use_cases.map.update_map_use_case import UpdateMapUseCase
@@ -19,8 +18,6 @@ from app.src.use_cases.map.get_map_by_id_use_case import GetMapByIdUseCase
 from app.src.domain.interface_repositories.map_repository import MapRepository
 from app.src.infrastructure.db.repositories.map_repository_sql import SQLMapRepository
 
-=======
->>>>>>> 07fb66bccad4ba25d2a9f3f15cbc841696dfccde
 from app.src.use_cases.user.create_user_use_case import CreateUserUseCase
 from app.src.use_cases.user.delete_user_use_case import DeleteUserUseCase
 from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase

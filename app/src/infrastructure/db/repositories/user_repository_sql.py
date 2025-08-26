@@ -1,8 +1,9 @@
+import datetime
 from sqlmodel import Session, select
 from sqlalchemy import func
 from typing import List, Optional
 from sqlalchemy.exc import IntegrityError
-from app.src.common.exception import NotFoundError, DeletionFailedError, ForeignKeyConstraintError
+from app.src.common.exception import NotFoundError, UpdateFailedError
 
 
 from app.src.domain.entities.user import User
@@ -148,33 +149,43 @@ class SQLUserRepository(UserRepository):
             deleted_at=user_model.deleted_at,
         )
 
-    def delete_user(self, user_id: int) -> bool:
-        try:
-            self.session.execute(
-            "DELETE FROM user_group WHERE user_id = :user_id",
-            {"user_id": user_id}
-            )
-            self.session.commit()
+    def delete_user(self, user_id: int) -> User:
+        statement = select(UserModel).where(UserModel.id == user_id)
+        user_model = self.session.exec(statement).first()
+        if not user_model:
+            raise ValueError(f"User with ID {user_id} not found")
 
-            user_model = self.session.get(UserModel, user_id)
-            if not user_model:
-                raise NotFoundError("User", user_id)
-            self.session.delete(user_model)
-            self.session.commit()
-            return True
+        # Anonymisation des champs
+        user_model.email = f"anonymized_{user_id}@example.com"
+        user_model.firstname = "Anonymized"
+        user_model.lastname = "User"
+        user_model.password = ""
+        user_model.salt = ""
+        user_model.secret_2fa = None
+        user_model.phone_number = None
+        user_model.is_active = False
+        user_model.is_delete = True
+        user_model.updated_at = datetime.datetime.utcnow()
 
-        except NotFoundError:
-            raise
-        except IntegrityError as e:
-            self.session.rollback()
-            if hasattr(e.orig, "pgcode") and e.orig.pgcode == "23503":
-                constraint_name = getattr(e.orig.diag, "constraint_name", None)
-                table_name = getattr(e.orig.diag, "table_name", None)
-                raise ForeignKeyConstraintError("User", table_name, constraint_name) from e
-            raise
-        except Exception as e:
-            self.session.rollback()
-            raise DeletionFailedError("User", str(e)) from e
+        self.session.add(user_model)
+        self.session.commit()
+        self.session.refresh(user_model)
+        return User(
+            id=user_model.id,
+            email=user_model.email,
+            password=user_model.password,
+            salt=user_model.salt,
+            secret_2fa=user_model.secret_2fa,
+            firstname=user_model.firstname,
+            lastname=user_model.lastname,
+            role=user_model.role,
+            phone_number=user_model.phone_number,
+            is_active=user_model.is_active,
+            is_delete=user_model.is_delete,
+            created_at=user_model.created_at,
+            updated_at=user_model.updated_at,
+            deleted_at=user_model.deleted_at,
+        )        
     
     def paginate_users(self, cursor: Optional[int], limit: int):
         statement = select(UserModel)
