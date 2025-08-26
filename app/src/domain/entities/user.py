@@ -15,6 +15,7 @@ class User:
     secret_2fa: str | None = None
     role: Role = Role.GUEST
     phone_number: str | None = None
+    group: str | None = None
     is_active: bool = True
     is_delete: bool = False
     created_at: datetime | None = None
