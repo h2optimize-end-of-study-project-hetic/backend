@@ -43,7 +43,7 @@ class RoomUpdateModelRequest(BaseModel):
         default=None, title="Room description", description="Optional description of the room"
     )
     floor: int | None = Field(default=None, title="Floor", description="Floor number where the room is located")
-    building_id: int | None = Field(default=None, title="Building ID", description="Identifier of the building")
+    building_id: int | None = Field(default=None, gt=0, title="Building ID", description="Identifier of the building")
     area: float | None = Field(default=None, gt=0, title="Area", description="Area of the room in square meters")
     shape: list[list[float]] | None = Field(
         default=None, title="Shape", description="List of coordinates representing the shape of the room"

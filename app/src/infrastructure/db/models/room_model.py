@@ -3,7 +3,6 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, TIMESTAMP, JSON, text
 
 
-
 class RoomModel(SQLModel, table=True):
     __tablename__ = "room"
 
