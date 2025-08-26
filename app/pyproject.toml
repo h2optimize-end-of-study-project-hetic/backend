@@ -8,6 +8,7 @@ dependencies = [
     "email_validator",
     "fastapi",
     "gunicorn",
+    "passlib[bcrypt]",
     "psycopg2-binary",
     "pydantic",
     "pydantic-settings",

@@ -12,14 +12,14 @@ class User:
     email: str
     password: str
     salt: str
-    secret_2fa: str | None
-    role: Role = Role.GUEST
     firstname: str
     lastname: str
-    phone_number: str | None
+    secret_2fa: str | None = None
+    role: Role = Role.GUEST
+    phone_number: str | None = None
     is_active: bool = True
     is_delete: bool = False
-    created_at: datetime | None
+    created_at: datetime | None = None
     updated_at: datetime | None = None
     deleted_at: datetime | None = None
 
@@ -44,7 +44,7 @@ class User:
 
     def to_dict(self) -> dict:
         data = asdict(self)
-        data["role"] = self.role.value
+        data["role"] = self.role.value if hasattr(self.role, "value") else self.role
         for field in ["created_at", "updated_at", "deleted_at"]:
             if data[field]:
                 data[field] = data[field].isoformat()

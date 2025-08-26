@@ -10,6 +10,14 @@ from app.src.use_cases.tag.get_tag_by_id_use_case import GetTagByIdUseCase
 from app.src.domain.interface_repositories.tag_repository import TagRepository
 from app.src.infrastructure.db.repositories.tag_repository_sql import SQLTagRepository
 
+from app.src.use_cases.user.create_user_use_case import CreateUserUseCase
+from app.src.use_cases.user.delete_user_use_case import DeleteUserUseCase
+from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase
+from app.src.use_cases.user.get_user_by_list_use_case import GetUserListUseCase
+from app.src.use_cases.user.get_user_by_id_use_case import GetUserByIdUseCase
+from app.src.domain.interface_repositories.user_repository import UserRepository
+from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
+
 get_session_dep = Depends(get_session)
 
 
@@ -39,3 +47,28 @@ def update_tag_use_case(tag_repository: TagRepository = tag_repo_dep) -> UpdateT
 def delete_tag_use_case(tag_repository: TagRepository = tag_repo_dep) -> DeleteTagUseCase:
     return DeleteTagUseCase(tag_repository)
 
+
+def user_repository(session: Session = get_session_dep) -> UserRepository:
+    return SQLUserRepository(session)
+
+user_repo_dep = Depends(user_repository)
+
+
+def get_user_by_id_use_case(user_repository: UserRepository = user_repo_dep) -> GetUserByIdUseCase:
+    return GetUserByIdUseCase(user_repository)
+
+
+def get_user_list_use_case(user_repository: UserRepository = user_repo_dep) -> GetUserListUseCase:
+    return GetUserListUseCase(user_repository)
+
+
+def create_user_use_case(user_repository: UserRepository = user_repo_dep) -> CreateUserUseCase:
+    return CreateUserUseCase(user_repository)
+
+
+def update_user_use_case(user_repository: UserRepository = user_repo_dep) -> UpdateUserUseCase:
+    return UpdateUserUseCase(user_repository)
+
+
+def delete_user_use_case(user_repository: UserRepository = user_repo_dep) -> DeleteUserUseCase:
+    return DeleteUserUseCase(user_repository)
