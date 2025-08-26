@@ -7,6 +7,7 @@ from app.src.common.logging import setup_logging
 from app.src.presentation.api.router import router
 from app.src.presentation.core.config import settings
 from app.src.presentation.core.open_api_tags import OpenApiTags
+from app.src.presentation.middleware.auth import jwt_middleware
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -61,6 +62,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.middleware("http")(jwt_middleware)
 
 app.include_router(router, prefix=settings.API_V1_STR)
 

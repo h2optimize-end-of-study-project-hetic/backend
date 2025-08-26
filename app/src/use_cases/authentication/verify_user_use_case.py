@@ -1,7 +1,5 @@
-# app/src/use_cases/authentication/verify_user_use_case.py
 from datetime import datetime, timedelta
 import logging
-from typing import Optional
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -26,15 +24,13 @@ class VerifyUserUseCase:
         - Vérifie mdp (bcrypt) + statut
         - Génère le token et retourne { access_token, token_type, user }
         """
-        user: Optional[User] = self.user_repository.select_user_by_email(email)
+        user: User | None = self.user_repository.select_user_by_email(email)
         if user is None:
             raise NotFoundError("user", email)
 
-        # Statut: actif et non supprimé
         if not user.is_active or user.is_delete:
             raise VerifyUserError("No access")
 
-        # compare le mot de passe en clair au hash stocké dans user.password
         if not self._verify_password(password, user.password):
             raise VerifyUserError("Wrong credentials")
 
@@ -42,7 +38,6 @@ class VerifyUserUseCase:
             data={
                 "sub": str(user.id),
                 "email": user.email,
-                # si Role est un Enum, encoder la valeur; sinon, user.role est ok
                 "role": getattr(user.role, "value", user.role),
             },
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -51,18 +46,12 @@ class VerifyUserUseCase:
         return {
             "access_token": token,
             "token_type": "bearer",
-            "user": user,
         }
 
-    # --- helpers privés ---
 
     def _verify_password(self, plain: str, hashed: str) -> bool:
-        try:
-            test = pwd_context.verify(plain, hashed)
-            logger.error("Résultat de la vérification :", test)
-            # Si tu veux régénérer un hash du mot de passe en clair (optionnel, à ne pas faire en prod)
-            logger.error("Nouveau hash :", pwd_context.hash(plain))
-            return test
+        try:        
+            return pwd_context.verify(plain, hashed)
         except Exception:
             return False
 

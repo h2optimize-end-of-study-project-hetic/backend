@@ -16,9 +16,9 @@ class GetCurrentUserUseCase:
 
             if user_id is None:
                 raise NotFoundError("user", token)
-        except JWTError:
-            raise NotFoundError("user", token)
-        
+        except JWTError as e:
+            raise NotFoundError("user", token) from e
+
         user = self.user_repository.select_user_by_id(user_id)
 
         if user is None:

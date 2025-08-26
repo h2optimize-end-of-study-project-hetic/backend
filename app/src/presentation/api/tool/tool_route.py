@@ -1,7 +1,8 @@
 import logging
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Request, status
 
+from app.src.domain.entities.role import Role
 from app.src.presentation.core.config import settings
 from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig, generate_responses
@@ -30,3 +31,25 @@ async def read_tag_list():
         "log_level": settings.LOG_LEVEL,
         "debug": settings.is_debug,
     }
+
+
+
+@tool_router.get(
+    "/admin",
+    summary="Retrieve a list of info",
+    response_description="Detailed information of the application context",
+    responses=generate_responses([unexpected_error]),
+    deprecated=False,
+)
+async def admin_tag_list(request: Request):
+    """
+    Return ok if user is authenticated and has role admin
+    """
+    user = getattr(request.state, "user", None)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    
+    if user.get("role") != Role.admin.value:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+    
+    return {"ok": True, "user": user}
