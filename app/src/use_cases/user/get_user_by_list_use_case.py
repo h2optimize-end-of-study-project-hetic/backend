@@ -1,7 +1,6 @@
 import logging
 import math
 from dataclasses import dataclass
-
 from app.src.domain.entities.user import User
 from app.src.common.utils import decode, encode
 from app.src.domain.interface_repositories.user_repository import UserRepository

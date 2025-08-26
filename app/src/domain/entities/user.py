@@ -1,8 +1,6 @@
 from datetime import datetime
 from dataclasses import asdict, dataclass
-
 from dateutil.parser import parse as parse_datetime
-
 from app.src.domain.entities.role import Role
 
 

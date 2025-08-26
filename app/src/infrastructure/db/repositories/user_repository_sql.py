@@ -2,10 +2,6 @@ import datetime
 from sqlmodel import Session, select
 from sqlalchemy import func
 from typing import List, Optional
-from sqlalchemy.exc import IntegrityError
-from app.src.common.exception import NotFoundError, UpdateFailedError
-
-
 from app.src.domain.entities.user import User
 from app.src.infrastructure.db.models.user_model import UserModel
 from app.src.domain.interface_repositories.user_repository import UserRepository

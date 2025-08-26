@@ -1,4 +1,4 @@
-from app.src.common.exception import NotFoundError, DeletionFailedError, ForeignKeyConstraintError
+from app.src.common.exception import NotFoundError, ForeignKeyConstraintError
 from sqlalchemy.exc import IntegrityError
 
 class DeleteUserUseCase:

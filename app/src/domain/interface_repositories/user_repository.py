@@ -1,6 +1,5 @@
 from typing import List, Optional
 from abc import ABC, abstractmethod
-
 from app.src.domain.entities.tag import Tag
 
 class UserRepository(ABC):

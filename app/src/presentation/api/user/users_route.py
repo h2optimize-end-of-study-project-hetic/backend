@@ -1,6 +1,5 @@
 import logging
-from typing import Annotated, List
-
+from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.presentation.api.user.users_model import (
@@ -9,7 +8,6 @@ from app.src.presentation.api.user.users_model import (
     UserUpdateModel,
     PaginatedUsersModel,
 )
-from app.src.presentation.api.common.generic_model import PaginationMetadataModel
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig, generate_responses
 from app.src.domain.entities.user import User
 from app.src.use_cases.user.create_user_use_case import CreateUserUseCase
@@ -94,7 +92,7 @@ async def read_user_list(
         return PaginatedUsersModel(
             data=user_models,
             count=result.total,
-            offset=0,      # Mets ici la vraie valeur d'offset si tu l'utilises
+            offset=0,
             limit=limit
         )
     except Exception as e:
