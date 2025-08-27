@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = "app"
     POSTGRES_USER: str = "admin"
     POSTGRES_PASSWORD: str = "Changeme!1"
+    SECRET_KEY: str = "SECRET_KEY"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     @computed_field
     @property

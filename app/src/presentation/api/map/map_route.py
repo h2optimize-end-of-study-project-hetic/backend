@@ -5,6 +5,9 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 import shutil, os
 from fastapi.responses import FileResponse
 
+from app.src.domain.entities.role import Role
+from app.src.domain.entities.user import User
+from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.utils.image_management import process_image, handle_map_image
 from app.src.domain.entities.map import Map
 from app.src.presentation.core.open_api_maps import OpenApiMaps
@@ -15,12 +18,7 @@ from app.src.use_cases.map.get_map_list_use_case import GetMapListUseCase
 from app.src.use_cases.map.get_map_by_id_use_case import GetMapByIdUseCase
 from app.src.presentation.api.common.generic_model import PaginationMetadataModel
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig, generate_responses
-from app.src.presentation.api.map.map_model import (
-    PaginatedListMapModelResponse,
-    MapCreateModelRequest,
-    MapModelResponse,
-    MapUpdateModelRequest,
-)
+from app.src.presentation.api.map.map_model import (PaginatedListMapModelResponse, MapModelResponse)
 from app.src.presentation.dependencies import (
     create_map_use_case,
     delete_map_use_case,
@@ -38,9 +36,7 @@ from app.src.common.exception import (
 )
 
 map_not_found = OpenApiErrorResponseConfig(code=404, description="Map not found", detail="Map with ID '123' not found")
-map_already_exist = OpenApiErrorResponseConfig(
-    code=409, description="Map already exists", detail="Map with file_name 'Building A - Floor 1' already exists"
-)
+map_already_exist = OpenApiErrorResponseConfig(code=409, description="Map already exists", detail="Map with file_name 'Building A - Floor 1' already exists")
 creation_error = OpenApiErrorResponseConfig(code=406, description="Creation fails", detail="Failed to create Map")
 update_error = OpenApiErrorResponseConfig(code=406, description="Update fails", detail="Failed to update Map")
 deletion_error = OpenApiErrorResponseConfig(code=406, description="Deletion fails", detail="Failed to delete Map")
@@ -63,6 +59,7 @@ map_router = APIRouter(
 )
 async def create_map(
     use_case: Annotated[CreateMapUseCase, Depends(create_map_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     building_id: int = Form(...),
     file: UploadFile = File(...),
 ):
@@ -131,6 +128,7 @@ async def create_map(
 )
 async def read_map_list(
     use_case: Annotated[GetMapListUseCase, Depends(get_map_list_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     cursor: str | None = Query(None, description="Pagination cursor"),
     limit: int | None = Query(20, ge=1, description="Number of elements return"),
 ):
@@ -164,14 +162,6 @@ async def read_map_list(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error") from e
 
 
-@map_router.get(
-    "/{map_id}",
-    summary="Retrieve map info by ID",
-    response_model=MapModelResponse,
-    response_description="Detailed information of the requested map",
-    responses=generate_responses([map_not_found, unexpected_error]),
-    deprecated=False,
-)
 
 @map_router.get(
     "/img/{map_id}",
@@ -180,7 +170,8 @@ async def read_map_list(
 )
 async def get_map_image(
     map_id: int,
-    use_case: Annotated[GetMapByIdUseCase, Depends(get_map_by_id_use_case)]
+    use_case: Annotated[GetMapByIdUseCase, Depends(get_map_by_id_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
 ):
     try:
         map_entity = use_case.execute(map_id)
@@ -200,8 +191,17 @@ async def get_map_image(
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
+@map_router.get(
+    "/{map_id}",
+    summary="Retrieve map info by ID",
+    response_model=MapModelResponse,
+    response_description="Detailed information of the requested map",
+    responses=generate_responses([map_not_found, unexpected_error]),
+    deprecated=False,
+)
 async def read_map(
     use_case: Annotated[GetMapByIdUseCase, Depends(get_map_by_id_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     map_id: int = Path(..., ge=1, description="The map ID (positive integer)"),
 ):
     """
@@ -229,6 +229,7 @@ async def read_map(
 )
 async def update_map(
     use_case: Annotated[UpdateMapUseCase, Depends(update_map_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     file: Annotated[UploadFile | None, File()] = None,
     map_id: int = Path(..., ge=1, description="ID of the map to update"),
 ):
@@ -237,7 +238,6 @@ async def update_map(
 
         file.file.seek(0)
         image_update = await handle_map_image(file, existing_map)
-        print(type(image_update), image_update)
 
         updated_map = use_case.execute(map_id, image_update)
 
@@ -262,6 +262,7 @@ async def update_map(
 )
 async def delete_map(
     use_case: Annotated[DeleteMapUseCase, Depends(delete_map_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     map_id: int = Path(..., ge=1, description="ID of the map to delete"),
 ):
     try:

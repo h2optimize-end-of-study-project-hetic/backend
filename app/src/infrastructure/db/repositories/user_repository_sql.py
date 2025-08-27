@@ -4,6 +4,7 @@ from sqlalchemy import func
 from app.src.domain.entities.user import User
 from app.src.infrastructure.db.models.user_model import UserModel
 from app.src.domain.interface_repositories.user_repository import UserRepository
+from app.src.common.exception import NotFoundError
 
 class SQLUserRepository(UserRepository):
     def __init__(self, session: Session):
@@ -73,48 +74,21 @@ class SQLUserRepository(UserRepository):
         ]
 
     def select_user_by_id(self, user_id: int) -> User:
-        statement = select(UserModel).where(UserModel.id == user_id)
-        result = self.session.exec(statement).first()
-        if not result:
-            raise ValueError(f"User with ID {user_id} not found")
-        return User(
-            id=result.id,
-            email=result.email,
-            password=result.password,
-            salt=result.salt,
-            secret_2fa=result.secret_2fa,
-            firstname=result.firstname,
-            lastname=result.lastname,
-            role=result.role,
-            phone_number=result.phone_number,
-            is_active=result.is_active,
-            is_delete=result.is_delete,
-            created_at=result.created_at,
-            updated_at=result.updated_at,
-            deleted_at=result.deleted_at,
-        )
+        user_model = self.session.get(UserModel, user_id)
+        if not user_model:
+            raise NotFoundError("User", user_id)
 
-    def select_user_by_src_address(self, user_src_address: str) -> User:
-        statement = select(UserModel).where(UserModel.email == user_src_address)
-        result = self.session.exec(statement).first()
-        if not result:
-            raise ValueError(f"User with email {user_src_address} not found")
-        return User(
-            id=result.id,
-            email=result.email,
-            password=result.password,
-            salt=result.salt,
-            secret_2fa=result.secret_2fa,
-            firstname=result.firstname,
-            lastname=result.lastname,
-            role=result.role,
-            phone_number=result.phone_number,
-            is_active=result.is_active,
-            is_delete=result.is_delete,
-            created_at=result.created_at,
-            updated_at=result.updated_at,
-            deleted_at=result.deleted_at,
-        )
+        return User(**user_model.model_dump())
+
+    def select_user_by_email(self, email: str) -> User:
+        stmt = select(UserModel).where(UserModel.email == email)
+        user_model = self.session.scalar(stmt)
+
+        if not user_model:
+            raise NotFoundError("User", email)
+
+        return User(**user_model.model_dump())
+
 
     def update_user(self, user_id: int, user_data: dict) -> User:
         statement = select(UserModel).where(UserModel.id == user_id)

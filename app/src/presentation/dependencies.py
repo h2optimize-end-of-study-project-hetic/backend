@@ -1,5 +1,10 @@
+from app.src.domain.interface_repositories.user_repository import UserRepository
+from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
+from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
+from app.src.use_cases.authentication.verify_user_use_case import VerifyUserUseCase
 from fastapi import Depends
 from sqlmodel import Session
+
 
 from app.src.infrastructure.db.session import get_session
 from app.src.use_cases.tag.create_tag_use_case import CreateTagUseCase
@@ -30,8 +35,6 @@ from app.src.use_cases.user.delete_user_use_case import DeleteUserUseCase
 from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase
 from app.src.use_cases.user.get_user_by_list_use_case import GetUserListUseCase
 from app.src.use_cases.user.get_user_by_id_use_case import GetUserByIdUseCase
-from app.src.domain.interface_repositories.user_repository import UserRepository
-from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 
 get_session_dep = Depends(get_session)
 
@@ -41,9 +44,18 @@ get_session_dep = Depends(get_session)
 def tag_repository(session: Session = get_session_dep) -> TagRepository:
     return SQLTagRepository(session)
 
+def user_repository(session: Session = get_session_dep) -> UserRepository:
+    return SQLUserRepository(session)
+
 
 tag_repo_dep = Depends(tag_repository)
+user_repo_dep = Depends(user_repository)
 
+def get_current_user_use_case(user_repository: UserRepository = user_repo_dep) -> GetCurrentUserUseCase:
+    return GetCurrentUserUseCase(user_repository)
+
+def get_verify_user_use_case(user_repository: UserRepository = user_repo_dep) -> VerifyUserUseCase:
+    return VerifyUserUseCase(user_repository)
 
 def get_tag_by_id_use_case(tag_repository: TagRepository = tag_repo_dep) -> GetTagByIdUseCase:
     return GetTagByIdUseCase(tag_repository)
@@ -122,6 +134,7 @@ def update_user_use_case(user_repository: UserRepository = user_repo_dep) -> Upd
 
 def delete_user_use_case(user_repository: UserRepository = user_repo_dep) -> DeleteUserUseCase:
     return DeleteUserUseCase(user_repository)
+
 # Room
 
 def room_repository(session: Session = get_session_dep) -> RoomRepository:
@@ -149,3 +162,5 @@ def update_room_use_case(room_repository: RoomRepository = room_repo_dep) -> Upd
 
 def delete_room_use_case(room_repository: RoomRepository = room_repo_dep) -> DeleteRoomUseCase:
     return DeleteRoomUseCase(room_repository) 
+
+

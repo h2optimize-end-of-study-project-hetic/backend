@@ -19,6 +19,20 @@ class NotFoundError(CustomError):
         self.value = value
 
 
+class VerifyUserError(CustomError):
+    """
+    Exception raised when a requested resource is not found
+
+    Attributes:
+        message (msg): détail
+    """
+
+    def __init__(self, msg : str):
+        super().__init__(f"{msg}")
+        self.msg = msg
+  
+
+
 class AlreadyExistsError(CustomError):
     """
     Exception raised when trying to create a resource that already exists

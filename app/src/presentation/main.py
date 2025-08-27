@@ -38,7 +38,11 @@ app = FastAPI(
         },
         {
             "name": OpenApiTags.tool,
-            "description": "Données relatif au service",
+            "description": "Données relatives au service",
+        },
+        {
+            "name": OpenApiTags.auth,
+            "description": "Authentification",
         },
         {
             "name": OpenApiTags.room,
