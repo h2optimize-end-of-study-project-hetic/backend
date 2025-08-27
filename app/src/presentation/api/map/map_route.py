@@ -10,7 +10,7 @@ from app.src.domain.entities.user import User
 from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.utils.image_management import process_image, handle_map_image
 from app.src.domain.entities.map import Map
-from app.src.presentation.core.open_api_maps import OpenApiMaps
+from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.use_cases.map.delete_map_use_case import DeleteMapUseCase
 from app.src.use_cases.map.update_map_use_case import UpdateMapUseCase
 from app.src.use_cases.map.create_map_use_case import CreateMapUseCase
@@ -45,8 +45,8 @@ unexpected_error = OpenApiErrorResponseConfig(code=500, description="Unexpected 
 
 logger = logging.getLogger(__name__)
 map_router = APIRouter(
-    prefix=f"/{OpenApiMaps.map.value}", tags=[OpenApiMaps.map]
-)  # maps and OpenApiMaps are not bind to the entity map. It's just the param of APIRouter
+    prefix=f"/{OpenApiTags.map.value}", tags=[OpenApiTags.map]
+)  # maps and OpenApiTags are not bind to the entity map. It's just the param of APIRouter
 
 
 @map_router.post(

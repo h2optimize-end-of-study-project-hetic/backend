@@ -43,6 +43,16 @@ from app.src.use_cases.event.get_event_list_use_case import GetEventListUseCase
 from app.src.use_cases.event.get_event_by_id_use_case import GetEventByIdUseCase
 from app.src.domain.interface_repositories.event_repository import EventRepository
 from app.src.infrastructure.db.repositories.event_repository_sql import SQLEventRepository
+from app.src.domain.interface_repositories.user_repository import UserRepository
+from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
+
+from app.src.use_cases.event_room.create_event_room_use_case import CreateEventRoomUseCase
+from app.src.use_cases.event_room.delete_event_room_use_case import DeleteEventRoomUseCase
+from app.src.use_cases.event_room.update_event_room_use_case import UpdateEventRoomUseCase
+from app.src.use_cases.event_room.get_event_room_list_use_case import GetEventRoomListUseCase
+from app.src.use_cases.event_room.get_event_room_by_id_use_case import GetEventRoomByIdUseCase
+from app.src.domain.interface_repositories.event_room_repository import EventRoomRepository
+from app.src.infrastructure.db.repositories.event_room_repository_sql import SQLEventRoomRepository
 
 get_session_dep = Depends(get_session)
 
@@ -221,3 +231,32 @@ def update_event_use_case(event_repository: EventRepository = event_repo_dep) ->
 def delete_event_use_case(event_repository: EventRepository = event_repo_dep) -> DeleteEventUseCase:
     return DeleteEventUseCase(event_repository)
 
+
+
+# event_room
+
+def event_room_repository(session: Session = get_session_dep) -> EventRoomRepository:
+    return SQLEventRoomRepository(session)
+
+
+event_room_repo_dep = Depends(event_room_repository)
+
+
+def get_event_room_by_id_use_case(event_room_repository: EventRoomRepository = event_room_repo_dep) -> GetEventRoomByIdUseCase:
+    return GetEventRoomByIdUseCase(event_room_repository)
+
+
+def get_event_room_list_use_case(event_room_repository: EventRoomRepository = event_room_repo_dep) -> GetEventRoomListUseCase:
+    return GetEventRoomListUseCase(event_room_repository)
+
+
+def create_event_room_use_case(event_room_repository: EventRoomRepository = event_room_repo_dep) -> CreateEventRoomUseCase:
+    return CreateEventRoomUseCase(event_room_repository)
+
+
+def update_event_room_use_case(event_room_repository: EventRoomRepository = event_room_repo_dep) -> UpdateEventRoomUseCase:
+    return UpdateEventRoomUseCase(event_room_repository)
+
+
+def delete_event_room_use_case(event_room_repository: EventRoomRepository = event_room_repo_dep) -> DeleteEventRoomUseCase:
+    return DeleteEventRoomUseCase(event_room_repository) 
