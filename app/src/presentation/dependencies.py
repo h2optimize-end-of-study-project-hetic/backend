@@ -112,6 +112,31 @@ def update_map_use_case(map_repository: MapRepository = map_repo_dep) -> UpdateM
 def delete_map_use_case(map_repository: MapRepository = map_repo_dep) -> DeleteMapUseCase:
     return DeleteMapUseCase(map_repository)
 
+def event_repository(session: Session = get_session_dep) -> EventRepository:
+    return SQLEventRepository(session)
+
+event_repo_dep = Depends(event_repository)
+
+
+def get_event_by_id_use_case(event_repository: EventRepository = event_repo_dep) -> GetEventByIdUseCase:
+    return GetEventByIdUseCase(event_repository)
+
+
+def get_event_list_use_case(event_repository: EventRepository = event_repo_dep) -> GetEventListUseCase:
+    return GetEventListUseCase(event_repository)
+
+
+def create_event_use_case(event_repository: EventRepository = event_repo_dep) -> CreateEventUseCase:
+    return CreateEventUseCase(event_repository)
+
+
+def update_event_use_case(event_repository: EventRepository = event_repo_dep) -> UpdateEventUseCase:
+    return UpdateEventUseCase(event_repository)
+
+
+def delete_event_use_case(event_repository: EventRepository = event_repo_dep) -> DeleteEventUseCase:
+    return DeleteEventUseCase(event_repository)
+
 
 # user
 
