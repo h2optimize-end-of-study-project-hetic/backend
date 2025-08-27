@@ -9,9 +9,9 @@ class User:
     id: int | None
     email: str
     password: str
-    salt: str
     firstname: str
     lastname: str
+    salt: str | None
     secret_2fa: str | None
     phone_number: str | None
     created_at: datetime | None

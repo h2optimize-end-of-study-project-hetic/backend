@@ -4,10 +4,12 @@ from passlib.context import CryptContext
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
+from app.src.domain.entities.user import User
 from app.src.common.exception import NotFoundError
 from app.src.presentation.core.open_api_tags import OpenApiTags
+from app.src.presentation.api.tool.tool_model import UserModelResponse
+from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig
-from app.src.presentation.api.authentication.authentication_model import User
 from app.src.presentation.api.authentication.authentication_model import Token
 from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
 from app.src.presentation.dependencies import get_current_user_use_case, get_verify_user_use_case
@@ -51,19 +53,19 @@ async def login(
 
 @auth_router.get("/me",
     summary="Retrieve tag by ID",
-    response_model=User,
+    response_model=UserModelResponse,
     response_description="Detailed information of the requested tag"
-    )
+)
 async def read_users_me(
-    token: Annotated[str, Depends(oauth2_scheme)],
-    use_case: Annotated[GetCurrentUserUseCase, Depends(get_current_user_use_case)]
+    user: Annotated[User, Depends(secure_ressources())]
 ):
     """
     Returns the authenticated user's information
     from the JWT token.
     """
     try:
-        return use_case.execute(token)
+        result = UserModelResponse(**user.to_dict())
+        return result
 
     except NotFoundError as e :
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Invalid or expired token", headers={"WWW-Authenticate": "Bearer"}) from e

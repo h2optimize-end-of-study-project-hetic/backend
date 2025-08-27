@@ -2,6 +2,7 @@ import os
 import pytest
 import logging
 
+
 from alembic import command
 from sqlmodel import SQLModel
 from alembic.config import Config
@@ -11,7 +12,6 @@ from sqlalchemy import create_engine, text
 from app.src.presentation.main import app
 from app.src.presentation.core.config import settings
 from app.src.infrastructure.db.session import get_session
-
 
 test_db_name = f"{settings.POSTGRES_DB}_test"
 test_db_url = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@postgres/{test_db_name}"

@@ -10,7 +10,7 @@ class UserModel(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
     email: str = Field(..., unique=True, nullable=False)
-    salt: str = Field(..., nullable=False)
+    salt: str | None = Field(..., nullable=True)
     password: str = Field(..., nullable=False)
     secret_2fa: str | None = Field(default=None)
 

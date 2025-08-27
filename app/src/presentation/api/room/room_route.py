@@ -3,8 +3,11 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
+from app.src.domain.entities.role import Role
 from app.src.domain.entities.room import Room
+from app.src.domain.entities.user import User
 from app.src.presentation.api.common.generic_model import OffsetBasePaginationMetadataModel
+from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.use_cases.room.create_room_use_case import CreateRoomUseCase
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig, generate_responses
@@ -60,6 +63,7 @@ room_router = APIRouter(
 )
 async def create_room(
     use_case: Annotated[CreateRoomUseCase, Depends(create_room_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     room: Annotated[RoomCreateModelRequest, Body(embed=True)],
 ):
     """
@@ -125,6 +129,7 @@ async def create_room(
 )
 async def read_room_list(
     use_case: Annotated[GetRoomListUseCase, Depends(get_room_list_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     offset: int | None = Query(0, ge=0, description="Offset for pagination"),
     limit: int | None = Query(20, ge=1, description="Number of elements to return"),
 ):
@@ -169,6 +174,7 @@ async def read_room_list(
 )
 async def read_room(
     use_case: Annotated[GetRoomByIdUseCase, Depends(get_room_by_id_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     room_id: int = Path(..., ge=1, description="The room ID (positive integer)"),
 ):
     """
@@ -198,6 +204,7 @@ async def read_room(
 )
 async def update_room(
     use_case: Annotated[UpdateRoomUseCase, Depends(update_room_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     room: Annotated[RoomUpdateModelRequest, Body(embed=True)],
     room_id: int = Path(..., ge=1, description="ID of the room to update"),
 ):
@@ -246,6 +253,7 @@ async def update_room(
 )
 async def delete_room(
     use_case: Annotated[DeleteRoomUseCase, Depends(delete_room_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     room_id: int = Path(..., ge=1, description="ID of the room to delete"),
 ):
     """

@@ -7,7 +7,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-class User(BaseModel):
+class UserModelResponse(BaseModel):
     id: int
     email: str
     firstname: str
@@ -19,6 +19,3 @@ class User(BaseModel):
     created_at: datetime
     updated_at: datetime | None = None
     deleted_at: datetime | None = None    
-
-class UserInDB(User):
-    hashed_password: str

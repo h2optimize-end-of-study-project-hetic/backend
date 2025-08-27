@@ -1,8 +1,11 @@
 import logging
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from app.src.domain.entities.role import Role
+from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.presentation.api.user.users_model import (
+    UserBaseModelResponse,
     UserModel,
     UserCreateModel,
     UserUpdateModel,
@@ -51,12 +54,13 @@ user_router = APIRouter(prefix="/users", tags=[OpenApiTags.user])
 )
 async def create_user(
     use_case: Annotated[CreateUserUseCase, Depends(create_user_use_case)],
-    user_data: UserCreateModel,
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
+    user_data: UserCreateModel
 ):
     """
     Create a new user.
     """
-    try:
+    try:  
         user_entity = User.from_dict(user_data.dict())
         new_user: User = use_case.execute(user_entity)
         return UserModel(**new_user.to_dict())
@@ -80,6 +84,7 @@ async def create_user(
 )
 async def read_user_list(
     use_case: Annotated[GetUserListUseCase, Depends(get_user_list_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     cursor: str | None = Query(None, description="Pagination cursor"),
     limit: int | None = Query(20, ge=1, description="Number of elements to return"),
 ):
@@ -88,7 +93,7 @@ async def read_user_list(
     """
     try:
         result = use_case.execute(cursor, limit)
-        user_models = [UserModel(**user.to_dict()) for user in result.users]
+        user_models = [UserBaseModelResponse(**user.to_dict()) for user in result.users]
         return PaginatedUsersModel(
             data=user_models,
             count=result.total,
@@ -110,6 +115,7 @@ async def read_user_list(
 )
 async def read_user(
     use_case: Annotated[GetUserByIdUseCase, Depends(get_user_by_id_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     user_id: int = Path(..., ge=1, description="The user ID (positive integer)"),
 ):
     """
@@ -134,6 +140,7 @@ async def read_user(
 )
 async def update_user(
     use_case: Annotated[UpdateUserUseCase, Depends(update_user_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     user_id: int = Path(..., ge=1, description="ID of the user to update"),
     user_data: UserUpdateModel = None,
 ):
@@ -162,6 +169,7 @@ async def update_user(
 )
 async def delete_user(
     use_case: Annotated[DeleteUserUseCase, Depends(delete_user_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     user_id: int = Path(..., ge=1, description="ID of the user to delete"),
 ):
     try:

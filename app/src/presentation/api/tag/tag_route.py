@@ -3,7 +3,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
+from app.src.domain.entities.role import Role
 from app.src.domain.entities.tag import Tag
+from app.src.domain.entities.user import User
+from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.use_cases.tag.delete_tag_use_case import DeleteTagUseCase
 from app.src.use_cases.tag.update_tag_use_case import UpdateTagUseCase
@@ -60,6 +63,7 @@ tag_router = APIRouter(
 )
 async def create_tag(
     use_case: Annotated[CreateTagUseCase, Depends(create_tag_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     tag: Annotated[TagCreateModelRequest, Body(embed=True)],
 ):
     """
@@ -106,6 +110,7 @@ async def create_tag(
 )
 async def read_tag_list(
     use_case: Annotated[GetTagListUseCase, Depends(get_tag_list_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     cursor: str | None = Query(None, description="Pagination cursor"),
     limit: int | None = Query(20, ge=1, description="Number of elements return"),
 ):
@@ -149,6 +154,7 @@ async def read_tag_list(
 )
 async def read_tag(
     use_case: Annotated[GetTagByIdUseCase, Depends(get_tag_by_id_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     tag_id: int = Path(..., ge=1, description="The tag ID (positive integer)"),
 ):
     """
@@ -176,6 +182,7 @@ async def read_tag(
 )
 async def update_tag(
     use_case: Annotated[UpdateTagUseCase, Depends(update_tag_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     tag: Annotated[TagUpdateModelRequest, Body(embed=True)],
     tag_id: int = Path(..., ge=1, description="ID of the tag to update"),
 ):
@@ -204,6 +211,7 @@ async def update_tag(
 )
 async def delete_tag(
     use_case: Annotated[DeleteTagUseCase, Depends(delete_tag_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     tag_id: int = Path(..., ge=1, description="ID of the tag to delete"),
 ):
     try:

@@ -5,6 +5,7 @@ from app.src.use_cases.authentication.verify_user_use_case import VerifyUserUseC
 from fastapi import Depends
 from sqlmodel import Session
 
+
 from app.src.infrastructure.db.session import get_session
 from app.src.use_cases.tag.create_tag_use_case import CreateTagUseCase
 from app.src.use_cases.tag.delete_tag_use_case import DeleteTagUseCase
@@ -34,8 +35,6 @@ from app.src.use_cases.user.delete_user_use_case import DeleteUserUseCase
 from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase
 from app.src.use_cases.user.get_user_by_list_use_case import GetUserListUseCase
 from app.src.use_cases.user.get_user_by_id_use_case import GetUserByIdUseCase
-from app.src.domain.interface_repositories.user_repository import UserRepository
-from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 
 get_session_dep = Depends(get_session)
 
@@ -135,6 +134,7 @@ def update_user_use_case(user_repository: UserRepository = user_repo_dep) -> Upd
 
 def delete_user_use_case(user_repository: UserRepository = user_repo_dep) -> DeleteUserUseCase:
     return DeleteUserUseCase(user_repository)
+
 # Room
 
 def room_repository(session: Session = get_session_dep) -> RoomRepository:
@@ -162,3 +162,5 @@ def update_room_use_case(room_repository: RoomRepository = room_repo_dep) -> Upd
 
 def delete_room_use_case(room_repository: RoomRepository = room_repo_dep) -> DeleteRoomUseCase:
     return DeleteRoomUseCase(room_repository) 
+
+

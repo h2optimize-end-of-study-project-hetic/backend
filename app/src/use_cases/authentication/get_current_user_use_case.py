@@ -8,19 +8,11 @@ class GetCurrentUserUseCase:
     def __init__(self, user_repository: UserRepository):
         self.user_repository = user_repository
 
-    def execute(self, token: str) -> User:
-        try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-            user_id: str | None = payload.get("sub")
 
-
-            if user_id is None:
-                raise NotFoundError("user", token)
-        except JWTError as e:
-            raise NotFoundError("user", token) from e
+    def execute(self, user_id: int) -> User:
 
         user = self.user_repository.select_user_by_id(user_id)
+        if not user or not user.is_active:
+            raise NotFoundError("user", user_id)
 
-        if user is None:
-            raise NotFoundError("user", token)
         return user

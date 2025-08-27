@@ -9,7 +9,8 @@ from app.src.domain.entities.room import Room
 from app.src.presentation.main import app
 from app.src.domain.entities.tag import Tag
 from app.src.presentation.core.config import settings
-
+from app.src.domain.entities.role import Role
+from app.src.domain.entities.user import User
 
 logger = logging.getLogger(__name__)
 
@@ -96,4 +97,33 @@ def sample_rooms_factory():
             for i in range(start, end)
         ]
 
+    return _factory
+
+
+@pytest.fixture()
+def sample_users_factory():
+    """
+    Factory pour générer une liste de Users de test.
+    Usage : sample_users_factory(start, end)
+    """
+    def _factory(start: int, end: int):
+        return [
+            User(
+                id=i,
+                email=f"user{i}@example.com",
+                password="hashedpassword",
+                firstname=f"First{i}",
+                lastname=f"Last{i}",
+                salt=None,
+                secret_2fa=None,
+                phone_number=f"060000000{i}",
+                created_at=parse_datetime("2025-07-17T20:14:19.947"),
+                updated_at=parse_datetime("2025-07-17T20:14:19.947"),
+                role=Role.admin.value if i % 2 == 0 else Role.guest.value,
+                is_active=True,
+                is_delete=False,
+                deleted_at=None
+            )
+            for i in range(start, end)
+        ]
     return _factory
