@@ -60,14 +60,6 @@ app = FastAPI(
             "name": OpenApiEvents.event,
             "description": "Les événements représentent des activités associées à une salle.",
         },
-        {
-            "name": OpenApiMaps.map,
-            "description": "Les maps correspondent aux images du plan d'un étage d'un bâtiment",
-        },
-        {
-            "name": OpenApiEvents.event,
-            "description": "Les événements représentent des activités associées à une salle.",
-        },
     ],
     servers=settings.SERVERS,
 )
