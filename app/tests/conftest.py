@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from dateutil.parser import parse as parse_datetime
 
 from app.src.domain.entities.room import Room
+from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.main import app
 from app.src.domain.entities.tag import Tag
 from app.src.presentation.core.config import settings
@@ -127,3 +128,5 @@ def sample_users_factory():
             for i in range(start, end)
         ]
     return _factory
+
+

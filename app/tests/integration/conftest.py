@@ -1,6 +1,8 @@
+from datetime import datetime, timedelta
 import os
 import pytest
 import logging
+from jose import jwt
 
 
 from alembic import command
@@ -9,9 +11,10 @@ from alembic.config import Config
 from sqlmodel import Session
 from sqlalchemy import create_engine, text
 
-from app.src.presentation.main import app
 from app.src.presentation.core.config import settings
-from app.src.infrastructure.db.session import get_session
+from app.src.domain.entities.role import Role
+from app.src.infrastructure.db.models.user_model import UserModel
+
 
 test_db_name = f"{settings.POSTGRES_DB}_test"
 test_db_url = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@postgres/{test_db_name}"
@@ -95,14 +98,45 @@ def clean_db():
         yield
 
 
-@pytest.fixture(scope="session", autouse=True)
-def override_dependencies():
-    def get_test_session():
-        with Session(test_engine) as session:
-            yield session
+@pytest.fixture
+def test_user():
+    """
+    Crée un utilisateur en base pour les tests.
+    Mot de passe = 1234 (hash déjà connu).
+    """
+    hashed_password = "$2b$12$A8IR/uZfnys3kvMmDP1PJuvJwKaqoUXD5brPDoRvxyTWXg2xuoo7W"
 
-    app.dependency_overrides[get_session] = get_test_session
+    user = UserModel(
+        email="testuser@example.com",
+        salt="testsalt",  # valeur bidon mais non NULL
+        password=hashed_password,
+        secret_2fa=None,  # si NOT NULL en DB, mettre une chaîne vide ""
+        firstname="John",
+        lastname="Doe",
+        phone_number="0600000000",
+        role=Role.admin.value,
+        is_active=True,
+        is_delete=False,
+        created_at=datetime.now(),
+        updated_at=datetime.now(),
+    )
 
-    yield
+    with Session(test_engine) as session:
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return user
 
-    app.dependency_overrides = {}
+
+@pytest.fixture
+def auth_headers(test_user):
+    expire = datetime.now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {
+        "sub": str(test_user.id),
+        "email": test_user.email,
+        "role": test_user.role,
+        "exp": expire,
+    }
+
+    token = jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return {"Authorization": f"Bearer {token}"}

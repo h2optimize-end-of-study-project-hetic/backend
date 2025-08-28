@@ -1,4 +1,5 @@
 import pytest
+import uuid
 
 
 @pytest.fixture
@@ -7,22 +8,22 @@ def fake_tag(sample_tags_factory):
 
 
 @pytest.fixture
-def tag_created(client, fake_tag):
+def tag_created(client, fake_tag, auth_headers):
     payload = {
         "tag": {
-            "name": fake_tag.name,
+            "name": f"{fake_tag.name}_{uuid.uuid4().hex[:8]}",
             "description": fake_tag.description,
-            "source_address": fake_tag.source_address,
+            "source_address": f"{fake_tag.source_address}_{uuid.uuid4().hex[:8]}",
         }
     }
-    response = client.post("/api/v1/tag", json=payload)
-    assert response.status_code == 200
+    response = client.post("/api/v1/tag", json=payload, headers=auth_headers)
+    assert response.status_code == 200, response.json()
     return response.json()
 
 
-def test_get_tag_by_id_success(client, tag_created):
+def test_get_tag_by_id_success(client, tag_created, auth_headers):
     tag_id = tag_created["id"]
-    response = client.get(f"/api/v1/tag/{tag_id}")
+    response = client.get(f"/api/v1/tag/{tag_id}", headers=auth_headers)
     assert response.status_code == 200
 
     data = response.json()
@@ -36,13 +37,13 @@ def test_get_tag_by_id_success(client, tag_created):
 
 
 @pytest.mark.parametrize("tag_id", [-1, 0, "abc"])
-def test_get_tag_by_id_failed_invalid_tag_id(client, tag_id):
-    response = client.get(f"/api/v1/tag/{tag_id}")
+def test_get_tag_by_id_failed_invalid_tag_id(client, tag_id, auth_headers):
+    response = client.get(f"/api/v1/tag/{tag_id}", headers=auth_headers)
     assert response.status_code == 422
 
 
-def test_get_tag_by_id_failed_not_found(client):
-    response = client.get("/api/v1/tag/9999")
+def test_get_tag_by_id_failed_not_found(client, auth_headers):
+    response = client.get("/api/v1/tag/9999", headers=auth_headers)
     assert response.status_code == 404
 
     data = response.json()
