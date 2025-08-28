@@ -29,6 +29,7 @@ class SQLMapRepository(MapRepository):
             map_model = MapModel(
                 building_id=map.building_id,
                 file_name=map.file_name,
+                floor=map.floor,
                 path=map.path,
                 width=map.width,
                 length=map.length,

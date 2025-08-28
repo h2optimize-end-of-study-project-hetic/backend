@@ -8,6 +8,7 @@ class Map:
     id: int | None
     building_id : int | None
     file_name: str
+    floor: int
     path: str
     width: int | None
     length : int | None
@@ -27,6 +28,7 @@ class Map:
             id=data.get("id"),
             building_id=data.get("building_id"),
             file_name=data["file_name"],
+            floor=data["floor"],
             path=data.get("path"),
             width=data.get("width"),
             length=data.get("length"),

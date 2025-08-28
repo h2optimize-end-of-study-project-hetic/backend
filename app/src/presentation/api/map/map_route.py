@@ -18,7 +18,7 @@ from app.src.use_cases.map.get_map_list_use_case import GetMapListUseCase
 from app.src.use_cases.map.get_map_by_id_use_case import GetMapByIdUseCase
 from app.src.presentation.api.common.generic_model import PaginationMetadataModel
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig, generate_responses
-from app.src.presentation.api.map.map_model import (PaginatedListMapModelResponse, MapModelResponse)
+from app.src.presentation.api.map.map_model import (PaginatedListMapModelResponse, MapModelResponse, MapUpdateModelRequest)
 from app.src.presentation.dependencies import (
     create_map_use_case,
     delete_map_use_case,
@@ -61,12 +61,14 @@ async def create_map(
     use_case: Annotated[CreateMapUseCase, Depends(create_map_use_case)],
     user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     building_id: int = Form(...),
+    floor: int = Form(...),
     file: UploadFile = File(...),
 ):
     """
     Create a new map
     - **building_id** : The building ID to which this map is attached to
     - **file_name**: Name of the map (minimum 3 characters, maximum 255 characters)
+    - **floor** : The floor of the map
     - **path**: Location of the map
     - **width** : Width of the map image
     - **width** : Length of the map image
@@ -94,6 +96,7 @@ async def create_map(
             id=None,
             building_id=building_id,
             file_name=file_name,
+            floor=floor,
             path=save_path,
             width=image_info.width,
             length=image_info.length,
@@ -232,14 +235,27 @@ async def update_map(
     user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     file: Annotated[UploadFile | None, File()] = None,
     map_id: int = Path(..., ge=1, description="ID of the map to update"),
+    building_id: Annotated[int | None, Form()] = None,
+    floor: Annotated[int | None, Form()] = None,
+
 ):
+    """
+    Update a map partially
+    """
     try:
         existing_map = use_case.get(map_id)
+        update_data = {}
 
-        file.file.seek(0)
-        image_update = await handle_map_image(file, existing_map)
+        if building_id is not None:
+            update_data["building_id"] = building_id
+        if floor is not None:
+            update_data["floor"] = floor
+        if file:
+            file.file.seek(0)
+            image_update = await handle_map_image(file, existing_map)
+            update_data.update(image_update) 
 
-        updated_map = use_case.execute(map_id, image_update)
+        updated_map = use_case.execute(map_id, update_data)
 
         return MapModelResponse(**updated_map.to_dict())
 
