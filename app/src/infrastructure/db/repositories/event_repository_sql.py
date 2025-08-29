@@ -48,7 +48,6 @@ class SQLEventRepository(EventRepository):
         return Event.from_dict(event_model.model_dump())
 
     def paginate_events(self, cursor: int | None, limit: int) -> tuple[list[Event], int, Event | None, Event | None]:
-        self.session.exec(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"))
 
         events = self.select_events(cursor, limit)
         total = self.count_all_events()
