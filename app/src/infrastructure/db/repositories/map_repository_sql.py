@@ -51,7 +51,6 @@ class SQLMapRepository(MapRepository):
         return Map.from_dict(map_model.model_dump())
 
     def paginate_maps(self, cursor: int | None, limit: int) -> tuple[list[Map], int, Map | None, Map | None]:
-        self.session.exec(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"))
 
         maps = self.select_maps(cursor, limit)
         total = self.count_all_maps()

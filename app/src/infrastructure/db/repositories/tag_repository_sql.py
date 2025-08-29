@@ -51,8 +51,6 @@ class SQLTagRepository(TagRepository):
 
 
     def paginate_tags(self, cursor: int | None, limit: int) -> tuple[list[Tag], int, Tag | None, Tag | None]:
-        self.session.exec(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"))
-
         tags = self.select_tags(cursor, limit)
         total = self.count_all_tags()
         first_tag = self.get_tag_by_position(0)

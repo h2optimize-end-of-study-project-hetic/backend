@@ -2,6 +2,7 @@ from collections.abc import Generator
 
 from sqlmodel import Session, create_engine
 
+from app.src.infrastructure.db.models.tag_model import TagModel
 from app.src.infrastructure.db.models.room_model import RoomModel
 from app.src.infrastructure.db.models.building_model import BuildingModel 
 

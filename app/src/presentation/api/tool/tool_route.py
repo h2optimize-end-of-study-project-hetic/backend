@@ -58,7 +58,7 @@ async def private_route(
 
 @tool_router.get("/private/admin", summary="Admin info")
 async def private_admin_route(
-    user: Annotated[User, Depends(secure_ressources(Role.admin))]
+    user: Annotated[User, Depends(secure_ressources([Role.admin]))]
 ):
     result = UserModelResponse(**user.to_dict())
     return {
@@ -69,7 +69,7 @@ async def private_admin_route(
 
 @tool_router.get("/private/interne", summary="interne info")
 async def private_intern_route(
-    user: Annotated[User, Depends(secure_ressources(Role.intern))]
+    user: Annotated[User, Depends(secure_ressources([Role.intern]))]
 ):
     result = UserModelResponse(**user.to_dict())
     return {
