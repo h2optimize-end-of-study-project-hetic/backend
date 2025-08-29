@@ -36,6 +36,14 @@ from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase
 from app.src.use_cases.user.get_user_by_list_use_case import GetUserListUseCase
 from app.src.use_cases.user.get_user_by_id_use_case import GetUserByIdUseCase
 
+from app.src.use_cases.event.create_event_use_case import CreateEventUseCase
+from app.src.use_cases.event.delete_event_use_case import DeleteEventUseCase
+from app.src.use_cases.event.update_event_use_case import UpdateEventUseCase
+from app.src.use_cases.event.get_event_list_use_case import GetEventListUseCase
+from app.src.use_cases.event.get_event_by_id_use_case import GetEventByIdUseCase
+from app.src.domain.interface_repositories.event_repository import EventRepository
+from app.src.infrastructure.db.repositories.event_repository_sql import SQLEventRepository
+
 get_session_dep = Depends(get_session)
 
 
@@ -104,11 +112,33 @@ def update_map_use_case(map_repository: MapRepository = map_repo_dep) -> UpdateM
 def delete_map_use_case(map_repository: MapRepository = map_repo_dep) -> DeleteMapUseCase:
     return DeleteMapUseCase(map_repository)
 
+def event_repository(session: Session = get_session_dep) -> EventRepository:
+    return SQLEventRepository(session)
+
+event_repo_dep = Depends(event_repository)
 
 
-def user_repository(session: Session = get_session_dep) -> UserRepository:
-    return SQLUserRepository(session)
+def get_event_by_id_use_case(event_repository: EventRepository = event_repo_dep) -> GetEventByIdUseCase:
+    return GetEventByIdUseCase(event_repository)
 
+
+def get_event_list_use_case(event_repository: EventRepository = event_repo_dep) -> GetEventListUseCase:
+    return GetEventListUseCase(event_repository)
+
+
+def create_event_use_case(event_repository: EventRepository = event_repo_dep) -> CreateEventUseCase:
+    return CreateEventUseCase(event_repository)
+
+
+def update_event_use_case(event_repository: EventRepository = event_repo_dep) -> UpdateEventUseCase:
+    return UpdateEventUseCase(event_repository)
+
+
+def delete_event_use_case(event_repository: EventRepository = event_repo_dep) -> DeleteEventUseCase:
+    return DeleteEventUseCase(event_repository)
+
+
+# user
 
 def user_repository(session: Session = get_session_dep) -> UserRepository:
     return SQLUserRepository(session)
@@ -163,4 +193,31 @@ def update_room_use_case(room_repository: RoomRepository = room_repo_dep) -> Upd
 def delete_room_use_case(room_repository: RoomRepository = room_repo_dep) -> DeleteRoomUseCase:
     return DeleteRoomUseCase(room_repository) 
 
+
+# event
+
+def event_repository(session: Session = get_session_dep) -> EventRepository:
+    return SQLEventRepository(session)
+
+event_repo_dep = Depends(event_repository)
+
+
+def get_event_by_id_use_case(event_repository: EventRepository = event_repo_dep) -> GetEventByIdUseCase:
+    return GetEventByIdUseCase(event_repository)
+
+
+def get_event_list_use_case(event_repository: EventRepository = event_repo_dep) -> GetEventListUseCase:
+    return GetEventListUseCase(event_repository)
+
+
+def create_event_use_case(event_repository: EventRepository = event_repo_dep) -> CreateEventUseCase:
+    return CreateEventUseCase(event_repository)
+
+
+def update_event_use_case(event_repository: EventRepository = event_repo_dep) -> UpdateEventUseCase:
+    return UpdateEventUseCase(event_repository)
+
+
+def delete_event_use_case(event_repository: EventRepository = event_repo_dep) -> DeleteEventUseCase:
+    return DeleteEventUseCase(event_repository)
 

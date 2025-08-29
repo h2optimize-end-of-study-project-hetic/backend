@@ -4,19 +4,17 @@ from dataclasses import asdict, dataclass
 from dateutil.parser import parse as parse_datetime
 
 @dataclass
-class Map:
+class Event:
     id: int | None
-    building_id : int | None
-    file_name: str
-    floor: int
-    path: str
-    width: int | None
-    length : int | None
+    name: str
+    description: str
+    group_id: int | None
+    supervisor : str
     created_at: datetime | None
     updated_at: datetime | None = None
 
     @staticmethod
-    def from_dict(data: dict) -> "Map":
+    def from_dict(data: dict) -> "Event":
         def safe_parse(value):
             if isinstance(value, datetime):
                 return value
@@ -24,14 +22,12 @@ class Map:
                 return parse_datetime(value)
             return None
 
-        return Map(
+        return Event(
             id=data.get("id"),
-            building_id=data.get("building_id"),
-            file_name=data["file_name"],
-            floor=data["floor"],
-            path=data.get("path"),
-            width=data.get("width"),
-            length=data.get("length"),
+            name=data["name"],
+            description=data.get("description"),
+            group_id=data.get("group_id"),
+            supervisor=data.get("supervisor"),
             created_at=safe_parse(data.get("created_at")),
             updated_at=safe_parse(data.get("updated_at")),
         )
