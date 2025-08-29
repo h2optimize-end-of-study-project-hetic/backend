@@ -2,7 +2,10 @@ import pytest
 from unittest.mock import Mock
 from app.src.presentation.main import app
 from app.src.domain.entities.room import Room
+from app.src.domain.entities.user import User
+from app.src.domain.entities.role import Role
 from app.src.presentation.dependencies import create_room_use_case
+from app.src.presentation.api.secure_ressources import get_current_user_from_token
 from app.src.use_cases.room.create_room_use_case import CreateRoomUseCase
 from app.src.common.exception import CreationFailedError
 
@@ -13,6 +16,14 @@ def fake_room(sample_rooms_factory):
 
 
 @pytest.fixture
+def fake_user(sample_users_factory):
+    users = sample_users_factory(1, 2)
+    user = users[0]
+    user.role = Role.staff.value
+    return user
+
+
+@pytest.fixture
 def mock_create_room_use_case(fake_room):
     mock = Mock(spec=CreateRoomUseCase)
     mock.execute.return_value = fake_room
@@ -20,8 +31,16 @@ def mock_create_room_use_case(fake_room):
 
 
 @pytest.fixture
-def override_dependencies(mock_create_room_use_case):
+def mock_current_user(fake_user):
+    def _mock():
+        return fake_user
+    return _mock
+
+
+@pytest.fixture
+def override_dependencies(mock_create_room_use_case, mock_current_user):
     app.dependency_overrides[create_room_use_case] = lambda: mock_create_room_use_case
+    app.dependency_overrides[get_current_user_from_token] = mock_current_user
     yield
     app.dependency_overrides = {}
 
@@ -89,6 +108,56 @@ def test_create_room_failed_creation_error(client, override_dependencies, mock_c
     assert response.status_code == 422
     data = response.json()
     assert data["detail"] == "Failed to create Room"
+
+
+def test_create_room_unauthorized_without_token(client):
+    payload = {
+        "room": {
+            "name": "Test Room",
+            "description": "Test Description",
+            "floor": 1,
+            "building_id": 1,
+            "area": 25.5,
+            "shape": [[0, 0], [10, 10]],
+            "capacity": 10,
+        }
+    }
+
+    response = client.post("/api/v1/room", json=payload)
+    
+    assert response.status_code == 401
+    data = response.json()
+    assert "detail" in data
+
+
+def test_create_room_insufficient_permissions(client, mock_create_room_use_case, fake_user):
+    fake_user.role = Role.guest.value
+    
+    def mock_current_user_insufficient():
+        return fake_user
+    
+    app.dependency_overrides[create_room_use_case] = lambda: mock_create_room_use_case
+    app.dependency_overrides[get_current_user_from_token] = mock_current_user_insufficient
+    
+    payload = {
+        "room": {
+            "name": "Test Room",
+            "description": "Test Description",
+            "floor": 1,
+            "building_id": 1,
+            "area": 25.5,
+            "shape": [[0, 0], [10, 10]],
+            "capacity": 10,
+        }
+    }
+
+    response = client.post("/api/v1/room", json=payload)
+    
+    assert response.status_code == 403
+    data = response.json()
+    assert data["detail"] == "Insufficient permissions"
+    
+    app.dependency_overrides = {}
 
 
 def test_end():

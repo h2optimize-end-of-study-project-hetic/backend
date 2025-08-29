@@ -34,8 +34,10 @@ def override_dependencies(mock_get_tag_list_use_case):
     app.dependency_overrides = {}
 
 
-def test_get_tag_list_success(client, override_dependencies, mock_get_tag_list_use_case, fake_tags):
+def test_get_tag_list_success(authenticated_client, override_dependencies, mock_get_tag_list_use_case, fake_tags):
+    client, _ = authenticated_client
     response = client.get("/api/v1/tag", params={"limit": 10})
+
     mock_get_tag_list_use_case.execute.assert_called_once_with(None, 10)
     assert response.status_code == 200
 
@@ -51,14 +53,14 @@ def test_get_tag_list_success(client, override_dependencies, mock_get_tag_list_u
     assert first_tag["description"] == fake_tags[0].description
 
 
-def test_get_tag_list_failed_unexpectedly(client, override_dependencies, mock_get_tag_list_use_case):
+def test_get_tag_list_failed_unexpectedly(authenticated_client, override_dependencies, mock_get_tag_list_use_case):
+    client, _ = authenticated_client
     mock_get_tag_list_use_case.execute.side_effect = Exception("Unexpectedly")
 
     response = client.get("/api/v1/tag")
 
     assert response.status_code == 500
-    data = response.json()
-    assert data["detail"] == "Internal server error"
+    assert response.json()["detail"] == "Internal server error"
 
 
 def test_end():

@@ -5,6 +5,7 @@ from app.src.presentation.main import app
 from app.src.presentation.dependencies import delete_room_use_case
 from app.src.use_cases.room.delete_room_use_case import DeleteRoomUseCase
 from app.src.common.exception import DeletionFailedError
+from app.src.presentation.api.secure_ressources import get_current_user_from_token
 
 
 @pytest.fixture
@@ -15,13 +16,16 @@ def mock_delete_room_use_case():
 
 
 @pytest.fixture
-def override_dependencies(mock_delete_room_use_case):
+def override_dependencies(mock_delete_room_use_case, authenticated_client):
+    client, user = authenticated_client
     app.dependency_overrides[delete_room_use_case] = lambda: mock_delete_room_use_case
-    yield
-    app.dependency_overrides = {}
+    app.dependency_overrides[get_current_user_from_token] = lambda: user
+    yield client, user
+    app.dependency_overrides.clear()
 
 
-def test_delete_room_success(client, override_dependencies, mock_delete_room_use_case):
+def test_delete_room_success(override_dependencies, mock_delete_room_use_case):
+    client, _ = override_dependencies
     room_id = 1
 
     response = client.delete(f"/api/v1/room/{room_id}")
@@ -31,7 +35,8 @@ def test_delete_room_success(client, override_dependencies, mock_delete_room_use
     assert response.content == b""
 
 
-def test_delete_room_failed_error(client, override_dependencies, mock_delete_room_use_case):
+def test_delete_room_failed_error(override_dependencies, mock_delete_room_use_case):
+    client, _ = override_dependencies
     room_id = 1
     mock_delete_room_use_case.execute.side_effect = DeletionFailedError("Room")
 

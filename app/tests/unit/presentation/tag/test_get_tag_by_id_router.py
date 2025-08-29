@@ -23,11 +23,13 @@ def mock_get_tag_by_id_use_case(fake_tag):
 def override_dependencies(mock_get_tag_by_id_use_case):
     app.dependency_overrides[get_tag_by_id_use_case] = lambda: mock_get_tag_by_id_use_case
     yield
-    app.dependency_overrides = {}
+    app.dependency_overrides.clear()
 
 
-def test_get_tag_by_id_success(client, override_dependencies, mock_get_tag_by_id_use_case, fake_tag):
+def test_get_tag_by_id_success(authenticated_client, override_dependencies, mock_get_tag_by_id_use_case, fake_tag):
+    client, user = authenticated_client
     tag_id = fake_tag.id
+
     response = client.get(f"/api/v1/tag/{tag_id}")
 
     mock_get_tag_by_id_use_case.execute.assert_called_once_with(tag_id)
@@ -43,14 +45,16 @@ def test_get_tag_by_id_success(client, override_dependencies, mock_get_tag_by_id
 
 
 @pytest.mark.parametrize("tag_id", [-1, 0, "abc"])
-def test_get_tag_by_id_failed_invalid_tag_id(client, override_dependencies, mock_get_tag_by_id_use_case, tag_id):
+def test_get_tag_by_id_invalid_id(authenticated_client, override_dependencies, mock_get_tag_by_id_use_case, tag_id):
+    client, _ = authenticated_client
     response = client.get(f"/api/v1/tag/{tag_id}")
 
     assert response.status_code == 422
     mock_get_tag_by_id_use_case.execute.assert_not_called()
 
 
-def test_get_tag_by_id_failed_tag_not_found(client, override_dependencies, mock_get_tag_by_id_use_case):
+def test_get_tag_by_id_not_found(authenticated_client, override_dependencies, mock_get_tag_by_id_use_case):
+    client, _ = authenticated_client
     tag_id = 999
     mock_get_tag_by_id_use_case.execute.side_effect = NotFoundError("Tag", tag_id)
 
@@ -61,15 +65,24 @@ def test_get_tag_by_id_failed_tag_not_found(client, override_dependencies, mock_
     assert response.json()["detail"] == f"Tag with ID '{tag_id}' not found"
 
 
-def test_get_tag_by_id_failed_unexpectedly(client, override_dependencies, mock_get_tag_by_id_use_case):
-    mock_get_tag_by_id_use_case.execute.side_effect = Exception("Unexpectedly")
+def test_get_tag_by_id_unexpected_error(authenticated_client, override_dependencies, mock_get_tag_by_id_use_case):
+    client, _ = authenticated_client
     tag_id = 1
+    mock_get_tag_by_id_use_case.execute.side_effect = Exception("Unexpectedly")
 
     response = client.get(f"/api/v1/tag/{tag_id}")
 
     mock_get_tag_by_id_use_case.execute.assert_called_once_with(tag_id)
     assert response.status_code == 500
     assert response.json()["detail"] == "Internal server error"
+
+
+def test_get_tag_by_id_unauthorized(client, override_dependencies):
+    tag_id = 1
+    response = client.get(f"/api/v1/tag/{tag_id}")
+
+    assert response.status_code == 401
+    assert "detail" in response.json()
 
 
 def test_end():

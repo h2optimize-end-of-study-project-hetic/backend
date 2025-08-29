@@ -25,7 +25,8 @@ def override_dependencies(mock_update_tag_use_case):
     app.dependency_overrides = {}
 
 
-def test_update_tag_success(client, override_dependencies, mock_update_tag_use_case, fake_tag):
+def test_update_tag_success(authenticated_client, override_dependencies, mock_update_tag_use_case, fake_tag):
+    client, _ = authenticated_client
     fake_tag.name = "Updated name"
     fake_tag.description = "Updated description"
     fake_tag.source_address = "Updated src address"
@@ -52,7 +53,8 @@ def test_update_tag_success(client, override_dependencies, mock_update_tag_use_c
     assert data["source_address"] == fake_tag.source_address
 
 
-def test_update_tag_failed_unexpectedly(client, override_dependencies, mock_update_tag_use_case, fake_tag):
+def test_update_tag_failed_unexpectedly(authenticated_client, override_dependencies, mock_update_tag_use_case, fake_tag):
+    client, _ = authenticated_client
     tag_id = fake_tag.id
     payload = {
         "tag": {

@@ -23,10 +23,11 @@ def mock_get_room_by_id_use_case(fake_room):
 def override_dependencies(mock_get_room_by_id_use_case):
     app.dependency_overrides[get_room_by_id_use_case] = lambda: mock_get_room_by_id_use_case
     yield
-    app.dependency_overrides = {}
+    app.dependency_overrides.clear()
 
 
-def test_get_room_by_id_success(client, override_dependencies, mock_get_room_by_id_use_case, fake_room):
+def test_get_room_by_id_success(authenticated_client, override_dependencies, mock_get_room_by_id_use_case, fake_room):
+    client, _ = authenticated_client
     room_id = fake_room.id
     response = client.get(f"/api/v1/room/{room_id}")
 
@@ -45,7 +46,8 @@ def test_get_room_by_id_success(client, override_dependencies, mock_get_room_by_
     assert data["updated_at"] == fake_room.updated_at.isoformat()
 
 
-def test_get_room_by_id_failed_not_found(client, override_dependencies, mock_get_room_by_id_use_case):
+def test_get_room_by_id_failed_not_found(authenticated_client, override_dependencies, mock_get_room_by_id_use_case):
+    client, _ = authenticated_client
     room_id = 999
     mock_get_room_by_id_use_case.execute.side_effect = NotFoundError("Room", room_id)
 

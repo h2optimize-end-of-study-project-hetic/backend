@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 from dateutil.parser import parse as parse_datetime
 
 from app.src.domain.entities.room import Room
-from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.main import app
 from app.src.domain.entities.tag import Tag
 from app.src.presentation.core.config import settings
@@ -130,3 +129,66 @@ def sample_users_factory():
     return _factory
 
 
+
+@pytest.fixture
+def authenticated_client(client, sample_users_factory):
+    """
+    Fournit un client avec un utilisateur authentifié par défaut.
+    Utilise le système d'override des dépendances.
+    """
+    from app.src.presentation.api.secure_ressources import get_current_user_from_token
+    
+    user = sample_users_factory(1, 2)[0]
+    user.role = Role.admin.value
+    user.is_active = True
+    
+    def mock_current_user():
+        return user
+    
+    app.dependency_overrides[get_current_user_from_token] = mock_current_user
+    
+    yield client, user
+    
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def staff_authenticated_client(client, sample_users_factory):
+    """
+    Fournit un client avec un utilisateur staff authentifié.
+    """
+    from app.src.presentation.api.secure_ressources import get_current_user_from_token
+    
+    user = sample_users_factory(1, 2)[0]
+    user.role = Role.staff.value
+    user.is_active = True
+    
+    def mock_current_user():
+        return user
+    
+    app.dependency_overrides[get_current_user_from_token] = mock_current_user
+    
+    yield client, user
+    
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def guest_authenticated_client(client, sample_users_factory):
+    """
+    Fournit un client avec un utilisateur guest authentifié (permissions limitées).
+    """
+    from app.src.presentation.api.secure_ressources import get_current_user_from_token
+    
+    user = sample_users_factory(1, 2)[0]
+    user.role = Role.guest.value
+    user.is_active = True
+    
+    def mock_current_user():
+        return user
+    
+    app.dependency_overrides[get_current_user_from_token] = mock_current_user
+    
+    yield client, user
+    
+    app.dependency_overrides.clear()

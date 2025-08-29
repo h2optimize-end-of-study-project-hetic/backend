@@ -26,7 +26,8 @@ def override_dependencies(mock_update_tag_use_case):
     app.dependency_overrides = {}
 
 
-def test_update_tag_success(client, override_dependencies, mock_update_tag_use_case, fake_tag):
+def test_update_tag_success(authenticated_client, override_dependencies, mock_update_tag_use_case, fake_tag):
+    client, _ = authenticated_client
     fake_tag.name = "Updated name"
     fake_tag.description = "Updated description"
     fake_tag.source_address = "Updated src address"
@@ -56,7 +57,8 @@ def test_update_tag_success(client, override_dependencies, mock_update_tag_use_c
 
 
 @pytest.mark.parametrize("tag_id", [-1, 0, "abc"])
-def test_update_tag_failed_invalid_tag_id(client, override_dependencies, mock_update_tag_use_case, tag_id):
+def test_update_tag_failed_invalid_tag_id(authenticated_client, override_dependencies, mock_update_tag_use_case, tag_id):
+    client, _ = authenticated_client
     payload = {
         "tag": {
             "name": "Updated name",
@@ -70,7 +72,8 @@ def test_update_tag_failed_invalid_tag_id(client, override_dependencies, mock_up
     mock_update_tag_use_case.execute.assert_not_called()
 
 
-def test_update_tag_failed_tag_not_found(client, override_dependencies, mock_update_tag_use_case):
+def test_update_tag_failed_tag_not_found(authenticated_client, override_dependencies, mock_update_tag_use_case):
+    client, _ = authenticated_client
     tag_id = 999
     mock_update_tag_use_case.execute.side_effect = NotFoundError("Tag", tag_id)
 
@@ -87,7 +90,8 @@ def test_update_tag_failed_tag_not_found(client, override_dependencies, mock_upd
     assert response.json()["detail"] == f"Tag with ID '{tag_id}' not found"
 
 
-def test_update_tag_failed_already_exists(client, override_dependencies, mock_update_tag_use_case, fake_tag):
+def test_update_tag_failed_already_exists(authenticated_client, override_dependencies, mock_update_tag_use_case, fake_tag):
+    client, _ = authenticated_client
     mock_update_tag_use_case.execute.side_effect = AlreadyExistsError("Tag", "source_address", "existing_address")
 
     tag_id = fake_tag.id
@@ -106,7 +110,8 @@ def test_update_tag_failed_already_exists(client, override_dependencies, mock_up
     assert response.json()["detail"] == "Tag with source_address 'existing_address' already exists"
 
 
-def test_update_tag_failed(client, override_dependencies, mock_update_tag_use_case, fake_tag):
+def test_update_tag_failed(authenticated_client, override_dependencies, mock_update_tag_use_case, fake_tag):
+    client, _ = authenticated_client
     tag_id = fake_tag.id
     payload = {"tag": {"name": "Updated name"}}
     mock_update_tag_use_case.execute.side_effect = UpdateFailedError("Tag")
@@ -118,7 +123,8 @@ def test_update_tag_failed(client, override_dependencies, mock_update_tag_use_ca
     assert response.json()["detail"] == "Failed to update Tag"
 
 
-def test_update_tag_failed_unexpectedly(client, override_dependencies, mock_update_tag_use_case, fake_tag):
+def test_update_tag_failed_unexpectedly(authenticated_client, override_dependencies, mock_update_tag_use_case, fake_tag):
+    client, _ = authenticated_client
     tag_id = fake_tag.id
     payload = {
         "tag": {
@@ -144,7 +150,8 @@ def test_update_tag_failed_unexpectedly(client, override_dependencies, mock_upda
         "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quod quo harum officia alias reiciendis tenetur placeat autem dolore repellendus distinctio.Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quod quo harum officia alias reiciendis tenetur placeat autem dolore repellendus distinctio.",
     ],
 )
-def test_update_tag_failed_invalid_name(client, override_dependencies, mock_update_tag_use_case, name, fake_tag):
+def test_update_tag_failed_invalid_name(authenticated_client, override_dependencies, mock_update_tag_use_case, name, fake_tag):
+    client, _ = authenticated_client
     payload = {
         "tag": {
             "name": name,
@@ -160,8 +167,9 @@ def test_update_tag_failed_invalid_name(client, override_dependencies, mock_upda
 
 @pytest.mark.parametrize("source_address", ["te", ""])
 def test_update_tag_failed_invalid_source_address(
-    client, override_dependencies, mock_update_tag_use_case, source_address, fake_tag
+    authenticated_client, override_dependencies, mock_update_tag_use_case, source_address, fake_tag
 ):
+    client, _ = authenticated_client
     payload = {
         "tag": {
             "name": "Updated name",
@@ -175,7 +183,8 @@ def test_update_tag_failed_invalid_source_address(
     mock_update_tag_use_case.execute.assert_not_called()
 
 
-def test_update_tag_success_no_name(client, override_dependencies, mock_update_tag_use_case, fake_tag):
+def test_update_tag_success_no_name(authenticated_client, override_dependencies, mock_update_tag_use_case, fake_tag):
+    client, _ = authenticated_client
     fake_tag.description = "Updated description"
     fake_tag.source_address = "Updated src address"
     mock_update_tag_use_case.execute.return_value = fake_tag
@@ -202,7 +211,8 @@ def test_update_tag_success_no_name(client, override_dependencies, mock_update_t
     assert data["updated_at"] == fake_tag.updated_at.isoformat()
 
 
-def test_update_tag_success_no_description(client, override_dependencies, mock_update_tag_use_case, fake_tag):
+def test_update_tag_success_no_description(authenticated_client, override_dependencies, mock_update_tag_use_case, fake_tag):
+    client, _ = authenticated_client
     fake_tag.name = "Updated name"
     fake_tag.source_address = "Updated src address"
     mock_update_tag_use_case.execute.return_value = fake_tag
@@ -229,7 +239,8 @@ def test_update_tag_success_no_description(client, override_dependencies, mock_u
     assert data["updated_at"] == fake_tag.updated_at.isoformat()
 
 
-def test_update_tag_success_no_source_address(client, override_dependencies, mock_update_tag_use_case, fake_tag):
+def test_update_tag_success_no_source_address(authenticated_client, override_dependencies, mock_update_tag_use_case, fake_tag):
+    client, _ = authenticated_client
     fake_tag.name = "Updated name"
     fake_tag.description = "Updated description"
     mock_update_tag_use_case.execute.return_value = fake_tag
@@ -258,4 +269,3 @@ def test_update_tag_success_no_source_address(client, override_dependencies, moc
 
 def test_end():
     print("\n\nEnd => Update Tag route\n")
-
