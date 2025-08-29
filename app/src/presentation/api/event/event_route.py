@@ -76,6 +76,7 @@ event_router = APIRouter(
 )
 async def create_event(
     use_case: Annotated[CreateEventUseCase, Depends(create_event_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     event: Annotated[EventCreateModelRequest, Body(embed=True)],
 ):
     """
