@@ -3,22 +3,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 039ecb2 (add role to route)
 from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.domain.entities.role import Role
 from app.src.domain.entities.user import User
-
-<<<<<<< HEAD
-=======
->>>>>>> aa712d6 (crud event)
-=======
->>>>>>> 862071b (crud event)
-=======
->>>>>>> 039ecb2 (add role to route)
 from app.src.domain.entities.event import Event
 from app.src.presentation.core.open_api_events import OpenApiEvents
 from app.src.use_cases.event.delete_event_use_case import DeleteEventUseCase
@@ -34,6 +21,7 @@ from app.src.presentation.api.event.event_model import (
     EventModelResponse,
     EventUpdateModelRequest,
 )
+
 from app.src.presentation.dependencies import (
     create_event_use_case,
     delete_event_use_case,
@@ -76,7 +64,8 @@ event_router = APIRouter(
 )
 async def create_event(
     use_case: Annotated[CreateEventUseCase, Depends(create_event_use_case)],
-    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
+        user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
+
     event: Annotated[EventCreateModelRequest, Body(embed=True)],
 ):
     """
@@ -125,17 +114,7 @@ async def create_event(
 )
 async def read_event_list(
     use_case: Annotated[GetEventListUseCase, Depends(get_event_list_use_case)],
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
-=======
->>>>>>> aa712d6 (crud event)
-=======
->>>>>>> 862071b (crud event)
-=======
-    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
->>>>>>> 039ecb2 (add role to route)
     cursor: str | None = Query(None, description="Pagination cursor"),
     limit: int | None = Query(20, ge=1, description="Number of elements return"),
 ):
@@ -180,17 +159,7 @@ async def read_event_list(
 
 async def read_event(
     use_case: Annotated[GetEventByIdUseCase, Depends(get_event_by_id_use_case)],
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
-=======
->>>>>>> aa712d6 (crud event)
-=======
->>>>>>> 862071b (crud event)
-=======
-    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
->>>>>>> 039ecb2 (add role to route)
     event_id: int = Path(..., ge=1, description="The event ID (positive integer)"),
 ):
     """
@@ -218,19 +187,7 @@ async def read_event(
 )
 async def update_event(
     use_case: Annotated[UpdateEventUseCase, Depends(update_event_use_case)],
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
-=======
-    # file: Annotated[UploadFile | None, File()] = None,
->>>>>>> aa712d6 (crud event)
-=======
-    # file: Annotated[UploadFile | None, File()] = None,
->>>>>>> 862071b (crud event)
-=======
-    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
->>>>>>> 039ecb2 (add role to route)
     event: Annotated[EventUpdateModelRequest, Body(embed=True)],
     event_id: int = Path(..., ge=1, description="ID of the event to update"),
 ):
@@ -259,17 +216,7 @@ async def update_event(
 )
 async def delete_event(
     use_case: Annotated[DeleteEventUseCase, Depends(delete_event_use_case)],
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
-=======
->>>>>>> aa712d6 (crud event)
-=======
->>>>>>> 862071b (crud event)
-=======
-    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
->>>>>>> 039ecb2 (add role to route)
     event_id: int = Path(..., ge=1, description="ID of the event to delete"),
 ):
     try:

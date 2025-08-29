@@ -17,7 +17,7 @@ class EventBaseModel(BaseModel):
         ..., min_length=3, title="Description", description="The description must be at least 3 characters long"
     )
     group_id: int = Field(
-        default=None, title="Group ID", description="The group to which the event is attached"
+        default=None, gt=0, title="Group ID", description="The group to which the event is attached"
     )
     supervisor: str = Field(
         default=None, title="Supervisor", description="Name of the supervisor of the event"
@@ -30,20 +30,20 @@ class EventCreateModelRequest(EventBaseModel):
 
 class EventUpdateModelRequest(BaseModel):
     name: str | None = Field(
-        ...,
+        default=None,
         min_length=3,
         max_length=255,
         title="Name",
         description="The name of the event must be between 3 and 255 characters long",
     )
     description: str | None = Field(
-        ..., 
+        default=None,
         min_length=3, 
         title="Description", 
         description="The description must be at least 3 characters long"
     )
     group_id: int | None = Field(
-        default=None, title="Group ID", description="The group to which the event is attached"
+        default=None, gt=0, title="Group ID", description="The group to which the event is attached"
     )
     supervisor: str | None = Field(
         default=None, title="Supervisor", description="Name of the supervisor of the event"
