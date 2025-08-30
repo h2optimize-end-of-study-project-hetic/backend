@@ -30,6 +30,36 @@ target_metadata = SQLModel.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+from logging.config import fileConfig
+import os
+
+from sqlalchemy import engine_from_config, pool
+from sqlmodel import SQLModel
+from alembic import context
+
+# Import de ta config centralisée
+from app.src.presentation.core.config import Settings
+
+# Alembic Config object
+config = context.config
+
+# Logging
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# Cible pour autogenerate
+target_metadata = SQLModel.metadata
+
+# Utilise ta config Python (DRY)
+settings = Settings()
+db_url = settings.database_url
+
+# Injection dans la config Alembic
+escaped_db_url = db_url.replace('%', '%%')
+config.set_main_option("sqlalchemy.url", escaped_db_url)
+
+
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.

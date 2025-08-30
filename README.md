@@ -253,23 +253,26 @@ Remplacer `pytest` par `ptw`.
 ### Env 
 
 ```
-  ENVIRONMENT: development
-  BACKEND_HOST: ${{ vars.BACKEND_HOST || 'backend' }}
-  BACKEND_EXT_PORT: ${{ vars.BACKEND_EXT_PORT || 8000 }}
-  BACKEND_INT_PORT: ${{ vars.BACKEND_INT_PORT || 80 }}
-  DEBUG: ${{ vars.DEBUG || 'True' }}
-  LOG_LEVEL: ${{ vars.LOG_LEVEL || 'DEBUG' }}
-  API_V1_STR: ${{ vars.API_V1_STR || '/api/v1' }}
-  POSTGRES_HOST: ${{ vars.POSTGRES_HOST || 'postgres' }}
-  POSTGRES_PORT: ${{ vars.POSTGRES_PORT || 5432 }}
-  POSTGRES_DB: ${{ vars.POSTGRES_DB || 'app' }}
-  POSTGRES_DB_RECORDED: ${{ vars.POSTGRES_DB || 'recorded' }}
-  POSTGRES_USER: ${{ vars.POSTGRES_USER || 'admin' }}
-  POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD || 'Changeme!1' }}
-  GHCR_LOCATION: ${{ vars.GHCR_LOCATION || github.repository }}
-  SECRET_KEY: ${{ secrets.SECRET_KEY || 'dummysecret' }}
-  ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES || 30 }}
-  ALGORITHM: ${{ secrets.ALGORITHM || 'HS256' }}
+  BACKEND_HOST='backend'
+  BACKEND_EXT_PORT=8000
+  BACKEND_INT_PORT=80
+  DEBUG='True'
+  LOG_LEVEL='DEBUG'
+  API_V1_STR='/api/v1'
+  POSTGRES_HOST='postgres'
+  POSTGRES_PORT=5432
+  POSTGRES_DB='app'
+  POSTGRES_DB_RECORDED='recorded'
+  POSTGRES_USER='admin'
+  POSTGRES_PASSWORD='Changeme!1'
+  GHCR_LOCATION=github.repository
+  SECRET_KEY='dummysecret'
+  ACCESS_TOKEN_EXPIRE_MINUTES=30
+  ALGORITHM='HS256'
+  POSTGRES_NETWORK_NAME = 'postgres_net_release'
+  SSH_HOST=admin-hetic.arcplex.tech
+  SSH_PORT=2328
+  SSH_USER=joachim
 ```
 
 ### ⚠️ Troubleshooting – Erreur `/entrypoint.sh: not found` dans le conteneur *watcher* sous Windows

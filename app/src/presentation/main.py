@@ -1,7 +1,9 @@
 import logging
 from fastapi import FastAPI
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
 
 from app.src.common.logging import setup_logging
 from app.src.presentation.api.router import router
@@ -12,6 +14,7 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
+    root_path=settings.API_PREFIX,
     debug=settings.is_debug,
     redoc_url=None,
     openapi_url=settings.openapi_url,
@@ -73,7 +76,7 @@ app = FastAPI(
             "description": "Gestion des groupes d'utilisateurs",
         },
     ],
-    servers=settings.SERVERS,
+    servers=settings.SERVERS
 )
 
 origins = ["*"]
@@ -89,4 +92,3 @@ app.add_middleware(
 app.include_router(router, prefix=settings.API_V1_STR)
 
 app.mount("/static", StaticFiles(directory="app/src/presentation/static"), name="static")
-

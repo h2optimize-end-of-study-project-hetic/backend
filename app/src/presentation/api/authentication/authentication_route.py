@@ -2,7 +2,7 @@ import logging
 from typing import Annotated
 from passlib.context import CryptContext
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.src.domain.entities.user import User
 from app.src.common.exception import NotFoundError
@@ -11,8 +11,7 @@ from app.src.presentation.api.tool.tool_model import UserModelResponse
 from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig
 from app.src.presentation.api.authentication.authentication_model import Token
-from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
-from app.src.presentation.dependencies import get_current_user_use_case, get_verify_user_use_case
+from app.src.presentation.dependencies import get_verify_user_use_case
 from app.src.use_cases.authentication.verify_user_use_case import VerifyUserError, VerifyUserUseCase
 
 
@@ -23,8 +22,6 @@ logger = logging.getLogger(__name__)
 auth_router = APIRouter(prefix=f"/{OpenApiTags.auth.value}", tags=[OpenApiTags.auth])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
-
 
 @auth_router.post("/login", response_model=Token)
 async def login(

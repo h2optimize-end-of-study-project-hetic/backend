@@ -17,16 +17,25 @@ class Settings(BaseSettings):
     def is_debug(self) -> bool:
         return self.DEBUG or self.ENVIRONMENT in ("development", "testing")
 
+    API_PREFIX: str = ""
+    API_V1_STR: str = "/api/v1"
+
     @property
     def openapi_url(self) -> str:
-        return f"{settings.API_V1_STR}/openapi.json"
-        if self.ENVIRONMENT != "development":
-            return None
+        if self.ENVIRONMENT == "development":
+            return "/openapi.json"
         else:
-            return f"{settings.API_V1_STR}/openapi.json"
-
+            return "/openapi.json"
+ 
+ 
     BACKEND_EXT_PORT: int = 8000
-    BACKEND_INT_PORT: int = 80
+    BACKEND_INT_PORT: int = 80  
+
+    SERVERS: list = [
+        {"url": f"http://localhost:{BACKEND_EXT_PORT}", "description": "Local dev"},
+        {"url": "https://11.hetic.arcplex.dev/release_back", "description": "Release server"}
+    ]
+
 
     PROJECT_NAME: str = "H2Optimize"
     DESCRIPTION: str = "Manage the rooms use"
@@ -35,17 +44,13 @@ class Settings(BaseSettings):
     CONTACT_URL: HttpUrl = "https://github.com/h2optimize-end-of-study-project-hetic"
     CONTACT_EMAIL: EmailStr = "contact@hoptimize.fr"
     LICENCE_NAME: str = "MIT"
-    API_V1_STR: str = "/api/v1"
 
-    SERVERS: list = [
-        {"url": f"http://localhost:{BACKEND_EXT_PORT}", "description": "Local development server"},
-        {"url": "https://11.hetic.arcplex.dev:443", "description": "Production server"},
-    ]
+    
 
     FRONTEND_HOST: HttpUrl = "http://localhost:5173"
 
-    POSTGRES_HOST: str = "postgres"
-    POSTGRES_PORT: int = 5432
+    POSTGRES_HOST: str
+    POSTGRES_PORT: int
     POSTGRES_DB: str = "app"
     POSTGRES_DB_RECORDED: str = "recorded"
     POSTGRES_USER: str = "admin"

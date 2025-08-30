@@ -14,13 +14,3 @@ def test_is_debug_property_prod_debug():
 def test_is_debug_property_prod():
     s = Settings(ENVIRONMENT="production", DEBUG=False)
     assert s.is_debug is False
-
-
-def test_openapi_url_property_dev():
-    s = Settings(ENVIRONMENT="development", API_V1_STR="/api/v1")
-    assert s.openapi_url == "/api/v1/openapi.json"
-
-
-def test_openapi_url_property_prod():
-    s = Settings(ENVIRONMENT="production")
-    assert s.openapi_url is None

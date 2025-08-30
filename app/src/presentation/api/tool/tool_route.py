@@ -40,6 +40,20 @@ async def read_tag_list(
     }
 
 
+@tool_router.get(
+    "/version",
+    summary="Retrieve the information on the app",
+)
+async def get_version():
+    """
+    Retrieve the information on the app
+    """
+    return {
+        "title": settings.PROJECT_NAME,
+        "version": settings.VERSION,
+    }
+
+
 @tool_router.get("/public", summary="Public info")
 async def public_route():
     return {"message": "This is a public route, no authentication required."}
