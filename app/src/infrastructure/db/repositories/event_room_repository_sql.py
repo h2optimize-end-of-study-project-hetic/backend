@@ -49,7 +49,6 @@ class SQLEventRoomRepository(EventRoomRepository):
         return EventRoom.from_dict(event_room_model.model_dump())
 
     def paginate_event_rooms(self, cursor: int | None, limit: int) -> tuple[list[EventRoom], int, EventRoom | None, EventRoom | None]:
-        self.session.exec(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"))
 
         event_rooms = self.select_event_rooms(cursor, limit)
         total = self.count_all_event_rooms()

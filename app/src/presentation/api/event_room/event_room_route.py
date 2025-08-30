@@ -3,6 +3,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
+from app.src.presentation.api.secure_ressources import secure_ressources
+from app.src.domain.entities.role import Role
+from app.src.domain.entities.user import User
 from app.src.domain.entities.event_room import EventRoom
 from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.use_cases.event_room.delete_event_room_use_case import DeleteEventRoomUseCase
@@ -60,6 +63,7 @@ event_room_router = APIRouter(
 )
 async def create_event_room(
     use_case: Annotated[CreateEventRoomUseCase, Depends(create_event_room_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     event_room: Annotated[EventRoomCreateModelRequest, Body(embed=True)],
 
 ):
@@ -111,6 +115,7 @@ async def create_event_room(
 )
 async def read_event_room_list(
     use_case: Annotated[GetEventRoomListUseCase, Depends(get_event_room_list_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     cursor: str | None = Query(None, description="Pagination cursor"),
     limit: int | None = Query(20, ge=1, description="Number of elements return"),
 ):
@@ -154,6 +159,7 @@ async def read_event_room_list(
 )
 async def read_event_room(
     use_case: Annotated[GetEventRoomByIdUseCase, Depends(get_event_room_by_id_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     event_room_id: int = Path(..., ge=1, description="The event_room ID (positive integer)"),
 ):
     """
@@ -182,6 +188,7 @@ async def read_event_room(
 async def update_event_room(
     use_case: Annotated[UpdateEventRoomUseCase, Depends(update_event_room_use_case)],
     event_room: Annotated[EventRoomUpdateModelRequest, Body(embed=True)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     event_room_id: int = Path(..., ge=1, description="ID of the event_room to update"),
 ):
     try:
@@ -209,6 +216,7 @@ async def update_event_room(
 )
 async def delete_event_room(
     use_case: Annotated[DeleteEventRoomUseCase, Depends(delete_event_room_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
     event_room_id: int = Path(..., ge=1, description="ID of the event_room to delete"),
 ):
     try:

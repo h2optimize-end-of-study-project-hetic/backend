@@ -7,13 +7,13 @@ from app.src.presentation.api.common.generic_model import PaginationMetadataMode
 
 class EventRoomBaseModel(BaseModel):
     room_id: int = Field (
-        default=None, title="Room ID", description="The room ID to which this event_room is attached to"
+        default=None, title="Room ID", gt=0, description="The room ID to which this event_room is attached to"
     )
     event_id: int = Field (
-        default=None, title="Event ID", description="The event ID to which this event_room is attached to"
+        default=None, title="Event ID", gt=0, description="The event ID to which this event_room is attached to"
     )
     is_finished: bool = Field (
-        default=None, title="is_finished", description="Is the event_room done"
+        default=False, title="is_finished", description="Is the event_room done"
     )
     start_at: datetime = Field (
         default=None, title="start_at", description="When the event in this room start"
@@ -29,13 +29,13 @@ class EventRoomCreateModelRequest(EventRoomBaseModel):
 
 class EventRoomUpdateModelRequest(BaseModel):
     room_id: int | None = Field (
-        default=None, title="Room ID", description="The room ID to which this event_room is attached to"
+        default=None, title="Room ID", gt=0, description="The room ID to which this event_room is attached to"
     )
     event_id: int | None = Field (
-        default=None, title="Event ID", description="The event ID to which this event_room is attached to"
+        default=None, title="Event ID", gt=0, description="The event ID to which this event_room is attached to"
     )
     is_finished: bool | None = Field (
-        default=None, title="is_finished", description="Is the event_room done"
+        default=False, title="is_finished", description="Is the event_room done"
     )
     start_at: datetime | None = Field (
         default=None, title="start_at", description="When the event in this room start"
