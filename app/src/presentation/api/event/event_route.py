@@ -7,7 +7,7 @@ from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.domain.entities.role import Role
 from app.src.domain.entities.user import User
 from app.src.domain.entities.event import Event
-from app.src.presentation.core.open_api_events import OpenApiEvents
+from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.use_cases.event.delete_event_use_case import DeleteEventUseCase
 from app.src.use_cases.event.update_event_use_case import UpdateEventUseCase
 from app.src.use_cases.event.create_event_use_case import CreateEventUseCase
@@ -50,7 +50,7 @@ unexpected_error = OpenApiErrorResponseConfig(code=500, description="Unexpected 
 
 logger = logging.getLogger(__name__)
 event_router = APIRouter(
-    prefix=f"/{OpenApiEvents.event.value}", tags=[OpenApiEvents.event]
+    prefix=f"/{OpenApiTags.event.value}", tags=[OpenApiTags.event]
 )  # events and OpenApiEvents are not bind to the entity event. It's just the param of APIRouter
 
 

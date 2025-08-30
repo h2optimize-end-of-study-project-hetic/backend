@@ -6,3 +6,6 @@ class OpenApiTags(Enum):
     tool = "tool"
     room = "room"
     auth = "auth"
+    event = "event"
+    event_room = "event_room"
+    map = "map"

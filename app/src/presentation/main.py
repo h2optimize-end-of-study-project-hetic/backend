@@ -7,8 +7,6 @@ from app.src.common.logging import setup_logging
 from app.src.presentation.api.router import router
 from app.src.presentation.core.config import settings
 from app.src.presentation.core.open_api_tags import OpenApiTags
-from app.src.presentation.core.open_api_events import OpenApiEvents
-from app.src.presentation.core.open_api_maps import OpenApiMaps
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -51,28 +49,16 @@ app = FastAPI(
             "description": "Gestion des salle au sein des organisations",
         },
         {
-            "name": OpenApiMaps.map,
-            "description": "Les maps correspondent aux images du plan d'un étage d'un bâtiment",
-        },
-        {
-            "name": OpenApiEvents.event,
+            "name": OpenApiTags.event,
             "description": "Les événements représentent des activités associées à une salle.",
         },
+                {
+            "name": OpenApiTags.event_room,
+            "description": "Gestion entre les évènements et la salle",
+        },
         {
-            "name": OpenApiMaps.map,
+            "name": OpenApiTags.map,
             "description": "Les maps correspondent aux images du plan d'un étage d'un bâtiment",
-        },
-        {
-            "name": OpenApiEvents.event,
-            "description": "Les événements représentent des activités associées à une salle.",
-        },
-        {
-            "name": OpenApiMaps.map,
-            "description": "Les maps correspondent aux images du plan d'un étage d'un bâtiment",
-        },
-        {
-            "name": OpenApiEvents.event,
-            "description": "Les événements représentent des activités associées à une salle.",
         },
     ],
     servers=settings.SERVERS,
