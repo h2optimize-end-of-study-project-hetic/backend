@@ -60,10 +60,10 @@ jobs:
           tags: backend:dev
 
       - name: Run tests with pytest
-        run: |
-          docker run --rm \
-            --env-file .env \
-            backend:dev pytest -vvs --cov=app/src --cov-report=term-missing
+        run: make buildd
+
+      - name: Run tests with pytest
+        run: make test
 
   build:
     runs-on: ubuntu-latest
