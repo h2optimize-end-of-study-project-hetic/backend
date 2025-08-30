@@ -249,13 +249,28 @@ Remplacer `pytest` par `ptw`.
 
 *Disclaimer : pytest-watcher est aussi observateur que Daredevil*
 
-### Référence
 
-- https://github.com/zhanymkanov/fastapi-best-practices
-- https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
-- https://github.com/faraday-academy/fast-api-lms/tree/7-async-and-code-cleanup
-- https://github.com/codingforentrepreneurs/analytics-api/tree/main
+### Env 
 
+```
+  ENVIRONMENT: development
+  BACKEND_HOST: ${{ vars.BACKEND_HOST || 'backend' }}
+  BACKEND_EXT_PORT: ${{ vars.BACKEND_EXT_PORT || 8000 }}
+  BACKEND_INT_PORT: ${{ vars.BACKEND_INT_PORT || 80 }}
+  DEBUG: ${{ vars.DEBUG || 'True' }}
+  LOG_LEVEL: ${{ vars.LOG_LEVEL || 'DEBUG' }}
+  API_V1_STR: ${{ vars.API_V1_STR || '/api/v1' }}
+  POSTGRES_HOST: ${{ vars.POSTGRES_HOST || 'postgres' }}
+  POSTGRES_PORT: ${{ vars.POSTGRES_PORT || 5432 }}
+  POSTGRES_DB: ${{ vars.POSTGRES_DB || 'app' }}
+  POSTGRES_DB_RECORDED: ${{ vars.POSTGRES_DB || 'recorded' }}
+  POSTGRES_USER: ${{ vars.POSTGRES_USER || 'admin' }}
+  POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD || 'Changeme!1' }}
+  GHCR_LOCATION: ${{ vars.GHCR_LOCATION || github.repository }}
+  SECRET_KEY: ${{ secrets.SECRET_KEY || 'dummysecret' }}
+  ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES || 30 }}
+  ALGORITHM: ${{ secrets.ALGORITHM || 'HS256' }}
+```
 
 ### ⚠️ Troubleshooting – Erreur `/entrypoint.sh: not found` dans le conteneur *watcher* sous Windows
 
@@ -278,6 +293,13 @@ Les systèmes utilisent des conventions différentes pour terminer les lignes da
 
 **Solution :**
 Convertir le fichier en `LF` avec VSCode :
+
 ![Fin de ligne VSCode](./doc/image/sequence_end_line.png)
 
----
+
+### Référence
+
+- https://github.com/zhanymkanov/fastapi-best-practices
+- https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
+- https://github.com/faraday-academy/fast-api-lms/tree/7-async-and-code-cleanup
+- https://github.com/codingforentrepreneurs/analytics-api/tree/main

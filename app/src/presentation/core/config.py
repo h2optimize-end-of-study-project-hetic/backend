@@ -19,6 +19,7 @@ class Settings(BaseSettings):
 
     @property
     def openapi_url(self) -> str:
+        return f"{settings.API_V1_STR}/openapi.json"
         if self.ENVIRONMENT != "development":
             return None
         else:
