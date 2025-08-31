@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from app.src.infrastructure.db.models.room_model import RoomModel
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, TIMESTAMP, DECIMAL, text
@@ -18,11 +19,11 @@ class BuildingModel(SQLModel, table=True):
     city: str | None = Field(default=None)
     country: str | None = Field(default=None)
 
-    latitude: float | None = Field(
+    latitude: Decimal | None = Field(
         default=None,
         sa_column=Column(DECIMAL(9, 6), nullable=True),
     )
-    longitude: float | None = Field(
+    longitude: Decimal | None = Field(
         default=None,
         sa_column=Column(DECIMAL(9, 6), nullable=True),
     )

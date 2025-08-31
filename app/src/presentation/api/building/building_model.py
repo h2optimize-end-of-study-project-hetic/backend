@@ -1,7 +1,7 @@
 from datetime import datetime
+from decimal import Decimal
 
 from pydantic import BaseModel, Field
-from decimal import Decimal
 from app.src.presentation.api.common.generic_model import PaginationMetadataModel
 
 
@@ -30,13 +30,18 @@ class BuildingBaseModel(BaseModel):
     country: str = Field (
         default=None, title="Country", description="The country where the building is"
     )
-    latitude: Decimal  = Field (
+    latitude: Decimal = Field (
         default=None, title="Latitude", description="The latitude where the building is"
     )
-    longitude: Decimal  = Field (
+    longitude: Decimal = Field (
         default=None, title="Longitude", description="The longitude where the building is"
     )
 
+    class Config:
+        orm_mode = True
+        json_encoders = {
+            Decimal: lambda v: float(v) if v is not None else None,
+        }
 
 class BuildingCreateModelRequest(BuildingBaseModel):
     pass
@@ -67,10 +72,10 @@ class BuildingUpdateModelRequest(BaseModel):
     country: str | None = Field (
         default=None, title="Country", description="The country where the building is"
     )
-    latitude: Decimal  | None = Field (
+    latitude: Decimal | None = Field (
         default=None, title="Latitude", description="The latitude where the building is"
     )
-    longitude: Decimal  | None = Field (
+    longitude: Decimal | None = Field (
         default=None, title="Longitude", description="The longitude where the building is"
     )
 

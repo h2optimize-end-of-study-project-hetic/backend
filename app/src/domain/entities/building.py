@@ -1,5 +1,6 @@
 from datetime import datetime
 from dataclasses import asdict, dataclass
+from decimal import Decimal
 
 from dateutil.parser import parse as parse_datetime
 
@@ -14,8 +15,8 @@ class Building:
     postal_code : str | None
     city : str | None
     country : str | None
-    latitude : float | None
-    longitude : float | None
+    latitude : Decimal | None
+    longitude : Decimal | None
     created_at: datetime | None
     updated_at: datetime | None = None
 
@@ -33,13 +34,13 @@ class Building:
             name=data.get("name"),
             description=data.get("description"),
             room_count=data.get("room_count"),
-            street_number=safe_parse(data.get("street_number")),
-            street_name=safe_parse(data.get("street_name")),
-            postal_code=safe_parse(data.get("postal_code")),
-            city=safe_parse(data.get("city")),
-            country=safe_parse(data.get("country")),
-            latitude=safe_parse(data.get("latitude")),
-            longitude=safe_parse(data.get("longitude")),
+            street_number=data.get("street_number"),
+            street_name=data.get("street_name"),
+            postal_code=data.get("postal_code"),
+            city=data.get("city"),
+            country=data.get("country"),
+            latitude=data.get("latitude"),
+            longitude=data.get("longitude"),
             created_at=safe_parse(data.get("created_at")),
             updated_at=safe_parse(data.get("updated_at")),
         )
