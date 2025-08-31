@@ -52,13 +52,25 @@ app = FastAPI(
             "name": OpenApiTags.event,
             "description": "Les événements représentent des activités associées à une salle.",
         },
-                {
+        {
             "name": OpenApiTags.event_room,
             "description": "Gestion entre les évènements et la salle",
         },
         {
             "name": OpenApiTags.map,
             "description": "Les maps correspondent aux images du plan d'un étage d'un bâtiment",
+        },
+        {
+            "name": OpenApiTags.building,
+            "description": "Gestion des bâtiments",
+        },
+        {
+            "name": OpenApiTags.group,
+            "description": "Gestion des groupes",
+        },
+        {
+            "name": OpenApiTags.user_group,
+            "description": "Gestion des groupes d'utilisateurs",
         },
     ],
     servers=settings.SERVERS,

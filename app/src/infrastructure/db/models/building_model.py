@@ -1,4 +1,5 @@
 from datetime import datetime
+from app.src.infrastructure.db.models.room_model import RoomModel
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, TIMESTAMP, DECIMAL, text
 

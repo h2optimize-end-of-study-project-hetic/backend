@@ -54,6 +54,30 @@ from app.src.use_cases.event_room.get_event_room_by_id_use_case import GetEventR
 from app.src.domain.interface_repositories.event_room_repository import EventRoomRepository
 from app.src.infrastructure.db.repositories.event_room_repository_sql import SQLEventRoomRepository
 
+from app.src.use_cases.building.create_building_use_case import CreateBuildingUseCase
+from app.src.use_cases.building.delete_building_use_case import DeleteBuildingUseCase
+from app.src.use_cases.building.update_building_use_case import UpdateBuildingUseCase
+from app.src.use_cases.building.get_building_list_use_case import GetBuildingListUseCase
+from app.src.use_cases.building.get_building_by_id_use_case import GetBuildingByIdUseCase
+from app.src.domain.interface_repositories.building_repository import BuildingRepository
+from app.src.infrastructure.db.repositories.building_repository_sql import SQLBuildingRepository
+
+from app.src.use_cases.group.create_group_use_case import CreateGroupUseCase
+from app.src.use_cases.group.delete_group_use_case import DeleteGroupUseCase
+from app.src.use_cases.group.update_group_use_case import UpdateGroupUseCase
+from app.src.use_cases.group.get_group_list_use_case import GetGroupListUseCase
+from app.src.use_cases.group.get_group_by_id_use_case import GetGroupByIdUseCase
+from app.src.domain.interface_repositories.group_repository import GroupRepository
+from app.src.infrastructure.db.repositories.group_repository_sql import SQLGroupRepository
+
+from app.src.use_cases.user_group.create_user_group_use_case import CreateUserGroupUseCase
+from app.src.use_cases.user_group.delete_user_group_use_case import DeleteUserGroupUseCase
+from app.src.use_cases.user_group.update_user_group_use_case import UpdateUserGroupUseCase
+from app.src.use_cases.user_group.get_user_group_list_use_case import GetUserGroupListUseCase
+from app.src.use_cases.user_group.get_user_group_by_id_use_case import GetUserGroupByIdUseCase
+from app.src.domain.interface_repositories.user_group_repository import UserGroupRepository
+from app.src.infrastructure.db.repositories.user_group_repository_sql import SQLUserGroupRepository
+
 get_session_dep = Depends(get_session)
 
 
@@ -260,3 +284,71 @@ def update_event_room_use_case(event_room_repository: EventRoomRepository = even
 
 def delete_event_room_use_case(event_room_repository: EventRoomRepository = event_room_repo_dep) -> DeleteEventRoomUseCase:
     return DeleteEventRoomUseCase(event_room_repository) 
+
+
+# building
+
+def building_repository(session: Session = get_session_dep) -> BuildingRepository:
+    return SQLBuildingRepository(session)
+
+building_repo_dep = Depends(building_repository)
+
+def get_building_by_id_use_case(building_repository: BuildingRepository = building_repo_dep) -> GetBuildingByIdUseCase:
+    return GetBuildingByIdUseCase(building_repository)
+
+def get_building_list_use_case(building_repository: BuildingRepository = building_repo_dep) -> GetBuildingListUseCase:
+    return GetBuildingListUseCase(building_repository)
+
+def create_building_use_case(building_repository: BuildingRepository = building_repo_dep) -> CreateBuildingUseCase:
+    return CreateBuildingUseCase(building_repository)
+
+def update_building_use_case(building_repository: BuildingRepository = building_repo_dep) -> UpdateBuildingUseCase:
+    return UpdateBuildingUseCase(building_repository)
+
+def delete_building_use_case(building_repository: BuildingRepository = building_repo_dep) -> DeleteBuildingUseCase:
+    return DeleteBuildingUseCase(building_repository) 
+
+# group
+
+def group_repository(session: Session = get_session_dep) -> GroupRepository:
+    return SQLGroupRepository(session)
+
+group_repo_dep = Depends(group_repository)
+
+def get_group_by_id_use_case(group_repository: GroupRepository = group_repo_dep) -> GetGroupByIdUseCase:
+    return GetGroupByIdUseCase(group_repository)
+
+def get_group_list_use_case(group_repository: GroupRepository = group_repo_dep) -> GetGroupListUseCase:
+    return GetGroupListUseCase(group_repository)
+
+def create_group_use_case(group_repository: GroupRepository = group_repo_dep) -> CreateGroupUseCase:
+    return CreateGroupUseCase(group_repository)
+
+def update_group_use_case(group_repository: GroupRepository = group_repo_dep) -> UpdateGroupUseCase:
+    return UpdateGroupUseCase(group_repository)
+
+def delete_group_use_case(group_repository: GroupRepository = group_repo_dep) -> DeleteGroupUseCase:
+    return DeleteGroupUseCase(group_repository) 
+
+
+# user_group
+
+def user_group_repository(session: Session = get_session_dep) -> UserGroupRepository:
+    return SQLUserGroupRepository(session)
+
+user_group_repo_dep = Depends(user_group_repository)
+
+def get_user_group_by_id_use_case(user_group_repository: UserGroupRepository = user_group_repo_dep) -> GetUserGroupByIdUseCase:
+    return GetUserGroupByIdUseCase(user_group_repository)
+
+def get_user_group_list_use_case(user_group_repository: UserGroupRepository = user_group_repo_dep) -> GetUserGroupListUseCase:
+    return GetUserGroupListUseCase(user_group_repository)
+
+def create_user_group_use_case(user_group_repository: UserGroupRepository = user_group_repo_dep) -> CreateUserGroupUseCase:
+    return CreateUserGroupUseCase(user_group_repository)
+
+def update_user_group_use_case(user_group_repository: UserGroupRepository = user_group_repo_dep) -> UpdateUserGroupUseCase:
+    return UpdateUserGroupUseCase(user_group_repository)
+
+def delete_user_group_use_case(user_group_repository: UserGroupRepository = user_group_repo_dep) -> DeleteUserGroupUseCase:
+    return DeleteUserGroupUseCase(user_group_repository) 
