@@ -64,5 +64,9 @@ class Settings(BaseSettings):
             path=self.POSTGRES_DB,
         )
 
+    # External APIs
+    OPENWEATHER_API_KEY: str | None = None
+    OPENWEATHER_BASE_URL: str = "https://api.openweathermap.org/data/2.5"
+
 
 settings = Settings()

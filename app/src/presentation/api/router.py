@@ -7,6 +7,7 @@ from app.src.presentation.api.room.room_route import room_router
 from app.src.presentation.api.authentication.authentication_route import auth_router
 from app.src.presentation.api.event.event_route import event_router
 from app.src.presentation.api.event_room.event_room_route import event_room_router
+from app.src.presentation.api.weather.weather_route import weather_router
 
 router = APIRouter()
 router.include_router(tag_router)
@@ -17,3 +18,4 @@ router.include_router(user_router)
 router.include_router(auth_router)
 router.include_router(event_router)
 router.include_router(event_room_router)
+router.include_router(weather_router)
