@@ -2,16 +2,18 @@ from datetime import datetime
 
 from sqlalchemy import text
 from sqlmodel import Field, SQLModel
-from sqlalchemy import Column, TIMESTAMP, text
+from sqlalchemy import Column, TIMESTAMP, text, Integer, ForeignKey
 
 
 class UserGroupModel(SQLModel, table=True):
     __tablename__ = "user_group"
 
-    id: int | None = Field(default=None, primary_key=True)
-
-    group_id: int | None = Field(default=None)
-    user_id: int | None = Field(default=None)
+    user_id: int = Field(
+        sa_column=Column(Integer, ForeignKey("user.id"), primary_key=True)
+    )
+    group_id: int = Field(
+        sa_column=Column(Integer, ForeignKey("group.id"), primary_key=True)
+    )
 
     created_at: datetime | None = Field(
         default=None,

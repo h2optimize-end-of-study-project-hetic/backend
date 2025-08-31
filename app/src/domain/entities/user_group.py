@@ -5,7 +5,6 @@ from dateutil.parser import parse as parse_datetime
 
 @dataclass
 class UserGroup:
-    id: int | None
     group_id: int | None
     user_id: int | None
     created_at: datetime | None
@@ -21,7 +20,6 @@ class UserGroup:
             return None
 
         return UserGroup(
-            id=data.get("id"),
             group_id=data.get("group_id"),
             user_id=data.get("user_id"),
             created_at=safe_parse(data.get("created_at")),

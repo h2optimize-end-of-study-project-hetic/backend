@@ -27,30 +27,35 @@ class GetUserGroupListUseCase:
     def execute(self, cursor: str | None, limit: int | None = None) -> PaginatedUserGroup:
         limit = limit or 20
 
-        decoded_cursor = None
+        decoded_cursor: tuple[int,int] | None = None
         if cursor:
-            decoded_cursor = decode(cursor, "UserGroup pagination cursor")
-            decoded_cursor = decoded_cursor.get("id") if decoded_cursor else None
+            decoded_data = decode(cursor, "UserGroup pagination cursor")
+            if decoded_data and "user_id" in decoded_data and "group_id" in decoded_data:
+                decoded_cursor = (decoded_data["user_id"], decoded_data["group_id"])
 
-        user_groups, total, first_user_group, last_user_group = self.user_group_repository.paginate_user_groups(decoded_cursor, (limit + 1))
+        user_groups, total, first_user_group, last_user_group = self.user_group_repository.paginate_user_groups(
+            decoded_cursor, limit + 1
+        )
 
-        next_user_group = None
+        next_user_group: UserGroup | None = None
         if len(user_groups) == (limit + 1):
             next_user_group = user_groups.pop(-1)
 
         chunk_count = math.ceil(total / limit) if limit else 1
 
-        first_cursor = {"id": first_user_group.id} if first_user_group else None
-        last_cursor = {"id": last_user_group.id} if last_user_group else None
-        next_cursor = {"id": next_user_group.id} if next_user_group else None
+        # Génération des cursors composite
+        first_cursor = encode({"user_id": first_user_group.user_id, "group_id": first_user_group.group_id}) if first_user_group else None
+        last_cursor  = encode({"user_id": last_user_group.user_id, "group_id": last_user_group.group_id}) if last_user_group else None
+        next_cursor  = encode({"user_id": next_user_group.user_id, "group_id": next_user_group.group_id}) if next_user_group else None
+        current_cursor = encode({"user_id": decoded_cursor[0], "group_id": decoded_cursor[1]}) if decoded_cursor else first_cursor
 
         return PaginatedUserGroup(
             user_groups=user_groups,
             total=total,
             chunk_size=len(user_groups),
             chunk_count=chunk_count,
-            current_cursor=encode({"id": decoded_cursor}) if decoded_cursor else encode(first_cursor) if first_cursor else None,
-            first_cursor=encode(first_cursor) if first_cursor else None,
-            last_cursor=encode(last_cursor) if last_cursor else None,
-            next_cursor=encode(next_cursor) if next_cursor else None,
+            current_cursor=current_cursor,
+            first_cursor=first_cursor,
+            last_cursor=last_cursor,
+            next_cursor=next_cursor,
         )

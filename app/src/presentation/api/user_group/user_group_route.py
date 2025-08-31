@@ -75,7 +75,7 @@ async def create_user_group(
     """
     try:
         user_group_entity = UserGroup(
-            id=None,
+            # id=None,
             group_id=user_group.group_id,
             user_id=user_group.user_id,
             created_at=None,
@@ -144,8 +144,8 @@ async def read_user_group_list(
 
 
 @user_group_router.get(
-    "/{user_group_id}",
-    summary="Retrieve user_group info by ID",
+    "/{user_id}/{group_id}",
+    summary="Retrieve user_group info by user_id and group_id",
     response_model=UserGroupModelResponse,
     response_description="Detailed information of the requested user_group",
     responses=generate_responses([user_group_not_found, unexpected_error]),
@@ -154,15 +154,14 @@ async def read_user_group_list(
 async def read_user_group(
     use_case: Annotated[GetUserGroupByIdUseCase, Depends(get_user_group_by_id_use_case)],
     user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
-    user_group_id: int = Path(..., ge=1, description="The user_group ID (positive integer)"),
+    user_id: int = Path(..., ge=1, description="The user ID (positive integer)"),
+    group_id: int = Path(..., ge=1, description="The group ID (positive integer)")
 ):
     """
-    Retrieve a user_group by its unique identifier
-
-    - **user_group_id**: Must be a positive integer (≥ 1)
+    Retrieve a user_group by its composite key (user_id, group_id)
     """
     try:
-        user_group_entity: UserGroup = use_case.execute(user_group_id)
+        user_group_entity: UserGroup = use_case.execute(user_id, group_id)
 
         return UserGroupModelResponse(**user_group_entity.to_dict())
 
@@ -174,7 +173,7 @@ async def read_user_group(
 
 
 @user_group_router.patch(
-    "/{user_group_id}",
+    "/{user_id}/{group_id}",
     summary="Update a user_group partially",
     response_model=UserGroupModelResponse,
     responses=generate_responses([user_group_not_found, user_group_already_exist, unexpected_error]),
@@ -183,11 +182,12 @@ async def update_user_group(
     use_case: Annotated[UpdateUserGroupUseCase, Depends(update_user_group_use_case)],
     user_group: Annotated[UserGroupUpdateModelRequest, Body(embed=True)],
     user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
-    user_group_id: int = Path(..., ge=1, description="ID of the user_group to update"),
+    user_id: int = Path(..., ge=1, description="User ID of the user_group"),
+    group_id: int = Path(..., ge=1, description="Group ID of the user_group"),
 ):
     try:
         update_data = user_group.model_dump(exclude_unset=True)
-        updated_user_group = use_case.execute(user_group_id, update_data)
+        updated_user_group = use_case.execute(user_id, group_id, update_data)
 
         return UserGroupModelResponse(**updated_user_group.to_dict())
 
@@ -203,7 +203,7 @@ async def update_user_group(
 
 
 @user_group_router.delete(
-    "/{user_group_id}",
+    "/{user_id}/{group_id}",
     summary="Delete a user_group by ID",
     status_code=status.HTTP_204_NO_CONTENT,
     responses=generate_responses([user_group_not_found, deletion_error, unexpected_error]),
@@ -211,10 +211,11 @@ async def update_user_group(
 async def delete_user_group(
     use_case: Annotated[DeleteUserGroupUseCase, Depends(delete_user_group_use_case)],
     user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
-    user_group_id: int = Path(..., ge=1, description="ID of the user_group to delete"),
+    user_id: int = Path(..., ge=1, description="User ID of the user_group"),
+    group_id: int = Path(..., ge=1, description="Group ID of the user_group"),
 ):
     try:
-        use_case.execute(user_group_id)
+        use_case.execute(user_id, group_id)
 
     except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e

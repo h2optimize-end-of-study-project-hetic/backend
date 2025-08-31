@@ -28,7 +28,8 @@ class UserGroupUpdateModelRequest(BaseModel):
 
 
 class UserGroupModelResponse(UserGroupBaseModel):
-    id: int
+    user_id: int
+    group_id: int
     created_at: datetime | None
     updated_at: datetime | None
 
