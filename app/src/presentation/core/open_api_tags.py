@@ -9,3 +9,4 @@ class OpenApiTags(Enum):
     event = "event"
     event_room = "event_room"
     map = "map"
+    weather = "weather"
