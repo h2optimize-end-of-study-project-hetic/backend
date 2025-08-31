@@ -77,6 +77,11 @@ app = FastAPI(
             "name": OpenApiTags.room_tag,
             "description": "Lien entre les pieces et les balises",
         },
+        {
+            "name": OpenApiTags.view,
+            "description": "Affiche toutes les vues",
+        },
+
     ],
     servers=settings.SERVERS
 )

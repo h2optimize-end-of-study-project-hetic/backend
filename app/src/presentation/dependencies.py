@@ -427,3 +427,15 @@ def get_sensor_repo(
 
     model, ts_attr = entry
     return SQLSensorRepository(session, model, ts_attr)
+
+# view
+from app.src.use_cases.view.get_user_in_group_by_group_id_use_case import GetUsersInGroupUseCase
+from app.src.infrastructure.db.repositories.view_repository_sql import GroupUserRepository
+
+def get_group_repository(session: Session = get_session_dep) -> GroupUserRepository:
+    return GroupUserRepository(session)
+
+def get_users_in_group_use_case(
+    repository: GroupRepository = Depends(get_group_repository)
+) -> GetUsersInGroupUseCase:
+    return GetUsersInGroupUseCase(repository)
