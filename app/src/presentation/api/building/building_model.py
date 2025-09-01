@@ -38,6 +38,7 @@ class BuildingBaseModel(BaseModel):
     )
 
     class Config:
+        # orm_mode = True
         json_encoders = {
             Decimal: lambda v: float(v) if v is not None else None,
         }
