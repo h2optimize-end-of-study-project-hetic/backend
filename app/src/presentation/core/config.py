@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str = "postgres"
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = "app"
+    POSTGRES_DB_RECORDED: str = "recorded"
     POSTGRES_USER: str = "admin"
     POSTGRES_PASSWORD: str = "Changeme!1"
     SECRET_KEY: str = "SECRET_KEY"
@@ -55,14 +56,28 @@ class Settings(BaseSettings):
     @computed_field
     @property
     def database_url(self) -> str:
-        return PostgresDsn.build(
-            scheme="postgresql+psycopg2",
-            username=self.POSTGRES_USER,
-            password=self.POSTGRES_PASSWORD,
-            host=self.POSTGRES_HOST,
-            port=self.POSTGRES_PORT,
-            path=self.POSTGRES_DB,
-        )
+        return str(
+            PostgresDsn.build(
+                scheme="postgresql+psycopg2",
+                username=self.POSTGRES_USER,
+                password=self.POSTGRES_PASSWORD,
+                host=self.POSTGRES_HOST,
+                port=self.POSTGRES_PORT,
+                path=self.POSTGRES_DB,
+        ))
+    
+    @computed_field
+    @property
+    def database_recorded_url(self) -> str:
+        return str(
+            PostgresDsn.build(
+                scheme="postgresql+psycopg2",
+                username=self.POSTGRES_USER,
+                password=self.POSTGRES_PASSWORD,
+                host=self.POSTGRES_HOST,
+                port=self.POSTGRES_PORT,
+                path=self.POSTGRES_DB_RECORDED,
+        ))
 
     # External APIs
     OPENWEATHER_API_KEY: str | None = None
