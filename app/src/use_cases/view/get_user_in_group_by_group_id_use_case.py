@@ -1,6 +1,5 @@
 from app.src.infrastructure.db.repositories.view_repository_sql import GroupUserRepository
 from app.src.common.exception import NotFoundError
-# from app.src.domain.entities.user import User
 from app.src.infrastructure.db.models.user_model import UserModel
 
 
