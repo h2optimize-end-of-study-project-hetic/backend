@@ -11,6 +11,7 @@ from app.src.presentation.api.weather.weather_route import weather_router
 from app.src.presentation.api.building.building_route import building_router
 from app.src.presentation.api.group.group_route import group_router
 from app.src.presentation.api.user_group.user_group_route import user_group_router
+from app.src.presentation.api.sensor.sensor_route import sensor_router
 
 router = APIRouter()
 router.include_router(tag_router)
@@ -25,3 +26,4 @@ router.include_router(weather_router)
 router.include_router(building_router)
 router.include_router(group_router)
 router.include_router(user_group_router)
+router.include_router(sensor_router)
