@@ -1,11 +1,15 @@
+<<<<<<< HEAD
 from app.src.domain.interface_repositories.room_tag_repository import RoomTagRepository
 from app.src.domain.interface_repositories.user_repository import UserRepository
 from app.src.infrastructure.db.repositories.room_tag_repository_sql import SQLRoomTagRepository
 from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
+=======
+>>>>>>> dced0ae (Implement sensor management features including CRUD operations, data models, and API routes)
 from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
 from app.src.use_cases.authentication.verify_user_use_case import VerifyUserUseCase
-from fastapi import Depends
-from sqlmodel import Session
+from fastapi import Depends, HTTPException, status
+from sqlmodel import Session, SQLModel
+from typing import Type
 
 
 from app.src.infrastructure.db.session import get_session
@@ -39,7 +43,12 @@ from app.src.use_cases.map.get_map_by_id_use_case import GetMapByIdUseCase
 from app.src.domain.interface_repositories.map_repository import MapRepository
 from app.src.infrastructure.db.repositories.map_repository_sql import SQLMapRepository
 
+<<<<<<< HEAD
 from app.src.use_cases.tag.update_tag_with_room_link_use_case import UpdateTagWithRoomLinkUseCase
+=======
+from app.src.domain.interface_repositories.user_repository import UserRepository
+from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
+>>>>>>> dced0ae (Implement sensor management features including CRUD operations, data models, and API routes)
 from app.src.use_cases.user.create_user_use_case import CreateUserUseCase
 from app.src.use_cases.user.delete_user_use_case import DeleteUserUseCase
 from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase
@@ -85,6 +94,19 @@ from app.src.use_cases.user_group.get_user_group_list_use_case import GetUserGro
 from app.src.use_cases.user_group.get_user_group_by_id_use_case import GetUserGroupByIdUseCase
 from app.src.domain.interface_repositories.user_group_repository import UserGroupRepository
 from app.src.infrastructure.db.repositories.user_group_repository_sql import SQLUserGroupRepository
+
+from app.src.infrastructure.db.session import get_session_recorded
+from app.src.infrastructure.db.repositories.sensor_repository_sql import SQLSensorRepository
+from app.src.infrastructure.db.models.sensor_model import (
+    SensorButtonModel,
+    SensorHumidityModel,
+    SensorMotionModel,
+    SensorNeighborsCountModel,
+    SensorNeighborsDetailModel,
+    SensorPressureModel,
+    SensorTemperatureModel,
+    SensorVoltageModel,
+)
 
 get_session_dep = Depends(get_session)
 
@@ -370,3 +392,39 @@ def delete_room_tag_use_case(room_tag_repository: RoomTagRepository = room_tag_r
 
 def update_tag_with_room_link_use_case(tag_repository: TagRepository = tag_repo_dep, room_tag_repository: RoomTagRepository = room_tag_repo_dep) -> UpdateTagWithRoomLinkUseCase:
     return UpdateTagWithRoomLinkUseCase(tag_repository, room_tag_repository)
+
+
+# Sensor
+
+SENSOR_MODEL_MAP: dict[str, tuple[Type[SQLModel], str | None]] = {
+    # "alias_url": (Model, ts_attr facultatif)
+    "button": (SensorButtonModel, "recorded_at"),
+    "humidity": (SensorHumidityModel, "recorded_at"),
+    "motion": (SensorMotionModel, "recorded_at"),
+    "neighbors_count": (SensorNeighborsCountModel, "recorded_at"),
+    "neighbors_detail": (SensorNeighborsDetailModel, "recorded_at"),
+    "pressure": (SensorPressureModel, "recorded_at"),
+    "temperature": (SensorTemperatureModel, "recorded_at"),
+    "voltage": (SensorVoltageModel, "recorded_at"),
+    "sensor_button": (SensorButtonModel, "recorded_at"),
+    "sensor_humidity": (SensorHumidityModel, "recorded_at"),
+    "sensor_motion": (SensorMotionModel, "recorded_at"),
+    "sensor_neighbors_count": (SensorNeighborsCountModel, "recorded_at"),
+    "sensor_neighbors_detail": (SensorNeighborsDetailModel, "recorded_at"),
+    "sensor_pressure": (SensorPressureModel, "recorded_at"),
+    "sensor_temperature": (SensorTemperatureModel, "recorded_at"),
+    "sensor_voltage": (SensorVoltageModel, "recorded_at"),
+}
+
+def get_sensor_repo(
+    kind: str,
+    session: Session = Depends(get_session_recorded),
+) -> SQLSensorRepository:
+    entry = SENSOR_MODEL_MAP.get(kind)
+    if not entry:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Unknown sensor kind '{kind}'.",
+        )
+    model, ts_attr = entry
+    return SQLSensorRepository(session, model, ts_attr)

@@ -14,3 +14,4 @@ class OpenApiTags(Enum):
     building = "building"
     group = "group"
     user_group = "user_group"
+    sensor = "sensor"

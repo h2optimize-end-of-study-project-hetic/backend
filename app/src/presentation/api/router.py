@@ -12,6 +12,7 @@ from app.src.presentation.api.room_tag.room_tag_route import room_tag_router
 from app.src.presentation.api.event_room.event_room_route import event_room_router
 from app.src.presentation.api.user_group.user_group_route import user_group_router
 from app.src.presentation.api.authentication.authentication_route import auth_router
+from app.src.presentation.api.sensor.sensor_route import sensor_router
 
 router = APIRouter()
 router.include_router(tag_router)
@@ -27,3 +28,4 @@ router.include_router(building_router)
 router.include_router(room_tag_router)
 router.include_router(event_room_router)
 router.include_router(user_group_router)
+router.include_router(sensor_router)
