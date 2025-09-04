@@ -1,0 +1,106 @@
+[project]
+name = "H2Optimize"
+version = "0.0.1"
+description = "API backend for H2Optimize"
+requires-python = ">=3.11"
+dependencies = [
+    "alembic",
+    "email_validator",
+    "fastapi",
+    "gunicorn",
+    "passlib[bcrypt]",
+    "psycopg2-binary",
+    "pydantic",
+    "pydantic-settings",
+    "python-dateutil",
+    "python-dotenv",
+    "python-jose",
+    "python-multipart",
+    "sqlalchemy",
+    "sqlmodel",
+    "python-multipart",
+    "pillow",
+    "uvicorn[standard]",
+    "httpx"
+    ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-watcher",
+    "ruff"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app/src"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+src = ["app"] 
+exclude = ["venv", ".venv", "__pycache__", "migrations", ".ruff_cache"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "T20", "RUF"]
+ignore = ["E501", "I001", 'F821']
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["T201"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint.isort]
+known-third-party = ["fastapi", "pydantic", "sqlalchemy", "uvicorn", "sqlmodel"]
+known-first-party = ["app"]
+combine-as-imports = true
+force-sort-within-sections = false
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder"]
+
+
+[tool.pytest.ini_options]
+minversion = "8.4"
+addopts = ""
+asyncio_mode = "auto"
+pythonpath = ["/code"]
+
+[tool.coverage.run]
+branch = true
+omit = [
+    "*/__init__.py",
+    "*/migrations/*",
+    "*/pycache/*",
+    "*/tests/*",
+    "app/src/common/logging.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+]
+
+[tool.coverage.html]
+directory = "/code/app/.coverage"
+title = "Rapport Coverage H2Optimize"
+show_contexts = true
+
+[tool.pytest-watcher]
+now = true
+delay = 0.1
+patterns = ["*.py"]

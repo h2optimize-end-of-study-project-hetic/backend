@@ -1,0 +1,130 @@
+import pytest
+from unittest.mock import Mock
+
+from app.src.presentation.main import app
+from app.src.presentation.dependencies import get_tag_list_use_case
+from app.src.use_cases.tag.get_tag_list_use_case import GetTagListUseCase
+from app.src.domain.entities.role import Role
+from app.src.presentation.api.secure_ressources import get_current_user_from_token
+
+
+@pytest.fixture
+def fake_tags(sample_tags_factory):
+    return sample_tags_factory(1, 26)
+
+
+@pytest.fixture
+def fake_user(sample_users_factory):
+    user = sample_users_factory(1, 2)[0]
+    user.role = Role.admin.value
+    user.is_active = True
+    return user
+
+
+@pytest.fixture
+def mock_get_tag_list_use_case(fake_tags):
+    mock = Mock(spec=GetTagListUseCase)
+    mock.execute.return_value = Mock(
+        tags=fake_tags[:10],
+        total=25,
+        chunk_size=10,
+        chunk_count=3,
+        current_cursor="id=1",
+        first_cursor="id=1",
+        last_cursor="id=21",
+        next_cursor="id=11",
+    )
+    return mock
+
+
+@pytest.fixture
+def override_dependencies(mock_get_tag_list_use_case, fake_user):
+    app.dependency_overrides[get_tag_list_use_case] = lambda: mock_get_tag_list_use_case
+    app.dependency_overrides[get_current_user_from_token] = lambda: fake_user
+    yield
+    app.dependency_overrides = {}
+
+
+def test_get_tag_list_success_cursor_is_none_limit(client, override_dependencies, mock_get_tag_list_use_case, fake_tags):
+    response = client.get("/api/v1/tag", params={"cursor": None, "limit": 10})
+    mock_get_tag_list_use_case.execute.assert_called_once_with("", 10)
+    assert response.status_code == 200
+
+    json_data = response.json()
+    assert "data" in json_data
+    assert "metadata" in json_data
+    assert len(json_data["data"]) == 10
+
+    first_tag = json_data["data"][0]
+    assert first_tag["id"] == fake_tags[0].id
+    assert first_tag["name"] == fake_tags[0].name
+
+    metadata = json_data["metadata"]
+    assert metadata["total"] == 25
+    assert metadata["chunk_size"] == 10
+    assert metadata["current_cursor"] == "id=1"
+
+
+def test_get_tag_list_success_no_cursor_limit(client, override_dependencies, mock_get_tag_list_use_case, fake_tags):
+    mock_get_tag_list_use_case.execute.return_value = Mock(
+        tags=fake_tags[:10],
+        total=25,
+        chunk_size=10,
+        chunk_count=3,
+        current_cursor="id=11",
+        first_cursor="id=1",
+        last_cursor="id=21",
+        next_cursor="id=21",
+    )
+    response = client.get("/api/v1/tag", params={"limit": 10})
+    mock_get_tag_list_use_case.execute.assert_called_once_with(None, 10)
+    assert response.status_code == 200
+
+
+def test_get_tag_list_success_cursor_no_limit(client, override_dependencies, mock_get_tag_list_use_case, fake_tags):
+    mock_get_tag_list_use_case.execute.return_value = Mock(
+        tags=fake_tags[:20],
+        total=25,
+        chunk_size=20,
+        chunk_count=2,
+        current_cursor="id=21",
+        first_cursor="id=1",
+        last_cursor="id=21",
+        next_cursor=None,
+    )
+    response = client.get("/api/v1/tag", params={"cursor": "id=21"})
+    mock_get_tag_list_use_case.execute.assert_called_once_with("id=21", 20)
+    assert response.status_code == 200
+
+
+def test_get_tag_list_success_no_cursor_no_limit(client, override_dependencies, mock_get_tag_list_use_case, fake_tags):
+    mock_get_tag_list_use_case.execute.return_value = Mock(
+        tags=fake_tags[:20],
+        total=25,
+        chunk_size=20,
+        chunk_count=2,
+        current_cursor="id=1",
+        first_cursor="id=1",
+        last_cursor="id=21",
+        next_cursor="id=21",
+    )
+    response = client.get("/api/v1/tag", params={})
+    mock_get_tag_list_use_case.execute.assert_called_once_with(None, 20)
+    assert response.status_code == 200
+
+
+def test_get_tag_list_invalid_limit(client, override_dependencies):
+    response = client.get("/api/v1/tag", params={"limit": 0})
+    assert response.status_code == 422
+
+
+def test_get_tag_list_failed_unexpectedly(client, override_dependencies, mock_get_tag_list_use_case):
+    mock_get_tag_list_use_case.execute.side_effect = Exception("Unexpectedly")
+    response = client.get("/api/v1/tag")
+    assert response.status_code == 500
+    data = response.json()
+    assert data["detail"] == "Internal server error"
+
+
+def test_end():
+    print("\n\nEnd => Get tag list route\n")
