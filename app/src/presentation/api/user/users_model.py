@@ -17,6 +17,18 @@ class UserCreateModel(UserBaseModel):
     salt: str | None = Field(default="1234")
     secret_2fa: str | None = None
 
+class UserCreateModelNoAuth(BaseModel):
+    email: EmailStr = Field(..., min_length=5, max_length=255)
+    firstname: str = Field(..., min_length=1, max_length=255)
+    lastname: str = Field(..., min_length=1, max_length=255)
+    phone_number: str | None = None
+    password: str = Field(default="1234", min_length=3)
+    role: Role = Role.guest.value
+    is_active: bool = False
+    salt: str | None = '1234'
+    secret_2fa: str | None = None
+
+
 class UserUpdateModel(BaseModel):
     email: str | None = Field(default=None, min_length=5, max_length=255)
     firstname: str | None = Field(default=None, min_length=1, max_length=255)
