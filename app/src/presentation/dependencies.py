@@ -376,7 +376,7 @@ SENSOR_MODEL_MAP: dict[str, tuple[Type[SQLModel], str | None]] = {
     "motion": (SensorMotionModel, "recorded_at"),
     "neighbors_count": (SensorNeighborsCountModel, "recorded_at"),
     "neighbors_detail": (SensorNeighborsDetailModel, "recorded_at"),
-    "pressure": (SensorPressureModel, "recorded_at"),
+    "pressure": (SensorPressureModel),
     "temperature": (SensorTemperatureModel, "recorded_at"),
     "voltage": (SensorVoltageModel, "recorded_at"),
     "sensor_button": (SensorButtonModel, "recorded_at"),
