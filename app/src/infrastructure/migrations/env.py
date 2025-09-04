@@ -1,64 +1,27 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
 
 from alembic import context
-
+from app.src.presentation.core.config import Settings
 from app.src.infrastructure.db.models.tag_model import TagModel
 from app.src.infrastructure.db.models.room_model import RoomModel
 from app.src.infrastructure.db.models.building_model import BuildingModel 
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
+
 config = context.config
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
 target_metadata = SQLModel.metadata
 
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
-
-from logging.config import fileConfig
-import os
-
-from sqlalchemy import engine_from_config, pool
-from sqlmodel import SQLModel
-from alembic import context
-
-# Import de ta config centralisée
-from app.src.presentation.core.config import Settings
-
-# Alembic Config object
-config = context.config
-
-# Logging
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
-
-# Cible pour autogenerate
-target_metadata = SQLModel.metadata
-
-# Utilise ta config Python (DRY)
 settings = Settings()
 db_url = settings.database_url
 
-# Injection dans la config Alembic
 escaped_db_url = db_url.replace('%', '%%')
 config.set_main_option("sqlalchemy.url", escaped_db_url)
-
-
 
 
 def run_migrations_offline() -> None:
