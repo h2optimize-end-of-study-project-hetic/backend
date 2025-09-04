@@ -62,12 +62,16 @@ class SensorNeighborsDetailModel(SQLModel, table=True):
 # Pression (hPa)
 class SensorPressureModel(SQLModel, table=True):
     __tablename__ = "sensor_pressure"
-    id: int | None = Field(default=None, primary_key=True)
-    value: float = Field(..., nullable=False)
-    recorded_at: datetime = Field(
+    __table_args__ = {"extend_existing": True}
+
+    source_address: str = Field(default="", nullable=False, primary_key=True)
+    atmospheric_pressure: float = Field(..., nullable=False)
+    time: datetime = Field(
         default=None,
-        sa_column=Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"), nullable=False),
-    )
+        sa_column=Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"), primary_key=True, nullable=False),
+    ),
+    relevance: float = Field(..., nullable=False)
+
 
 
 # Température (°C)
