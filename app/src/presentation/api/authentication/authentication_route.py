@@ -1,17 +1,17 @@
 import logging
 from typing import Annotated
 from passlib.context import CryptContext
-from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.src.domain.entities.user import User
 from app.src.common.exception import NotFoundError
 from app.src.presentation.core.open_api_tags import OpenApiTags
+from app.src.presentation.dependencies import get_verify_user_use_case
 from app.src.presentation.api.tool.tool_model import UserModelResponse
 from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig
 from app.src.presentation.api.authentication.authentication_model import Token
-from app.src.presentation.dependencies import get_verify_user_use_case
 from app.src.use_cases.authentication.verify_user_use_case import VerifyUserError, VerifyUserUseCase
 
 

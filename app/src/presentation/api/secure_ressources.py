@@ -1,8 +1,8 @@
 from typing import Annotated
 from jose import JWTError, jwt
 from collections.abc import Sequence
-from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, status
 
 from app.src.domain.entities.role import Role
 from app.src.domain.entities.user import User

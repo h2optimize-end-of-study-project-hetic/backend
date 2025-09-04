@@ -1,9 +1,7 @@
 import logging
 from fastapi import FastAPI
-from fastapi.security import OAuth2PasswordBearer
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
-from fastapi.openapi.utils import get_openapi
 
 from app.src.common.logging import setup_logging
 from app.src.presentation.api.router import router
