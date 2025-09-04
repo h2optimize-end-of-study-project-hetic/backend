@@ -6,6 +6,7 @@ from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.presentation.api.user.users_model import (
     UserBaseModelResponse,
+    UserCreateModelNoAuth,
     UserModel,
     UserCreateModel,
     UserUpdateModel,
@@ -43,6 +44,37 @@ unexpected_error = OpenApiErrorResponseConfig(code=500, description="Unexpected 
 
 logger = logging.getLogger(__name__)
 user_router = APIRouter(prefix="/users", tags=[OpenApiTags.user])
+
+
+@user_router.post(
+    "/new",
+    summary="Create a new user ",
+    response_model=UserModel,
+    response_description="Details of the created user",
+    responses=generate_responses([user_already_exist, creation_error, unexpected_error]),
+    deprecated=False,
+)
+async def create_user_no_auth(
+    use_case: Annotated[CreateUserUseCase, Depends(create_user_use_case)],
+    user_data: UserCreateModelNoAuth
+):
+    """
+    Create a new user.
+    """
+    try:  
+        user_entity = User.from_dict(user_data.model_dump())
+        new_user: User = use_case.execute(user_entity)
+        return UserModel(**new_user.to_dict())
+    except AlreadyExistsError as e:
+        logger.error(e)
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
+    except CreationFailedError as e:
+        logger.error(e)
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=str(e)) from e
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error") from e
+
 
 @user_router.post(
     "",
