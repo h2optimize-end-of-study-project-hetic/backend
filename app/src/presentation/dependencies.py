@@ -369,25 +369,26 @@ def delete_user_group_use_case(user_group_repository: UserGroupRepository = user
 
 # Sensor
 
-SENSOR_MODEL_MAP: dict[str, tuple[Type[SQLModel], str | None]] = {
-    # "alias_url": (Model, ts_attr facultatif)
-    "button": (SensorButtonModel, "recorded_at"),
-    "humidity": (SensorHumidityModel, "recorded_at"),
-    "motion": (SensorMotionModel, "recorded_at"),
-    "neighbors_count": (SensorNeighborsCountModel, "recorded_at"),
-    "neighbors_detail": (SensorNeighborsDetailModel, "recorded_at"),
-    "pressure": (SensorPressureModel),
-    "temperature": (SensorTemperatureModel, "recorded_at"),
-    "voltage": (SensorVoltageModel, "recorded_at"),
-    "sensor_button": (SensorButtonModel, "recorded_at"),
-    "sensor_humidity": (SensorHumidityModel, "recorded_at"),
-    "sensor_motion": (SensorMotionModel, "recorded_at"),
-    "sensor_neighbors_count": (SensorNeighborsCountModel, "recorded_at"),
-    "sensor_neighbors_detail": (SensorNeighborsDetailModel, "recorded_at"),
-    "sensor_pressure": (SensorPressureModel, "recorded_at"),
-    "sensor_temperature": (SensorTemperatureModel, "recorded_at"),
-    "sensor_voltage": (SensorVoltageModel, "recorded_at"),
+SENSOR_MODEL_MAP: dict[str, tuple[Type[SQLModel], str]] = {
+    # alias_url → (Model, colonne temporelle)
+    "button": (SensorButtonModel, "time"),
+    "humidity": (SensorHumidityModel, "time"),
+    "motion": (SensorMotionModel, "time"),
+    "neighbors_count": (SensorNeighborsCountModel, "time"),
+    "neighbors_detail": (SensorNeighborsDetailModel, "time"),
+    "pressure": (SensorPressureModel, "time"),
+    "temperature": (SensorTemperatureModel, "time"),
+    "voltage": (SensorVoltageModel, "time"),
+    "sensor_button": (SensorButtonModel, "time"),
+    "sensor_humidity": (SensorHumidityModel, "time"),
+    "sensor_motion": (SensorMotionModel, "time"),
+    "sensor_neighbors_count": (SensorNeighborsCountModel, "time"),
+    "sensor_neighbors_detail": (SensorNeighborsDetailModel, "time"),
+    "sensor_pressure": (SensorPressureModel, "time"),
+    "sensor_temperature": (SensorTemperatureModel, "time"),
+    "sensor_voltage": (SensorVoltageModel, "time"),
 }
+
 
 def get_sensor_repo(
     kind: str,
@@ -399,5 +400,6 @@ def get_sensor_repo(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Unknown sensor kind '{kind}'.",
         )
+
     model, ts_attr = entry
     return SQLSensorRepository(session, model, ts_attr)
