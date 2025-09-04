@@ -1,19 +1,21 @@
 from typing import Annotated
 from jose import JWTError, jwt
 from collections.abc import Sequence
-from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, status
 
 from app.src.domain.entities.role import Role
 from app.src.domain.entities.user import User
 from app.src.common.exception import NotFoundError
 from app.src.presentation.core.config import settings
+from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.presentation.dependencies import get_current_user_use_case
 from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
-
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl=f"{settings.API_PREFIX}{settings.API_V1_STR}/{OpenApiTags.auth.value}/login"
+)
 
 async def get_current_user_from_token(
     token: str = Depends(oauth2_scheme),

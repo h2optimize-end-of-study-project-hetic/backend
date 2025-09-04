@@ -249,13 +249,16 @@ Remplacer `pytest` par `ptw`.
 
 *Disclaimer : pytest-watcher est aussi observateur que Daredevil*
 
-### Référence
 
-- https://github.com/zhanymkanov/fastapi-best-practices
-- https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
-- https://github.com/faraday-academy/fast-api-lms/tree/7-async-and-code-cleanup
-- https://github.com/codingforentrepreneurs/analytics-api/tree/main
+### Env
 
+#### En local
+
+Ce baser sur le fichier .env & .env.template
+
+#### CI / CD
+
+Ce baser sur le fichier .env.action.template
 
 ### ⚠️ Troubleshooting – Erreur `/entrypoint.sh: not found` dans le conteneur *watcher* sous Windows
 
@@ -278,6 +281,13 @@ Les systèmes utilisent des conventions différentes pour terminer les lignes da
 
 **Solution :**
 Convertir le fichier en `LF` avec VSCode :
+
 ![Fin de ligne VSCode](./doc/image/sequence_end_line.png)
 
----
+
+### Référence
+
+- https://github.com/zhanymkanov/fastapi-best-practices
+- https://github.com/fastapi/full-stack-fastapi-template/tree/master/backend
+- https://github.com/faraday-academy/fast-api-lms/tree/7-async-and-code-cleanup
+- https://github.com/codingforentrepreneurs/analytics-api/tree/main

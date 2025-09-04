@@ -20,13 +20,14 @@ dependencies = [
     "sqlmodel",
     "python-multipart",
     "pillow",
-    "uvicorn[standard]"]
+    "uvicorn[standard]",
+    "httpx"
+    ]
 
 [project.optional-dependencies]
 dev = [
     "pytest",
     "pytest-asyncio",
-    "httpx",
     "pytest-cov",
     "pytest-watcher",
     "ruff"]

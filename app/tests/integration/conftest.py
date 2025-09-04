@@ -3,7 +3,7 @@ import os
 import pytest
 import logging
 from jose import jwt
-
+from urllib.parse import quote
 
 from alembic import command
 from sqlmodel import SQLModel
@@ -15,9 +15,12 @@ from app.src.presentation.core.config import settings
 from app.src.domain.entities.role import Role
 from app.src.infrastructure.db.models.user_model import UserModel
 
-
 test_db_name = f"{settings.POSTGRES_DB}_test"
-test_db_url = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@postgres/{test_db_name}"
+
+escaped_password = quote(settings.POSTGRES_PASSWORD)
+test_db_url = f"postgresql://{settings.POSTGRES_USER}:{escaped_password}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+
+admin_url = f"postgresql://{settings.POSTGRES_USER}:{escaped_password}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/postgres"
 
 
 def modify_alembic_ini(original_ini_path: str, new_url: str) -> str:
