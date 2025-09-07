@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import text
 from sqlmodel import Field, SQLModel
-from sqlalchemy import Column, TIMESTAMP, JSON, text
+from sqlalchemy import Column, TIMESTAMP
 
 
 class EventRoomModel(SQLModel, table=True):

@@ -1,7 +1,7 @@
 import logging
 
 from psycopg2 import errors
-from sqlalchemy import func, text
+from sqlalchemy import func
 from sqlmodel import Session, select
 from sqlalchemy.exc import IntegrityError
 

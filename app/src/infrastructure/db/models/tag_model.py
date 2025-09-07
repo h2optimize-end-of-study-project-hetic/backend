@@ -1,6 +1,6 @@
 from datetime import datetime
-from sqlmodel import SQLModel, Field
 from sqlalchemy import Column, TIMESTAMP, text
+from sqlmodel import Relationship, SQLModel, Field
 
 
 class TagModel(SQLModel, table=True):
@@ -27,3 +27,4 @@ class TagModel(SQLModel, table=True):
             nullable=True,
         ),
     )
+    room_tags: list["RoomTagModel"] = Relationship(back_populates="tag")

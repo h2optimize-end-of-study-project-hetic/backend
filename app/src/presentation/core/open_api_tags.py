@@ -7,6 +7,7 @@ class OpenApiTags(Enum):
     room = "room"
     auth = "auth"
     event = "event"
+    room_tag = "room_tag"
     event_room = "event_room"
     map = "map"
     weather = "weather"

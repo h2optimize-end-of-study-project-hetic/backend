@@ -23,8 +23,8 @@ class RoomTag:
 
         return RoomTag(
             id=data.get("id"),
-            tag_id=int(data["tag_id"]),
-            room_id=int(data["room_id"]),
+            tag_id=data["tag_id"],
+            room_id=data["room_id"],
             start_at=safe_parse(data.get("start_at")),
             end_at=safe_parse(data.get("end_at")),
             created_at=safe_parse(data.get("created_at")),
