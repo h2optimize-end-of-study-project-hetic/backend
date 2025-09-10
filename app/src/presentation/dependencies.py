@@ -9,12 +9,14 @@ from sqlmodel import Session
 
 
 from app.src.infrastructure.db.session import get_session
+from app.src.use_cases.room.get_room_with_tag_list_use_case import GetRoomWithTagListUseCase
 from app.src.use_cases.room_tag.create_room_tag_use_case import CreateRoomTagUseCase
 from app.src.use_cases.room_tag.delete_room_tag_use_case import DeleteRoomTagUseCase
 from app.src.use_cases.room_tag.get_room_tag_by_id_use_case import GetRoomTagByIdUseCase
 from app.src.use_cases.room_tag.get_room_tag_list_use_case import GetRoomTagListUseCase
 from app.src.use_cases.room_tag.update_room_tag_use_case import UpdateRoomTagUseCase
 from app.src.use_cases.tag.create_tag_use_case import CreateTagUseCase
+from app.src.use_cases.tag.create_tag_with_room_link_use_case import CreateTagWithRoomLinkUseCase
 from app.src.use_cases.tag.delete_tag_use_case import DeleteTagUseCase
 from app.src.use_cases.tag.update_tag_use_case import UpdateTagUseCase
 from app.src.use_cases.room.delete_room_use_case import DeleteRoomUseCase
@@ -37,6 +39,7 @@ from app.src.use_cases.map.get_map_by_id_use_case import GetMapByIdUseCase
 from app.src.domain.interface_repositories.map_repository import MapRepository
 from app.src.infrastructure.db.repositories.map_repository_sql import SQLMapRepository
 
+from app.src.use_cases.tag.update_tag_with_room_link_use_case import UpdateTagWithRoomLinkUseCase
 from app.src.use_cases.user.create_user_use_case import CreateUserUseCase
 from app.src.use_cases.user.delete_user_use_case import DeleteUserUseCase
 from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase
@@ -114,6 +117,10 @@ def get_tag_list_use_case(tag_repository: TagRepository = tag_repo_dep) -> GetTa
 
 def create_tag_use_case(tag_repository: TagRepository = tag_repo_dep) -> CreateTagUseCase:
     return CreateTagUseCase(tag_repository)
+
+def create_tag_with_room_link_use_case(tag_repository: TagRepository = tag_repo_dep) -> CreateTagWithRoomLinkUseCase:
+    return CreateTagWithRoomLinkUseCase(tag_repository)
+
 
 
 def update_tag_use_case(tag_repository: TagRepository = tag_repo_dep) -> UpdateTagUseCase:
@@ -219,6 +226,10 @@ def get_room_by_id_use_case(room_repository: RoomRepository = room_repo_dep) -> 
 
 def get_room_list_use_case(room_repository: RoomRepository = room_repo_dep) -> GetRoomListUseCase:
     return GetRoomListUseCase(room_repository)
+
+
+def get_room_with_tag_list_use_case(room_repository: RoomRepository = room_repo_dep) -> GetRoomWithTagListUseCase:
+    return GetRoomWithTagListUseCase(room_repository)
 
 
 def create_room_use_case(room_repository: RoomRepository = room_repo_dep) -> CreateRoomUseCase:
@@ -355,3 +366,7 @@ def update_room_tag_use_case(room_tag_repository: RoomTagRepository = room_tag_r
 
 def delete_room_tag_use_case(room_tag_repository: RoomTagRepository = room_tag_repo_dep) -> DeleteRoomTagUseCase:
     return DeleteRoomTagUseCase(room_tag_repository)
+
+
+def update_tag_with_room_link_use_case(tag_repository: TagRepository = tag_repo_dep, room_tag_repository: RoomTagRepository = room_tag_repo_dep) -> UpdateTagWithRoomLinkUseCase:
+    return UpdateTagWithRoomLinkUseCase(tag_repository, room_tag_repository)

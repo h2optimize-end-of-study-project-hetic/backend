@@ -32,7 +32,7 @@ def test_get_tag_by_id_success(authenticated_client, override_dependencies, mock
 
     response = client.get(f"/api/v1/tag/{tag_id}")
 
-    mock_get_tag_by_id_use_case.execute.assert_called_once_with(tag_id)
+    mock_get_tag_by_id_use_case.execute.assert_called_once_with(tag_id, with_rooms=False)
     assert response.status_code == 200
     data = response.json()
 
@@ -60,7 +60,7 @@ def test_get_tag_by_id_not_found(authenticated_client, override_dependencies, mo
 
     response = client.get(f"/api/v1/tag/{tag_id}")
 
-    mock_get_tag_by_id_use_case.execute.assert_called_once_with(tag_id)
+    mock_get_tag_by_id_use_case.execute.assert_called_once_with(tag_id, with_rooms=False)
     assert response.status_code == 404
     assert response.json()["detail"] == f"Tag with ID '{tag_id}' not found"
 
@@ -72,7 +72,7 @@ def test_get_tag_by_id_unexpected_error(authenticated_client, override_dependenc
 
     response = client.get(f"/api/v1/tag/{tag_id}")
 
-    mock_get_tag_by_id_use_case.execute.assert_called_once_with(tag_id)
+    mock_get_tag_by_id_use_case.execute.assert_called_once_with(tag_id, with_rooms=False)
     assert response.status_code == 500
     assert response.json()["detail"] == "Internal server error"
 

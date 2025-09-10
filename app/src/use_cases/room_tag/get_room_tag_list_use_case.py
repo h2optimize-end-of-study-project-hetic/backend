@@ -26,7 +26,6 @@ class GetRoomTagListUseCase:
         self.room_tag_repository = room_tag_repository
 
     def execute(self, cursor: str | None, limit: int | None = None, active_only: bool = False) -> PaginatedRoomTag:
-        limit = limit or 20
 
         decoded_cursor = None
         if cursor:

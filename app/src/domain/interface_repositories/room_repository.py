@@ -27,3 +27,18 @@ class RoomRepository(ABC):
     @abstractmethod
     def delete_room(self, room_id: int) -> bool:
         pass
+
+
+    @abstractmethod
+    def get_room_by_position(self, position: int) -> Room | None:
+        pass
+
+    @abstractmethod
+    def select_rooms_with_tags(self, cursor: int | None, limit: int) -> list[Room]:
+        pass
+
+    @abstractmethod
+    def paginate_rooms_with_tags(self, cursor: int | None, limit: InterruptedError) -> tuple[list[Room], int, Room | None, Room | None]:       
+        pass
+
+

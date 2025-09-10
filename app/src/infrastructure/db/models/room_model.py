@@ -37,5 +37,5 @@ class RoomModel(SQLModel, table=True):
             nullable=True,
         ),
     )
-    tags: list["RoomTagModel"] = Relationship(back_populates="room")
     building: "BuildingModel" = Relationship(back_populates="rooms")
+    room_tags: list["RoomTagModel"] = Relationship(back_populates="room")

@@ -214,3 +214,53 @@ class SQLRoomTagRepository(RoomTagRepository):
             self.session.rollback()
             logger.error(e)
             raise DeletionFailedError("RoomTag", str(e)) from e
+    
+
+    def update_roomtag_by_tag_id_room_id(self, tag_id: int, room_id: int, start_at: datetime, end_at: datetime | None) -> RoomTag:
+        try:
+            statement = select(RoomTagModel).where(
+                and_(
+                    RoomTagModel.tag_id == tag_id,
+                    RoomTagModel.room_id == room_id,
+                )
+            )
+            room_tag_model = self.session.exec(statement).first()
+
+            if room_tag_model:
+                room_tag_model.start_at = start_at
+                room_tag_model.end_at = end_at
+            else:
+                room_tag_model = RoomTagModel(
+                    tag_id=tag_id,
+                    room_id=room_id,
+                    start_at=start_at,
+                    end_at=end_at,
+                )
+                self.session.add(room_tag_model)
+
+            self.session.commit()
+            self.session.refresh(room_tag_model)
+            return RoomTag.from_dict(room_tag_model.model_dump())
+
+        except IntegrityError as e:
+            self.session.rollback()
+            if isinstance(e.orig, errors.ForeignKeyViolation):
+                constraint_name = getattr(e.orig.diag, "constraint_name", None)
+                table_name = getattr(e.orig.diag, "table_name", None)
+                raise ForeignKeyConstraintError("RoomTag", constraint_name, table_name) from e
+
+            if isinstance(e.orig, errors.CheckViolation):
+                constraint_name = getattr(e.orig.diag, "constraint_name", None)
+                table_name = getattr(e.orig.diag, "table_name", None)
+                raise CheckConstraintError("RoomTag", constraint_name, table_name) from e
+
+            logger.error(e)
+            raise UpdateFailedError("RoomTag", "Integrity error") from e
+        except Exception as e:
+            self.session.rollback()
+            logger.error(e)
+
+            if isinstance(e.orig, errors.RaiseException) or "Already exist" in str(e.orig):
+                raise AlreadyExistsError("RoomTag", "room_id, tag_id", f"room_id={room_id} and tag_id={tag_id}") from e
+            
+            raise UpdateFailedError("RoomTag", str(e)) from e

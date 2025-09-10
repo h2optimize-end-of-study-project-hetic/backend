@@ -28,12 +28,12 @@ def upgrade() -> None:
           IF EXISTS (
             SELECT 1
             FROM room_tag rt
-            WHERE rt.room_id = NEW.room_id
-              AND rt.tag_id = NEW.tag_id
-              AND (
-                rt.end_at IS NULL
-                OR NEW.start_at <= rt.end_at
-              )
+                WHERE rt.tag_id = NEW.tag_id
+                  AND rt.id <> COALESCE(NEW.id, -1)
+                  AND (
+                    (rt.end_at IS NULL OR NEW.start_at <= rt.end_at)
+                    AND (NEW.end_at IS NULL OR rt.start_at <= NEW.end_at)
+                  )
           ) THEN
             RAISE EXCEPTION 'Already exist';
           END IF;

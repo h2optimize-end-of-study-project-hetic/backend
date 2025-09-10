@@ -47,7 +47,7 @@ def override_dependencies(mock_get_tag_list_use_case, fake_user):
 
 def test_get_tag_list_success_cursor_is_none_limit(client, override_dependencies, mock_get_tag_list_use_case, fake_tags):
     response = client.get("/api/v1/tag", params={"cursor": None, "limit": 10})
-    mock_get_tag_list_use_case.execute.assert_called_once_with("", 10)
+    mock_get_tag_list_use_case.execute.assert_called_once_with("", 10, with_rooms=False)
     assert response.status_code == 200
 
     json_data = response.json()
@@ -77,7 +77,7 @@ def test_get_tag_list_success_no_cursor_limit(client, override_dependencies, moc
         next_cursor="id=21",
     )
     response = client.get("/api/v1/tag", params={"limit": 10})
-    mock_get_tag_list_use_case.execute.assert_called_once_with(None, 10)
+    mock_get_tag_list_use_case.execute.assert_called_once_with(None, 10, with_rooms=False)
     assert response.status_code == 200
 
 
@@ -93,7 +93,7 @@ def test_get_tag_list_success_cursor_no_limit(client, override_dependencies, moc
         next_cursor=None,
     )
     response = client.get("/api/v1/tag", params={"cursor": "id=21"})
-    mock_get_tag_list_use_case.execute.assert_called_once_with("id=21", 20)
+    mock_get_tag_list_use_case.execute.assert_called_once_with("id=21", 20, with_rooms=False)
     assert response.status_code == 200
 
 
@@ -109,7 +109,7 @@ def test_get_tag_list_success_no_cursor_no_limit(client, override_dependencies, 
         next_cursor="id=21",
     )
     response = client.get("/api/v1/tag", params={})
-    mock_get_tag_list_use_case.execute.assert_called_once_with(None, 20)
+    mock_get_tag_list_use_case.execute.assert_called_once_with(None, 20, with_rooms=False)
     assert response.status_code == 200
 
 

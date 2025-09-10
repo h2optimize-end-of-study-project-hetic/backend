@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 
 from psycopg2 import errors
@@ -6,10 +7,12 @@ from sqlmodel import Session, select
 from sqlalchemy.exc import IntegrityError
 
 from app.src.domain.entities.tag import Tag
+from app.src.infrastructure.db.models.room_tag_model import RoomTagModel
 from app.src.infrastructure.db.models.tag_model import TagModel
 from app.src.domain.interface_repositories.tag_repository import TagRepository
 from app.src.common.exception import (
     AlreadyExistsError,
+    CheckConstraintError,
     CreationFailedError,
     DeletionFailedError,
     ForeignKeyConstraintError,
@@ -50,8 +53,8 @@ class SQLTagRepository(TagRepository):
         return Tag.from_dict(tag_model.model_dump())
 
 
-    def paginate_tags(self, cursor: int | None, limit: int) -> tuple[list[Tag], int, Tag | None, Tag | None]:
-        tags = self.select_tags(cursor, limit)
+    def paginate_tags(self, cursor: int | None, limit: int, with_rooms: bool = False) -> tuple[list[Tag], int, Tag | None, Tag | None]:       
+        tags = self.select_tags(cursor, limit, with_rooms)
         total = self.count_all_tags()
         first_tag = self.get_tag_by_position(0)
         last_page_offset = (
@@ -65,14 +68,36 @@ class SQLTagRepository(TagRepository):
         return tags, total, first_tag, last_tag
 
 
-    def select_tags(self, cursor: int | None, limit: int) -> list[Tag]:
+    def select_tags(self, cursor: int | None, limit: int, with_rooms: bool = False) -> list[Tag]:
         statement = select(TagModel).order_by(TagModel.id)
         if cursor:
             statement = statement.where(TagModel.id >= cursor)
         statement = statement.limit(limit)
 
         results = self.session.exec(statement).all()
-        return [Tag(**tag.model_dump()) for tag in results]
+
+        if with_rooms:
+            return [
+                Tag(
+                    **tag.model_dump(),
+                    rooms=[
+                        {
+                            **room_tag.model_dump(),
+                            "room": {
+                                **room_tag.room.model_dump(),
+                                "building": room_tag.room.building.model_dump()
+                                if room_tag.room and room_tag.room.building
+                                else None,
+                            },
+                        }
+                        for room_tag in tag.room_tags
+                    ],
+                )
+                for tag in results
+            ]
+        else:
+            return [Tag(**tag.model_dump()) for tag in results]
+
 
 
     def count_all_tags(self) -> int:
@@ -90,13 +115,28 @@ class SQLTagRepository(TagRepository):
         return Tag(**result.model_dump()) if result else None
 
 
-    def select_tag_by_id(self, tag_id: int) -> Tag:
+    def select_tag_by_id(self, tag_id: int, with_rooms: bool = False) -> Tag:
         tag_model = self.session.get(TagModel, tag_id)
         if not tag_model:
             raise NotFoundError("Tag", tag_id)
 
-        return Tag(**tag_model.model_dump())
-
+        if with_rooms:
+            return Tag(
+                **tag_model.model_dump(),
+                rooms=[
+                    {
+                        **room_tag.model_dump(),
+                        "room": {
+                            **room_tag.room.model_dump(),
+                            "building": room_tag.room.building.model_dump()
+                            if room_tag.room and room_tag.room.building else None,
+                        },
+                    }
+                    for room_tag in tag_model.room_tags
+                ],
+            )
+        else:
+            return Tag(**tag_model.model_dump())
 
     def update_tag(self, tag_id: int, tag_data: dict) -> Tag:
         try:
@@ -146,9 +186,19 @@ class SQLTagRepository(TagRepository):
             if not tag_model:
                 raise NotFoundError("Tag", tag_id)
 
-            self.session.delete(tag_model)
-            self.session.commit()
-            return True
+            statement = select(RoomTagModel).where(RoomTagModel.tag_id == tag_id)
+            room_tags = self.session.exec(statement).all()
+
+            if room_tags:
+                now = datetime.now()
+                for rt in room_tags:
+                    rt.end_at = now
+                self.session.commit()
+                return True
+            else:
+                self.session.delete(tag_model)
+                self.session.commit()
+                return True
 
         except NotFoundError:
             raise
@@ -175,3 +225,68 @@ class SQLTagRepository(TagRepository):
             raise NotFoundError("Tag", tag_src_address, "source_address")
 
         return Tag(**tag_model.model_dump())
+
+
+    def create_with_room_link(self, tag: Tag, room_id: int, start_at: datetime, end_at: datetime | None = None) -> Tag:
+        try:       
+            tag_model = TagModel(
+                name=tag.name,
+                description=tag.description,
+                source_address=tag.source_address,
+            )
+            self.session.add(tag_model)
+            self.session.flush()
+
+            new_tag = Tag.from_dict(tag_model.model_dump())
+
+            room_tag_model = RoomTagModel(
+                tag_id=tag_model.id,
+                room_id=room_id,
+                start_at=start_at,
+                end_at=end_at
+            )
+            self.session.add(room_tag_model)
+            self.session.flush()
+            self.session.commit()
+
+            new_tag.rooms = [
+                {
+                    **room_tag.model_dump(),
+                    "room": {
+                        **room_tag.room.model_dump(),
+                        "building": room_tag.room.building.model_dump()
+                        if room_tag.room and room_tag.room.building else None,
+                    },
+                }
+                for room_tag in tag_model.room_tags
+            ]
+            return new_tag
+
+        except IntegrityError as e:
+            self.session.rollback()
+            orig = getattr(e, "orig", None)
+            if orig :
+                if isinstance(e.orig, errors.UniqueViolation):
+                    raise AlreadyExistsError("Tag", "source_address", tag_model.source_address) from e
+                
+                if isinstance(e.orig, errors.ForeignKeyViolation):
+                    constraint_name = getattr(e.orig.diag, "constraint_name", None)
+                    table_name = getattr(e.orig.diag, "table_name", None)
+                    raise ForeignKeyConstraintError("RoomTag", constraint_name, table_name) from e
+            
+                if isinstance(e.orig, errors.CheckViolation):
+                    constraint_name = getattr(e.orig.diag, "constraint_name", None)
+                    table_name = getattr(e.orig.diag, "table_name", None)
+                    raise CheckConstraintError("RoomTag", constraint_name, table_name) from e
+                
+            logger.error(e)
+            raise CreationFailedError("Tag", "Integrity error") from e
+        except Exception as e:
+            self.session.rollback()
+            logger.error(e)
+            orig = getattr(e, "orig", None)
+            
+            if orig and (isinstance(e.orig, errors.RaiseException) or "Already exist" in str(e.orig)):
+                raise AlreadyExistsError("RoomTag", "room_id, tag_id", f"room_id={room_id} and tag_id={tag_model.id}") from e
+            
+            raise CreationFailedError("TagWithRoomlink", str(e)) from e

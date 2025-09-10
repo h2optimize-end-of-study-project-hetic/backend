@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 
 from app.src.domain.entities.tag import Tag
 
@@ -9,11 +10,11 @@ class TagRepository(ABC):
         pass
 
     @abstractmethod
-    def paginate_tags(self, cursor: int | None, limit: int) -> tuple[list[Tag], int, Tag | None, Tag | None]:
+    def paginate_tags(self, cursor: int | None, limit: int, with_rooms: bool = False) -> tuple[list[Tag], int, Tag | None, Tag | None]:
         pass
 
     @abstractmethod
-    def select_tags(self, offset: int | None = None, limit: int | None = None) -> list[Tag | None]:
+    def select_tags(self, offset: int | None = None, limit: int | None = None, with_rooms: bool = False) -> list[Tag | None]:
         pass
 
     @abstractmethod
@@ -21,7 +22,7 @@ class TagRepository(ABC):
         pass
 
     @abstractmethod
-    def select_tag_by_id(self, tag_id: int) -> Tag:
+    def select_tag_by_id(self, tag_id: int, with_rooms: bool = False) -> Tag:
         pass
 
     @abstractmethod
@@ -38,4 +39,8 @@ class TagRepository(ABC):
 
     @abstractmethod
     def get_tag_by_position(self, position: int) -> Tag:
+        pass
+
+    @abstractmethod
+    def create_with_room_link(self, tag: Tag, room_id: int, start_at: datetime, end_at: datetime | None = None) -> Tag: 
         pass

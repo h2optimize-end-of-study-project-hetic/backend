@@ -61,7 +61,9 @@ async def create_user_no_auth(
     """
     Create a new user.
     """
-    try:  
+    try:
+        user_data.is_active = False
+        user_data.role = Role.guest.value
         user_entity = User.from_dict(user_data.model_dump())
         new_user: User = use_case.execute(user_entity)
         return UserModel(**new_user.to_dict())
@@ -93,7 +95,7 @@ async def create_user(
     Create a new user.
     """
     try:  
-        user_entity = User.from_dict(user_data.dict())
+        user_entity = User.from_dict(user_data.model_dump())
         new_user: User = use_case.execute(user_entity)
         return UserModel(**new_user.to_dict())
     except AlreadyExistsError as e:

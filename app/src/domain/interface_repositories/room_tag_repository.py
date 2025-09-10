@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 
 from app.src.domain.entities.room_tag import RoomTag
 
@@ -34,4 +35,8 @@ class RoomTagRepository(ABC):
 
     @abstractmethod
     def get_roomtag_by_position(self, position: int, active_only: bool = False) -> RoomTag:
+        pass
+
+    @abstractmethod
+    def update_roomtag_by_tag_id_room_id(self, tag_id: int, room_id: int, start_at: datetime, end_at: datetime | None) -> RoomTag:
         pass
