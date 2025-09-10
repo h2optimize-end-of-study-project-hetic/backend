@@ -125,7 +125,7 @@ def upgrade() -> None:
 
 
     op.create_table(
-        'app_user',
+        'user',
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('email', sa.Text, unique=True, nullable=False),
         sa.Column('salt', sa.Text, nullable=False),
