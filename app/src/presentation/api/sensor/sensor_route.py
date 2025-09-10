@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 sensor_router = APIRouter(prefix="/sensors", tags=[OpenApiTags.sensor])
 
-# --- Error configs
+
 not_found_error = OpenApiErrorResponseConfig(
     code=404, description="Sensor not found", detail="Sensor with this ID was not found"
 )
@@ -24,8 +24,6 @@ unexpected_error = OpenApiErrorResponseConfig(
     code=500, description="Unexpected error", detail="Internal server error"
 )
 
-
-# --- Routes dynamiques ---
 
 @sensor_router.get(
     "/{kind}/latest",
