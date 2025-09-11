@@ -122,3 +122,17 @@ class ForeignKeyConstraintError(CustomError):
         super().__init__(msg)
         self.resource = resource
         self.constraint_name = constraint_name
+
+
+class CheckConstraintError(CustomError):
+    """
+    Exception raised when trying to violates defined constraint
+    """
+
+    def __init__(self, resource: str, constraint_name: str | None = None, table_name: str | None = None):
+        msg = f"Failed to execute request on {resource}"
+        if constraint_name:
+            msg += f", Violates check constraint : {constraint_name} from table {table_name}"
+        super().__init__(msg)
+        self.resource = resource
+        self.constraint_name = constraint_name

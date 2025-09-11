@@ -32,4 +32,4 @@ class RoomTagModel(SQLModel, table=True):
     )
 
     tag: "TagModel" = Relationship(back_populates="room_tags")
-    room: "RoomModel" = Relationship(back_populates="tags")
+    room: "RoomModel" = Relationship(back_populates="room_tags")

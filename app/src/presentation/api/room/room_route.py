@@ -6,22 +6,25 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from app.src.domain.entities.role import Role
 from app.src.domain.entities.room import Room
 from app.src.domain.entities.user import User
-from app.src.presentation.api.common.generic_model import OffsetBasePaginationMetadataModel
+from app.src.presentation.api.common.generic_model import OffsetBasePaginationMetadataModel, PaginationMetadataModel
 from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.presentation.core.open_api_tags import OpenApiTags
 from app.src.use_cases.room.create_room_use_case import CreateRoomUseCase
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig, generate_responses
 from app.src.presentation.api.room.room_model import (
     PaginatedListRoomModelResponse,
+    PaginatedListRoomWithTagModelResponse,
     RoomCreateModelRequest,
     RoomModelResponse,
     RoomUpdateModelRequest,
+    RoomWithTagModelResponse,
 )
 from app.src.presentation.dependencies import (
     create_room_use_case,
     delete_room_use_case,
     get_room_by_id_use_case,
     get_room_list_use_case,
+    get_room_with_tag_list_use_case,
     update_room_use_case
 )
 from app.src.common.exception import (
@@ -34,6 +37,7 @@ from app.src.common.exception import (
 from app.src.use_cases.room.delete_room_use_case import DeleteRoomUseCase
 from app.src.use_cases.room.get_room_by_id_use_case import GetRoomByIdUseCase
 from app.src.use_cases.room.get_room_list_use_case import GetRoomListUseCase
+from app.src.use_cases.room.get_room_with_tag_list_use_case import GetRoomWithTagListUseCase
 from app.src.use_cases.room.update_room_use_case import UpdateRoomUseCase
 
 creation_error = OpenApiErrorResponseConfig(code=406, description="Creation fails", detail="Failed to create Room")
@@ -162,6 +166,46 @@ async def read_room_list(
             detail="Internal server error"
         ) from e
 
+
+@room_router.get(
+    "/tag",
+    summary="Retrieve a list of rooms",
+    response_model=PaginatedListRoomWithTagModelResponse,
+    response_description="Detailed information of the requested rooms with is tags",
+    responses=generate_responses([unexpected_error]),
+    deprecated=False,
+)
+async def read_tag_list(
+    use_case: Annotated[GetRoomWithTagListUseCase, Depends(get_room_with_tag_list_use_case)],
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
+    cursor: str | None = Query(None, description="Pagination cursor"),
+    limit: int | None = Query(20, ge=1, description="Number of elements return"),
+):
+    """
+    Retrieve a list of rooms
+
+    - **cursor**: Optional cursor for pagination (returns tags with id >= cursor)
+    - **limit**: Number of tags to return (default: 20)
+    """
+    try:
+        result = use_case.execute(cursor, limit)
+
+        metadata = PaginationMetadataModel(
+            total=result.total,
+            chunk_size=result.chunk_size,
+            chunk_count=result.chunk_count,
+            current_cursor=result.current_cursor,
+            first_cursor=result.first_cursor,
+            last_cursor=result.last_cursor,
+            next_cursor=result.next_cursor,
+        )
+
+        room_models = [RoomWithTagModelResponse(**room.to_dict()) for room in result.rooms]
+        return PaginatedListRoomWithTagModelResponse(data=room_models, metadata=metadata)
+
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error") from e
 
 
 @room_router.get(

@@ -38,7 +38,7 @@ def test_get_tag_list_success(authenticated_client, override_dependencies, mock_
     client, _ = authenticated_client
     response = client.get("/api/v1/tag", params={"limit": 10})
 
-    mock_get_tag_list_use_case.execute.assert_called_once_with(None, 10)
+    mock_get_tag_list_use_case.execute.assert_called_once_with(None, 10, with_rooms=False)
     assert response.status_code == 200
 
     json_data = response.json()

@@ -8,6 +8,7 @@ from app.src.presentation.core.config import Settings
 from app.src.infrastructure.db.models.tag_model import TagModel
 from app.src.infrastructure.db.models.room_model import RoomModel
 from app.src.infrastructure.db.models.building_model import BuildingModel 
+from app.src.infrastructure.db.models.room_tag_model import RoomTagModel
 
 
 config = context.config

@@ -17,6 +17,7 @@ class Room:
     end_at: datetime | None
     created_at: datetime | None
     updated_at: datetime | None = None
+    tags: list | None = None   
 
     @staticmethod
     def from_dict(data: dict) -> "Room":
@@ -47,4 +48,18 @@ class Room:
         for field in ["created_at", "updated_at", "start_at", "end_at"]:
             if data[field]:
                 data[field] = data[field].isoformat()
+
+        if self.tags:
+            serialized_tags = []
+            for tag in self.tags:
+                if isinstance(tag, dict):
+                    serialized_tags.append(tag)
+                elif hasattr(tag, "to_dict"):
+                    serialized_tags.append(tag.to_dict())
+                else:
+                    serialized_tags.append(tag)
+            data["tags"] = serialized_tags
+        else:
+            data["tags"] = None
+
         return data

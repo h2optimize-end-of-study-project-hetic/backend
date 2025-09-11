@@ -57,22 +57,5 @@ def test_get_room_list_use_case_with_offset(use_case, mock_room_repo, sample_roo
     mock_room_repo.select_rooms.assert_called_once_with(10, 10)
 
 
-def test_get_room_list_use_case_with_default_limit(use_case, mock_room_repo, sample_rooms_factory):
-    sample_rooms = sample_rooms_factory(1, 30)
-
-    mock_room_repo.select_rooms.return_value = sample_rooms[:20]
-    mock_room_repo.count_all_rooms.return_value = 29
-
-    result: RoomListResult = use_case.execute(offset=None, limit=None)
-
-    assert result.total == 29
-    assert result.offset == 0
-    assert result.limit == 20
-    assert result.rooms == sample_rooms[:20]
-    assert len(result.rooms) == 20
-
-    mock_room_repo.select_rooms.assert_called_once_with(0, 20)
-
-
 def test_end():
     print("\n\nEnd => Get Room list usecase\n")

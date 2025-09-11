@@ -1,4 +1,6 @@
+from app.src.domain.interface_repositories.room_tag_repository import RoomTagRepository
 from app.src.domain.interface_repositories.user_repository import UserRepository
+from app.src.infrastructure.db.repositories.room_tag_repository_sql import SQLRoomTagRepository
 from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
 from app.src.use_cases.authentication.verify_user_use_case import VerifyUserUseCase
@@ -7,7 +9,14 @@ from sqlmodel import Session
 
 
 from app.src.infrastructure.db.session import get_session
+from app.src.use_cases.room.get_room_with_tag_list_use_case import GetRoomWithTagListUseCase
+from app.src.use_cases.room_tag.create_room_tag_use_case import CreateRoomTagUseCase
+from app.src.use_cases.room_tag.delete_room_tag_use_case import DeleteRoomTagUseCase
+from app.src.use_cases.room_tag.get_room_tag_by_id_use_case import GetRoomTagByIdUseCase
+from app.src.use_cases.room_tag.get_room_tag_list_use_case import GetRoomTagListUseCase
+from app.src.use_cases.room_tag.update_room_tag_use_case import UpdateRoomTagUseCase
 from app.src.use_cases.tag.create_tag_use_case import CreateTagUseCase
+from app.src.use_cases.tag.create_tag_with_room_link_use_case import CreateTagWithRoomLinkUseCase
 from app.src.use_cases.tag.delete_tag_use_case import DeleteTagUseCase
 from app.src.use_cases.tag.update_tag_use_case import UpdateTagUseCase
 from app.src.use_cases.room.delete_room_use_case import DeleteRoomUseCase
@@ -30,6 +39,7 @@ from app.src.use_cases.map.get_map_by_id_use_case import GetMapByIdUseCase
 from app.src.domain.interface_repositories.map_repository import MapRepository
 from app.src.infrastructure.db.repositories.map_repository_sql import SQLMapRepository
 
+from app.src.use_cases.tag.update_tag_with_room_link_use_case import UpdateTagWithRoomLinkUseCase
 from app.src.use_cases.user.create_user_use_case import CreateUserUseCase
 from app.src.use_cases.user.delete_user_use_case import DeleteUserUseCase
 from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase
@@ -43,8 +53,6 @@ from app.src.use_cases.event.get_event_list_use_case import GetEventListUseCase
 from app.src.use_cases.event.get_event_by_id_use_case import GetEventByIdUseCase
 from app.src.domain.interface_repositories.event_repository import EventRepository
 from app.src.infrastructure.db.repositories.event_repository_sql import SQLEventRepository
-from app.src.domain.interface_repositories.user_repository import UserRepository
-from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 
 from app.src.use_cases.event_room.create_event_room_use_case import CreateEventRoomUseCase
 from app.src.use_cases.event_room.delete_event_room_use_case import DeleteEventRoomUseCase
@@ -80,17 +88,10 @@ from app.src.infrastructure.db.repositories.user_group_repository_sql import SQL
 
 get_session_dep = Depends(get_session)
 
-
-# Tag 
-
-def tag_repository(session: Session = get_session_dep) -> TagRepository:
-    return SQLTagRepository(session)
-
 def user_repository(session: Session = get_session_dep) -> UserRepository:
     return SQLUserRepository(session)
 
 
-tag_repo_dep = Depends(tag_repository)
 user_repo_dep = Depends(user_repository)
 
 def get_current_user_use_case(user_repository: UserRepository = user_repo_dep) -> GetCurrentUserUseCase:
@@ -98,6 +99,13 @@ def get_current_user_use_case(user_repository: UserRepository = user_repo_dep) -
 
 def get_verify_user_use_case(user_repository: UserRepository = user_repo_dep) -> VerifyUserUseCase:
     return VerifyUserUseCase(user_repository)
+
+# Tag 
+
+def tag_repository(session: Session = get_session_dep) -> TagRepository:
+    return SQLTagRepository(session)
+
+tag_repo_dep = Depends(tag_repository)
 
 def get_tag_by_id_use_case(tag_repository: TagRepository = tag_repo_dep) -> GetTagByIdUseCase:
     return GetTagByIdUseCase(tag_repository)
@@ -110,6 +118,10 @@ def get_tag_list_use_case(tag_repository: TagRepository = tag_repo_dep) -> GetTa
 def create_tag_use_case(tag_repository: TagRepository = tag_repo_dep) -> CreateTagUseCase:
     return CreateTagUseCase(tag_repository)
 
+def create_tag_with_room_link_use_case(tag_repository: TagRepository = tag_repo_dep) -> CreateTagWithRoomLinkUseCase:
+    return CreateTagWithRoomLinkUseCase(tag_repository)
+
+
 
 def update_tag_use_case(tag_repository: TagRepository = tag_repo_dep) -> UpdateTagUseCase:
     return UpdateTagUseCase(tag_repository)
@@ -119,7 +131,7 @@ def delete_tag_use_case(tag_repository: TagRepository = tag_repo_dep) -> DeleteT
     return DeleteTagUseCase(tag_repository)
 
 
-
+# Map 
 def map_repository(session: Session = get_session_dep) -> MapRepository:
     return SQLMapRepository(session)
 
@@ -216,6 +228,10 @@ def get_room_list_use_case(room_repository: RoomRepository = room_repo_dep) -> G
     return GetRoomListUseCase(room_repository)
 
 
+def get_room_with_tag_list_use_case(room_repository: RoomRepository = room_repo_dep) -> GetRoomWithTagListUseCase:
+    return GetRoomWithTagListUseCase(room_repository)
+
+
 def create_room_use_case(room_repository: RoomRepository = room_repo_dep) -> CreateRoomUseCase:
     return CreateRoomUseCase(room_repository)
 
@@ -226,36 +242,6 @@ def update_room_use_case(room_repository: RoomRepository = room_repo_dep) -> Upd
 
 def delete_room_use_case(room_repository: RoomRepository = room_repo_dep) -> DeleteRoomUseCase:
     return DeleteRoomUseCase(room_repository) 
-
-
-# event
-
-def event_repository(session: Session = get_session_dep) -> EventRepository:
-    return SQLEventRepository(session)
-
-event_repo_dep = Depends(event_repository)
-
-
-def get_event_by_id_use_case(event_repository: EventRepository = event_repo_dep) -> GetEventByIdUseCase:
-    return GetEventByIdUseCase(event_repository)
-
-
-def get_event_list_use_case(event_repository: EventRepository = event_repo_dep) -> GetEventListUseCase:
-    return GetEventListUseCase(event_repository)
-
-
-def create_event_use_case(event_repository: EventRepository = event_repo_dep) -> CreateEventUseCase:
-    return CreateEventUseCase(event_repository)
-
-
-def update_event_use_case(event_repository: EventRepository = event_repo_dep) -> UpdateEventUseCase:
-    return UpdateEventUseCase(event_repository)
-
-
-def delete_event_use_case(event_repository: EventRepository = event_repo_dep) -> DeleteEventUseCase:
-    return DeleteEventUseCase(event_repository)
-
-
 
 # event_room
 
@@ -352,3 +338,35 @@ def update_user_group_use_case(user_group_repository: UserGroupRepository = user
 
 def delete_user_group_use_case(user_group_repository: UserGroupRepository = user_group_repo_dep) -> DeleteUserGroupUseCase:
     return DeleteUserGroupUseCase(user_group_repository) 
+
+
+
+# RoomTag
+
+def room_tag_repository(session: Session = get_session_dep) -> RoomTagRepository:
+    return SQLRoomTagRepository(session)
+
+room_tag_repo_dep = Depends(room_tag_repository)
+
+def get_room_tag_by_id_use_case(room_tag_repository: RoomTagRepository = room_tag_repo_dep) -> GetRoomTagByIdUseCase:
+    return GetRoomTagByIdUseCase(room_tag_repository)
+
+
+def get_room_tag_list_use_case(room_tag_repository: RoomTagRepository = room_tag_repo_dep) -> GetRoomTagListUseCase:
+    return GetRoomTagListUseCase(room_tag_repository)
+
+
+def create_room_tag_use_case(room_tag_repository: RoomTagRepository = room_tag_repo_dep) -> CreateRoomTagUseCase:
+    return CreateRoomTagUseCase(room_tag_repository)
+
+
+def update_room_tag_use_case(room_tag_repository: RoomTagRepository = room_tag_repo_dep) -> UpdateRoomTagUseCase:
+    return UpdateRoomTagUseCase(room_tag_repository)
+
+
+def delete_room_tag_use_case(room_tag_repository: RoomTagRepository = room_tag_repo_dep) -> DeleteRoomTagUseCase:
+    return DeleteRoomTagUseCase(room_tag_repository)
+
+
+def update_tag_with_room_link_use_case(tag_repository: TagRepository = tag_repo_dep, room_tag_repository: RoomTagRepository = room_tag_repo_dep) -> UpdateTagWithRoomLinkUseCase:
+    return UpdateTagWithRoomLinkUseCase(tag_repository, room_tag_repository)

@@ -44,7 +44,7 @@ def test_get_tag_list_use_case_success_no_cursor(use_case, mock_tag_repo, sample
     assert result.tags == sample_tags[:10]
     assert len(result.tags) == 10
 
-    mock_tag_repo.paginate_tags.assert_called_once_with(None, limit + 1)
+    mock_tag_repo.paginate_tags.assert_called_once_with(None, limit + 1, with_rooms=False)
 
 
 def test_get_tag_list_use_case_success_with_cursor(use_case, mock_tag_repo, sample_tags_factory):
@@ -70,7 +70,7 @@ def test_get_tag_list_use_case_success_with_cursor(use_case, mock_tag_repo, samp
     assert result.tags == sample_tags[10:20]
     assert len(result.tags) == 10
 
-    mock_tag_repo.paginate_tags.assert_called_once_with("11", limit + 1)
+    mock_tag_repo.paginate_tags.assert_called_once_with("11", limit + 1, with_rooms=False)
 
 
 def test_get_tag_list_use_case_failed_with_invalid_cursor(use_case):
@@ -78,7 +78,7 @@ def test_get_tag_list_use_case_failed_with_invalid_cursor(use_case):
         use_case.execute(cursor="id11", limit=10)
 
 
-def test_get_tag_list_use_case_success_with_no_limit(use_case, mock_tag_repo, sample_tags_factory):
+def test_get_tag_list_use_case_success_with_limit20(use_case, mock_tag_repo, sample_tags_factory):
     sample_tags = sample_tags_factory(1, 26)
 
     limit = 20
@@ -88,7 +88,7 @@ def test_get_tag_list_use_case_success_with_no_limit(use_case, mock_tag_repo, sa
 
     mock_tag_repo.paginate_tags.return_value = (sample_tags[:21], total, first_tag, last_tag)
 
-    result: PaginatedTag = use_case.execute(cursor="id=1")
+    result: PaginatedTag = use_case.execute(cursor="id=1", limit=20)
 
     assert result.total == 25
     assert result.chunk_size == 20
@@ -101,7 +101,7 @@ def test_get_tag_list_use_case_success_with_no_limit(use_case, mock_tag_repo, sa
     assert result.tags == sample_tags[:20]
     assert len(result.tags) == 20
 
-    mock_tag_repo.paginate_tags.assert_called_once_with("1", limit + 1)
+    mock_tag_repo.paginate_tags.assert_called_once_with("1", limit + 1, with_rooms=False)
 
 
 def test_get_tag_list_use_case_success_with_cursor_last_cursor(use_case, mock_tag_repo, sample_tags_factory):
@@ -127,7 +127,7 @@ def test_get_tag_list_use_case_success_with_cursor_last_cursor(use_case, mock_ta
     assert result.tags == sample_tags[21:25]
     assert len(result.tags) == 4
 
-    mock_tag_repo.paginate_tags.assert_called_once_with("21", limit + 1)
+    mock_tag_repo.paginate_tags.assert_called_once_with("21", limit + 1, with_rooms=False)
 
 
 def test_get_tag_list_use_case_next_cursor(use_case, mock_tag_repo, sample_tags_factory):

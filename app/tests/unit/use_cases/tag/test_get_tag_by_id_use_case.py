@@ -26,9 +26,9 @@ def test_get_tag_by_id_use_case_execute_success(use_case, mock_tag_repo, sample_
 
     mock_tag_repo.select_tag_by_id.return_value = fake_tag
 
-    result = use_case.execute(tag_id)
+    result = use_case.execute(tag_id, with_rooms=False)
 
-    mock_tag_repo.select_tag_by_id.assert_called_once_with(tag_id)
+    mock_tag_repo.select_tag_by_id.assert_called_once_with(tag_id, with_rooms=False)
 
     assert result == fake_tag
 
