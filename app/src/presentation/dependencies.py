@@ -1,10 +1,8 @@
-<<<<<<< HEAD
+
 from app.src.domain.interface_repositories.room_tag_repository import RoomTagRepository
 from app.src.domain.interface_repositories.user_repository import UserRepository
 from app.src.infrastructure.db.repositories.room_tag_repository_sql import SQLRoomTagRepository
 from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
-=======
->>>>>>> dced0ae (Implement sensor management features including CRUD operations, data models, and API routes)
 from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
 from app.src.use_cases.authentication.verify_user_use_case import VerifyUserUseCase
 from fastapi import Depends, HTTPException, status
@@ -43,12 +41,12 @@ from app.src.use_cases.map.get_map_by_id_use_case import GetMapByIdUseCase
 from app.src.domain.interface_repositories.map_repository import MapRepository
 from app.src.infrastructure.db.repositories.map_repository_sql import SQLMapRepository
 
-<<<<<<< HEAD
 from app.src.use_cases.tag.update_tag_with_room_link_use_case import UpdateTagWithRoomLinkUseCase
-=======
 from app.src.domain.interface_repositories.user_repository import UserRepository
 from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
->>>>>>> dced0ae (Implement sensor management features including CRUD operations, data models, and API routes)
+
+from app.src.domain.interface_repositories.user_repository import UserRepository
+from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 from app.src.use_cases.user.create_user_use_case import CreateUserUseCase
 from app.src.use_cases.user.delete_user_use_case import DeleteUserUseCase
 from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase
@@ -361,8 +359,6 @@ def update_user_group_use_case(user_group_repository: UserGroupRepository = user
 def delete_user_group_use_case(user_group_repository: UserGroupRepository = user_group_repo_dep) -> DeleteUserGroupUseCase:
     return DeleteUserGroupUseCase(user_group_repository) 
 
-
-
 # RoomTag
 
 def room_tag_repository(session: Session = get_session_dep) -> RoomTagRepository:
@@ -392,6 +388,7 @@ def delete_room_tag_use_case(room_tag_repository: RoomTagRepository = room_tag_r
 
 def update_tag_with_room_link_use_case(tag_repository: TagRepository = tag_repo_dep, room_tag_repository: RoomTagRepository = room_tag_repo_dep) -> UpdateTagWithRoomLinkUseCase:
     return UpdateTagWithRoomLinkUseCase(tag_repository, room_tag_repository)
+
 
 
 # Sensor
