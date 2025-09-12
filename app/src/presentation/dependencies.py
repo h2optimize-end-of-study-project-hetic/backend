@@ -1,11 +1,13 @@
+
 from app.src.domain.interface_repositories.room_tag_repository import RoomTagRepository
 from app.src.domain.interface_repositories.user_repository import UserRepository
 from app.src.infrastructure.db.repositories.room_tag_repository_sql import SQLRoomTagRepository
 from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
 from app.src.use_cases.authentication.verify_user_use_case import VerifyUserUseCase
-from fastapi import Depends
-from sqlmodel import Session
+from fastapi import Depends, HTTPException, status
+from sqlmodel import Session, SQLModel
+from typing import Type
 
 
 from app.src.infrastructure.db.session import get_session
@@ -40,6 +42,11 @@ from app.src.domain.interface_repositories.map_repository import MapRepository
 from app.src.infrastructure.db.repositories.map_repository_sql import SQLMapRepository
 
 from app.src.use_cases.tag.update_tag_with_room_link_use_case import UpdateTagWithRoomLinkUseCase
+from app.src.domain.interface_repositories.user_repository import UserRepository
+from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
+
+from app.src.domain.interface_repositories.user_repository import UserRepository
+from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 from app.src.use_cases.user.create_user_use_case import CreateUserUseCase
 from app.src.use_cases.user.delete_user_use_case import DeleteUserUseCase
 from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase
@@ -85,6 +92,19 @@ from app.src.use_cases.user_group.get_user_group_list_use_case import GetUserGro
 from app.src.use_cases.user_group.get_user_group_by_id_use_case import GetUserGroupByIdUseCase
 from app.src.domain.interface_repositories.user_group_repository import UserGroupRepository
 from app.src.infrastructure.db.repositories.user_group_repository_sql import SQLUserGroupRepository
+
+from app.src.infrastructure.db.session import get_session_recorded
+from app.src.infrastructure.db.repositories.sensor_repository_sql import SQLSensorRepository
+from app.src.infrastructure.db.models.sensor_model import (
+    SensorButtonModel,
+    SensorHumidityModel,
+    SensorMotionModel,
+    SensorNeighborsCountModel,
+    SensorNeighborsDetailModel,
+    SensorPressureModel,
+    SensorTemperatureModel,
+    SensorVoltageModel,
+)
 
 get_session_dep = Depends(get_session)
 
@@ -339,8 +359,6 @@ def update_user_group_use_case(user_group_repository: UserGroupRepository = user
 def delete_user_group_use_case(user_group_repository: UserGroupRepository = user_group_repo_dep) -> DeleteUserGroupUseCase:
     return DeleteUserGroupUseCase(user_group_repository) 
 
-
-
 # RoomTag
 
 def room_tag_repository(session: Session = get_session_dep) -> RoomTagRepository:
@@ -370,3 +388,42 @@ def delete_room_tag_use_case(room_tag_repository: RoomTagRepository = room_tag_r
 
 def update_tag_with_room_link_use_case(tag_repository: TagRepository = tag_repo_dep, room_tag_repository: RoomTagRepository = room_tag_repo_dep) -> UpdateTagWithRoomLinkUseCase:
     return UpdateTagWithRoomLinkUseCase(tag_repository, room_tag_repository)
+
+
+
+# Sensor
+
+SENSOR_MODEL_MAP: dict[str, tuple[Type[SQLModel], str]] = {
+    # alias_url → (Model, colonne temporelle)
+    "button": (SensorButtonModel, "time"),
+    "humidity": (SensorHumidityModel, "time"),
+    "motion": (SensorMotionModel, "time"),
+    "neighbors_count": (SensorNeighborsCountModel, "time"),
+    "neighbors_detail": (SensorNeighborsDetailModel, "time"),
+    "pressure": (SensorPressureModel, "time"),
+    "temperature": (SensorTemperatureModel, "time"),
+    "voltage": (SensorVoltageModel, "time"),
+    "sensor_button": (SensorButtonModel, "time"),
+    "sensor_humidity": (SensorHumidityModel, "time"),
+    "sensor_motion": (SensorMotionModel, "time"),
+    "sensor_neighbors_count": (SensorNeighborsCountModel, "time"),
+    "sensor_neighbors_detail": (SensorNeighborsDetailModel, "time"),
+    "sensor_pressure": (SensorPressureModel, "time"),
+    "sensor_temperature": (SensorTemperatureModel, "time"),
+    "sensor_voltage": (SensorVoltageModel, "time"),
+}
+
+
+def get_sensor_repo(
+    kind: str,
+    session: Session = Depends(get_session_recorded),
+) -> SQLSensorRepository:
+    entry = SENSOR_MODEL_MAP.get(kind)
+    if not entry:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Unknown sensor kind '{kind}'.",
+        )
+
+    model, ts_attr = entry
+    return SQLSensorRepository(session, model, ts_attr)
