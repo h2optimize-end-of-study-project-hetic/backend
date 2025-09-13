@@ -95,8 +95,17 @@ def get_test_session():
 @pytest.fixture(autouse=True)
 def clean_db():
     with Session(test_engine) as session:
-        for table in reversed(SQLModel.metadata.sorted_tables):
-            session.exec(text(f'TRUNCATE TABLE "{table.name}" RESTART IDENTITY CASCADE;'))
+        tables = session.exec(
+            text("""
+                SELECT tablename
+                FROM pg_tables
+                WHERE schemaname = 'public';
+            """)
+        ).all()
+        for (table_name,) in tables:
+            session.exec(
+                text(f'TRUNCATE TABLE "{table_name}" RESTART IDENTITY CASCADE;')
+            )
         session.commit()
         yield
 
@@ -111,9 +120,9 @@ def test_user():
 
     user = UserModel(
         email="testuser@example.com",
-        salt="testsalt",  # valeur bidon mais non NULL
+        salt="testsalt",
         password=hashed_password,
-        secret_2fa=None,  # si NOT NULL en DB, mettre une chaîne vide ""
+        secret_2fa=None,
         firstname="John",
         lastname="Doe",
         phone_number="0600000000",
