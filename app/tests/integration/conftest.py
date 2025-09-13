@@ -15,10 +15,10 @@ from app.src.presentation.core.config import settings
 from app.src.domain.entities.role import Role
 from app.src.infrastructure.db.models.user_model import UserModel
 
-test_db_name = f"{settings.POSTGRES_DB}_test"
+test_db_name = settings.postgres_db
 
 escaped_password = quote(settings.POSTGRES_PASSWORD)
-test_db_url = f"postgresql://{settings.POSTGRES_USER}:{escaped_password}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+test_db_url = f"postgresql://{settings.POSTGRES_USER}:{escaped_password}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{test_db_name}"
 
 admin_url = f"postgresql://{settings.POSTGRES_USER}:{escaped_password}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/postgres"
 

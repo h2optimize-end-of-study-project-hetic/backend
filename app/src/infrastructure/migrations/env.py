@@ -4,21 +4,16 @@ from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
 
 from alembic import context
-from app.src.presentation.core.config import Settings
-from app.src.infrastructure.db.models.tag_model import TagModel
-from app.src.infrastructure.db.models.room_model import RoomModel
-from app.src.infrastructure.db.models.building_model import BuildingModel 
-from app.src.infrastructure.db.models.room_tag_model import RoomTagModel
-
+from app.src.presentation.core.config import settings
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = SQLModel.metadata
+target_metadata = None
 
-settings = Settings()
+
 db_url = settings.database_url
 
 escaped_db_url = db_url.replace('%', '%%')
