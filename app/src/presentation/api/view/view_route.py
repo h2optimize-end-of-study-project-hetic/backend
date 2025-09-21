@@ -1,11 +1,13 @@
 import logging
 from typing import Annotated
+from datetime import date as Date
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 
+from app.src.use_cases.view.get_events_by_date import GetEventsByDateUseCase
 from app.src.presentation.api.authentication.authentication_model import UserModelResponse
 from app.src.use_cases.view.get_user_in_group_by_group_id_use_case import GetUsersInGroupUseCase
 from app.src.use_cases.view.get_planning_by_user_id_use_case import GetEventsForUserUseCase
-from app.src.presentation.api.view.view_model import UserEventViewResponse
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from app.src.presentation.api.view.view_model import EventsByDateViewResponse, UserEventViewResponse
 
 from app.src.presentation.api.secure_ressources import secure_ressources
 from app.src.domain.entities.role import Role
@@ -17,6 +19,7 @@ from app.src.use_cases.view.get_user_in_group_by_group_id_use_case import GetUse
 from app.src.presentation.api.common.errors import OpenApiErrorResponseConfig, generate_responses
 
 from app.src.presentation.dependencies import (
+    get_events_by_date_use_case,
     get_user_events_use_case,
     get_users_in_group_use_case
 )
@@ -70,6 +73,23 @@ def get_user_events(
     try:
         results = use_case.execute(user_id)
         return [UserEventViewResponse(**dict(row)) for row in results]
+
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@view_router.get("/events/{date}", response_model=list[EventsByDateViewResponse])
+def get_events_by_date(
+    date: Date,   # ✅ FastAPI va parser directement "2025-08-31" en objet date
+    user: Annotated[User, Depends(secure_ressources([Role.staff, Role.technician]))],
+    use_case: Annotated[GetEventsByDateUseCase, Depends(get_events_by_date_use_case)]
+):
+    try:
+        results = use_case.execute(date)
+        return [EventsByDateViewResponse(**dict(row)) for row in results]
 
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))

@@ -5,6 +5,7 @@ from app.src.infrastructure.db.repositories.room_tag_repository_sql import SQLRo
 from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
 from app.src.use_cases.authentication.verify_user_use_case import VerifyUserUseCase
+from app.src.use_cases.view.get_events_by_date import GetEventsByDateUseCase
 from fastapi import Depends, HTTPException, status
 from sqlmodel import Session, SQLModel
 from typing import Type
@@ -108,7 +109,7 @@ from app.src.infrastructure.db.models.sensor_model import (
 
 
 from app.src.use_cases.view.get_user_in_group_by_group_id_use_case import GetUsersInGroupUseCase
-from app.src.infrastructure.db.repositories.view_repository_sql import GroupUserRepository, UserEventRepository
+from app.src.infrastructure.db.repositories.view_repository_sql import EventsByDateRepository, GroupUserRepository, UserEventRepository
 from app.src.use_cases.view.get_planning_by_user_id_use_case import GetEventsForUserUseCase
 
 get_session_dep = Depends(get_session)
@@ -450,3 +451,11 @@ def get_user_events_use_case(
     repository: UserEventRepository = Depends(get_user_event_repository),
 ) -> GetEventsForUserUseCase:
     return GetEventsForUserUseCase(repository)
+
+def get_events_by_date_repository(session: Session = get_session_dep) -> EventsByDateRepository:
+    return EventsByDateRepository(session)
+
+def get_events_by_date_use_case(
+    repository: EventsByDateRepository = Depends(get_events_by_date_repository),
+) -> GetEventsByDateUseCase:
+    return GetEventsByDateUseCase(repository)

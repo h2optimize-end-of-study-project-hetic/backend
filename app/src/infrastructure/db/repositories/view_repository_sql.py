@@ -1,4 +1,7 @@
-from sqlmodel import select, Session
+from sqlmodel import select, Session, func
+from datetime import datetime, time, timedelta
+from datetime import date as Date
+
 from app.src.infrastructure.db.models.user_model import UserModel
 from app.src.infrastructure.db.models.user_group_model import UserGroupModel
 from app.src.infrastructure.db.models.group_model import GroupModel
@@ -69,4 +72,57 @@ class UserEventRepository:
             }
             events.append(event_dict)
         
+        return events
+
+
+# events by day
+
+class EventsByDateRepository:
+    def __init__(self, session: Session):
+        self.session = session
+
+    def get_events_by_date(self, date: Date) -> list[dict]:
+        """
+        Retourne tous les events d'une journée
+        """
+        start_of_day = datetime.combine(date, time.min)  # 2025-08-31 00:00:00
+        end_of_day = datetime.combine(date, time.max)    # 2025-08-31 23:59:59.999999
+
+        statement = (
+            select(
+                EventRoomModel.room_id,
+                EventRoomModel.event_id,
+                EventRoomModel.start_at,
+                EventRoomModel.end_at,
+                EventModel.supervisor,
+                EventModel.name.label("event_name"),
+                EventModel.description,
+                EventModel.group_id,
+                GroupModel.name.label("group_name"),
+                GroupModel.member_count,
+            )
+            .join(EventModel, EventRoomModel.event_id == EventModel.id)
+            .join(GroupModel, EventModel.group_id == GroupModel.id)
+            .where(EventRoomModel.start_at >= start_of_day)
+            .where(EventRoomModel.start_at <= end_of_day)
+        )
+
+        results = self.session.exec(statement).all()
+
+        events = []
+        for row in results:
+            event_dict = {
+                "room_id": row[0],
+                "event_id": row[1],
+                "start_at": row[2],
+                "end_at": row[3],
+                "supervisor": row[4],
+                "event_name": row[5],
+                "description": row[6],
+                "group_id": row[7],
+                "group_name": row[8],
+                "member_count": row[9],
+            }
+            events.append(event_dict)
+
         return events
