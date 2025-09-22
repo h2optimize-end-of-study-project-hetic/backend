@@ -100,6 +100,7 @@ class EventsByDateRepository:
                 EventModel.group_id,
                 GroupModel.name.label("group_name"),
                 GroupModel.member_count,
+                EventRoomModel.id,
             )
             .join(EventModel, EventRoomModel.event_id == EventModel.id)
             .join(GroupModel, EventModel.group_id == GroupModel.id)
@@ -122,6 +123,7 @@ class EventsByDateRepository:
                 "group_id": row[7],
                 "group_name": row[8],
                 "member_count": row[9],
+                "id": row[10],
             }
             events.append(event_dict)
 

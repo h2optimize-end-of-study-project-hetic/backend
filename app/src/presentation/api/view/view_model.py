@@ -11,6 +11,7 @@ class UserEventViewResponse(BaseModel):
 
 
 class EventsByDateViewResponse(BaseModel):
+    id: int
     room_id: int
     event_id: int
     event_name: str
