@@ -15,3 +15,4 @@ class OpenApiTags(Enum):
     group = "group"
     user_group = "user_group"
     sensor = "sensor"
+    view = "view"
