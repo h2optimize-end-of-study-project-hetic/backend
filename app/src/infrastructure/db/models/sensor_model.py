@@ -1,7 +1,6 @@
 from datetime import datetime
-from typing import Optional
 from sqlmodel import SQLModel, Field
-from sqlalchemy import Column, TIMESTAMP, text
+from sqlalchemy import Column, TIMESTAMP
 
 
 class SensorTemperatureModel(SQLModel, table=True):
@@ -10,12 +9,12 @@ class SensorTemperatureModel(SQLModel, table=True):
     time: datetime = Field(
         sa_column=Column(TIMESTAMP(timezone=True), primary_key=True, nullable=False)
     )
-    sensor_id: Optional[int] = None
-    host: Optional[str] = None
-    source_address: Optional[str] = None
-    temperature: float
-    event_id: Optional[int] = None
-    relevance: float = 1.0
+    sensor_id: int | None = Field(default=None, nullable=True)
+    host: str | None = Field(default=None, nullable=True)
+    source_address: str | None = Field(default=None, nullable=True)
+    temperature: float | None = Field(default=None, nullable=True)
+    event_id: int | None = Field(default=None, nullable=True)
+    relevance: float | None = Field(default=1.0, nullable=True)
 
 
 class SensorHumidityModel(SQLModel, table=True):
@@ -24,11 +23,11 @@ class SensorHumidityModel(SQLModel, table=True):
     time: datetime = Field(
         sa_column=Column(TIMESTAMP(timezone=True), primary_key=True, nullable=False)
     )
-    sensor_id: Optional[int] = None
-    source_address: Optional[str] = None
-    humidity: float
-    event_id: Optional[int] = None
-    relevance: float = 1.0
+    sensor_id: int | None = Field(default=None, nullable=True)
+    source_address: str | None = Field(default=None, nullable=True)
+    humidity: float | None = Field(default=None, nullable=True)
+    event_id: int | None = Field(default=None, nullable=True)
+    relevance: float | None = Field(default=1.0, nullable=True)
 
 
 class SensorMotionModel(SQLModel, table=True):
@@ -37,16 +36,16 @@ class SensorMotionModel(SQLModel, table=True):
     time: datetime = Field(
         sa_column=Column(TIMESTAMP(timezone=True), primary_key=True, nullable=False)
     )
-    sensor_id: Optional[int] = None
-    host: Optional[str] = None
-    source_address: Optional[str] = None
-    state: Optional[str] = None
-    move_duration: Optional[int] = None
-    move_number: Optional[int] = None
-    x_axis: Optional[int] = None
-    y_axis: Optional[int] = None
-    z_axis: Optional[int] = None
-    event_id: Optional[int] = None
+    sensor_id: int | None = None
+    host: str | None = None
+    source_address: str | None = None
+    state: str | None = None
+    move_duration: int | None = None
+    move_number: int | None = None
+    x_axis: int | None = None
+    y_axis: int | None = None
+    z_axis: int | None = None
+    event_id: int | None = None
     relevance: float = 1.0
 
 
@@ -56,11 +55,11 @@ class SensorNeighborsCountModel(SQLModel, table=True):
     time: datetime = Field(
         sa_column=Column(TIMESTAMP(timezone=True), primary_key=True, nullable=False)
     )
-    sensor_id: Optional[int] = None
-    host: Optional[str] = None
-    source_address: Optional[str] = None
+    sensor_id: int | None = None
+    host: str | None = None
+    source_address: str | None = None
     neighbors: int
-    event_id: Optional[int] = None
+    event_id: int | None = None
     relevance: float = 1.0
 
 
@@ -70,13 +69,13 @@ class SensorNeighborsDetailModel(SQLModel, table=True):
     time: datetime = Field(
         sa_column=Column(TIMESTAMP(timezone=True), primary_key=True, nullable=False)
     )
-    sensor_id: Optional[int] = None
-    host: Optional[str] = None
-    source_address: Optional[str] = None
-    neighbor_address: Optional[str] = None
-    rssi: Optional[int] = None
-    tx_power: Optional[int] = None
-    event_id: Optional[int] = None
+    sensor_id: int | None = None
+    host: str | None = None
+    source_address: str | None = None
+    neighbor_address: str | None = None
+    rssi: int | None = None
+    tx_power: int | None = None
+    event_id: int | None = None
     relevance: float = 1.0
 
 
@@ -86,12 +85,12 @@ class SensorPressureModel(SQLModel, table=True):
     time: datetime = Field(
         sa_column=Column(TIMESTAMP(timezone=True), primary_key=True, nullable=False)
     )
-    sensor_id: Optional[int] = None
-    host: Optional[str] = None
-    source_address: Optional[str] = None
-    atmospheric_pressure: int
-    event_id: Optional[int] = None
-    relevance: float = 1.0
+    sensor_id: int | None = Field(default=None, nullable=True)
+    host: str | None = Field(default=None, nullable=True)
+    source_address: str | None = Field(default=None, nullable=True)
+    atmospheric_pressure: int | None = Field(default=None, nullable=True)
+    event_id: int | None = Field(default=None, nullable=True)
+    relevance: float | None = Field(default=1.0, nullable=True)
 
 
 class SensorVoltageModel(SQLModel, table=True):
@@ -100,11 +99,11 @@ class SensorVoltageModel(SQLModel, table=True):
     time: datetime = Field(
         sa_column=Column(TIMESTAMP(timezone=True), primary_key=True, nullable=False)
     )
-    sensor_id: Optional[int] = None
-    host: Optional[str] = None
-    source_address: Optional[str] = None
+    sensor_id: int | None = None
+    host: str | None = None
+    source_address: str | None = None
     voltage: float
-    event_id: Optional[int] = None
+    event_id: int | None = None
     relevance: float = 1.0
 
 
@@ -114,9 +113,9 @@ class SensorButtonModel(SQLModel, table=True):
     time: datetime = Field(
         sa_column=Column(TIMESTAMP(timezone=True), primary_key=True, nullable=False)
     )
-    sensor_id: Optional[int] = None
-    host: Optional[str] = None
-    source_address: Optional[str] = None
+    sensor_id: int | None = None
+    host: str | None = None
+    source_address: str | None = None
     button: int
-    event_id: Optional[int] = None
+    event_id: int | None = None
     relevance: float = 1.0

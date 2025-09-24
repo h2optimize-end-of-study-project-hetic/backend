@@ -1,6 +1,9 @@
 
+from typing import Type
+from app.src.domain.interface_repositories.data_repository import DataRepository
 from app.src.domain.interface_repositories.room_tag_repository import RoomTagRepository
 from app.src.domain.interface_repositories.user_repository import UserRepository
+from app.src.infrastructure.db.repositories.data_repository_sql import SQLDataRepository
 from app.src.infrastructure.db.repositories.room_tag_repository_sql import SQLRoomTagRepository
 from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 from app.src.use_cases.authentication.get_current_user_use_case import GetCurrentUserUseCase
@@ -8,10 +11,10 @@ from app.src.use_cases.authentication.verify_user_use_case import VerifyUserUseC
 from app.src.use_cases.view.get_events_by_date import GetEventsByDateUseCase
 from fastapi import Depends, HTTPException, status
 from sqlmodel import Session, SQLModel
-from typing import Type
-
 
 from app.src.infrastructure.db.session import get_session
+from app.src.use_cases.data.get_rooms_sensor_data_use_case import GetRoomsSensorDataUseCase
+from app.src.use_cases.data.get_single_room_sensor_use_case import GetSingleRoomSensorDataUseCase
 from app.src.use_cases.room.get_room_with_tag_list_use_case import GetRoomWithTagListUseCase
 from app.src.use_cases.room_tag.create_room_tag_use_case import CreateRoomTagUseCase
 from app.src.use_cases.room_tag.delete_room_tag_use_case import DeleteRoomTagUseCase
@@ -43,11 +46,7 @@ from app.src.domain.interface_repositories.map_repository import MapRepository
 from app.src.infrastructure.db.repositories.map_repository_sql import SQLMapRepository
 
 from app.src.use_cases.tag.update_tag_with_room_link_use_case import UpdateTagWithRoomLinkUseCase
-from app.src.domain.interface_repositories.user_repository import UserRepository
-from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 
-from app.src.domain.interface_repositories.user_repository import UserRepository
-from app.src.infrastructure.db.repositories.user_repository_sql import SQLUserRepository
 from app.src.use_cases.user.create_user_use_case import CreateUserUseCase
 from app.src.use_cases.user.delete_user_use_case import DeleteUserUseCase
 from app.src.use_cases.user.update_user_use_case import UpdateUserUseCase
@@ -398,7 +397,6 @@ def update_tag_with_room_link_use_case(tag_repository: TagRepository = tag_repo_
 
 
 # Sensor
-
 SENSOR_MODEL_MAP: dict[str, tuple[Type[SQLModel], str]] = {
     # alias_url → (Model, colonne temporelle)
     "button": (SensorButtonModel, "time"),
@@ -419,7 +417,6 @@ SENSOR_MODEL_MAP: dict[str, tuple[Type[SQLModel], str]] = {
     "sensor_voltage": (SensorVoltageModel, "time"),
 }
 
-
 def get_sensor_repo(
     kind: str,
     session: Session = Depends(get_session_recorded),
@@ -433,6 +430,38 @@ def get_sensor_repo(
 
     model, ts_attr = entry
     return SQLSensorRepository(session, model, ts_attr)
+
+
+# data
+get_session_record_dep = Depends(get_session_recorded)
+
+def data_repository(session: Session = get_session_dep, session_recorded : Session = get_session_record_dep) -> DataRepository:
+    return SQLDataRepository(session, session_recorded )
+
+data_repo_dep = Depends(data_repository)
+
+def get_rooms_sensor_data_use_case(data_repository: DataRepository = data_repo_dep, room_repository: RoomRepository = room_repo_dep) -> GetRoomsSensorDataUseCase:
+    return GetRoomsSensorDataUseCase(data_repository, room_repository)
+
+
+def get_single_room_sensor_data_use_case(data_repository: DataRepository = data_repo_dep, room_repository: RoomRepository = room_repo_dep) -> GetSingleRoomSensorDataUseCase:
+    return GetSingleRoomSensorDataUseCase(data_repository)
+
+
+# data
+get_session_record_dep = Depends(get_session_recorded)
+
+def data_repository(session: Session = get_session_dep, session_recorded : Session = get_session_record_dep) -> DataRepository:
+    return SQLDataRepository(session, session_recorded )
+
+data_repo_dep = Depends(data_repository)
+
+def get_rooms_sensor_data_use_case(data_repository: DataRepository = data_repo_dep, room_repository: RoomRepository = room_repo_dep) -> GetRoomsSensorDataUseCase:
+    return GetRoomsSensorDataUseCase(data_repository, room_repository)
+
+
+def get_single_room_sensor_data_use_case(data_repository: DataRepository = data_repo_dep, room_repository: RoomRepository = room_repo_dep) -> GetSingleRoomSensorDataUseCase:
+    return GetSingleRoomSensorDataUseCase(data_repository)
 
 # view
 

@@ -82,6 +82,10 @@ app = FastAPI(
             "description": "Affiche toutes les vues",
         },
 
+        {
+            "name": OpenApiTags.data,
+            "description": "data",
+        },
     ],
     servers=settings.SERVERS
 )
