@@ -73,6 +73,19 @@ app = FastAPI(
             "name": OpenApiTags.user_group,
             "description": "Gestion des groupes d'utilisateurs",
         },
+        {
+            "name": OpenApiTags.room_tag,
+            "description": "Lien entre les pieces et les balises",
+        },
+        {
+            "name": OpenApiTags.view,
+            "description": "Affiche toutes les vues",
+        },
+
+        {
+            "name": OpenApiTags.data,
+            "description": "data",
+        },
     ],
     servers=settings.SERVERS
 )

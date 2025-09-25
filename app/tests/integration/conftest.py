@@ -15,10 +15,10 @@ from app.src.presentation.core.config import settings
 from app.src.domain.entities.role import Role
 from app.src.infrastructure.db.models.user_model import UserModel
 
-test_db_name = f"{settings.POSTGRES_DB}_test"
+test_db_name = settings.postgres_db
 
 escaped_password = quote(settings.POSTGRES_PASSWORD)
-test_db_url = f"postgresql://{settings.POSTGRES_USER}:{escaped_password}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+test_db_url = f"postgresql://{settings.POSTGRES_USER}:{escaped_password}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{test_db_name}"
 
 admin_url = f"postgresql://{settings.POSTGRES_USER}:{escaped_password}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/postgres"
 
@@ -95,8 +95,17 @@ def get_test_session():
 @pytest.fixture(autouse=True)
 def clean_db():
     with Session(test_engine) as session:
-        for table in reversed(SQLModel.metadata.sorted_tables):
-            session.exec(text(f'TRUNCATE TABLE "{table.name}" RESTART IDENTITY CASCADE;'))
+        tables = session.exec(
+            text("""
+                SELECT tablename
+                FROM pg_tables
+                WHERE schemaname = 'public';
+            """)
+        ).all()
+        for (table_name,) in tables:
+            session.exec(
+                text(f'TRUNCATE TABLE "{table_name}" RESTART IDENTITY CASCADE;')
+            )
         session.commit()
         yield
 
@@ -111,9 +120,9 @@ def test_user():
 
     user = UserModel(
         email="testuser@example.com",
-        salt="testsalt",  # valeur bidon mais non NULL
+        salt="testsalt",
         password=hashed_password,
-        secret_2fa=None,  # si NOT NULL en DB, mettre une chaîne vide ""
+        secret_2fa=None,
         firstname="John",
         lastname="Doe",
         phone_number="0600000000",

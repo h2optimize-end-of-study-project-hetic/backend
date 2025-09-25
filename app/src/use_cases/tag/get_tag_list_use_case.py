@@ -24,15 +24,13 @@ class GetTagListUseCase:
     def __init__(self, tag_repository: TagRepository):
         self.tag_repository = tag_repository
 
-    def execute(self, cursor: str | None, limit: int | None = None) -> PaginatedTag:
-        limit = limit or 20
-
+    def execute(self, cursor: str | None, limit: int | None = None, with_rooms: bool = False) -> PaginatedTag:
         decoded_cursor = None
         if cursor:
             decoded_cursor = decode(cursor, "Tag pagination cursor")
             decoded_cursor = decoded_cursor.get("id") if decoded_cursor else None
 
-        tags, total, first_tag, last_tag = self.tag_repository.paginate_tags(decoded_cursor, (limit + 1))
+        tags, total, first_tag, last_tag = self.tag_repository.paginate_tags(decoded_cursor, (limit + 1), with_rooms=with_rooms)
 
         next_tag = None
         if len(tags) == (limit + 1):

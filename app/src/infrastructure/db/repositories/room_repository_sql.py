@@ -57,7 +57,7 @@ class SQLRoomRepository(RoomRepository):
             raise CreationFailedError("Room", str(e)) from e
 
         return Room.from_dict(room_model.model_dump())
-
+    
 
     def select_rooms(self, offset: int | None = None, limit: int | None = None) -> list[Room]:
         statement = select(RoomModel).order_by(RoomModel.created_at.desc())
@@ -150,4 +150,56 @@ class SQLRoomRepository(RoomRepository):
             self.session.rollback()
             logger.error(e)
             raise DeletionFailedError("Room", str(e)) from e
+
+
+
+    def paginate_rooms_with_tags(self, cursor: int | None, limit: InterruptedError) -> tuple[list[Room], int, Room | None, Room | None]:       
+        tags = self.select_rooms_with_tags(cursor, limit)
+        total = self.count_all_rooms()
+        first_tag = self.get_room_by_position(0)
+        last_page_offset = (
+            (total // (limit - 1)) * (limit - 1)
+            if total % (limit - 1) != 0
+            else ((total // (limit - 1)) - 1) * (limit - 1)
+        )
+
+        last_tag = self.get_room_by_position(last_page_offset)
+
+        return tags, total, first_tag, last_tag
+
+
+    def select_rooms_with_tags(self, cursor: int | None, limit: int) -> list[Room]:
+        statement = select(RoomModel).order_by(RoomModel.id)
+
+        if cursor:
+            statement = statement.where(RoomModel.id >= cursor)
+        statement = statement.limit(limit)
+
+        results = self.session.exec(statement).all()
+  
+        return [
+            Room(
+                **room.model_dump(),
+                tags=[
+                    {
+                        **room_tag.model_dump(),
+                        "tag": room_tag.tag.model_dump() if room_tag.tag else None
+                    }
+                    for room_tag in room.room_tags
+                ],
+            )
+            for room in results
+        ]
+
+
+
+
+    def get_room_by_position(self, position: int) -> Room | None:
+        if position >= 0:
+            statement = select(RoomModel).order_by(RoomModel.id.asc()).offset(position).limit(1)
+        else:
+            statement = select(RoomModel).order_by(RoomModel.id.desc()).offset(abs(position) - 1).limit(1)
+
+        result = self.session.exec(statement).first()
+        return Room(**result.model_dump()) if result else None
 

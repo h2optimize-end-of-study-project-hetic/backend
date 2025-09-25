@@ -125,9 +125,9 @@ pushback :
 
 
 test:
-	docker compose exec backend sh -c "pytest . -vvs  --cov"
+	docker compose exec backend sh -c "ENVIRONMENT=testing pytest . -vvs  --cov"
 
 coverage:
-	docker compose exec backend sh -c "pytest -v --cov=app/src --cov-report=term-missing --cov-report=html"
+	docker compose exec backend sh -c "ENVIRONMENT=testing pytest -v --cov=app/src --cov-report=term-missing --cov-report=html"
 
 

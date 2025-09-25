@@ -210,19 +210,19 @@ root@708b091e98e1:/code/app # alembic revision --autogenerate -m 'test'
 ### Lancer tous les tests
 
 ```bash
-pytest app/tests -vvs
+ENVIRONMENT=testing pytest app/tests -vvs
 ```
 
 ### Lancer uniquement les tests d’intégration
 
 ```bash
-pytest app/tests/integration -vvs
+ENVIRONMENT=testing pytest app/tests/integration -vvs
 ```
 
 ### Lancer uniquement les tests unitaires
 
 ```bash
-pytest app/tests/unit -vvs
+ENVIRONMENT=testing pytest app/tests/unit -vvs
 ```
 
 ---
@@ -232,13 +232,13 @@ pytest app/tests/unit -vvs
 **Exécuter tous les tests avec la couverture :**
 
 ```bash
-pytest app/tests -vvs --cov=app 
+ENVIRONMENT=testing pytest app/tests -vvs --cov=app 
 ```
 
 **Exécuter tous les tests avec la couverture + rapport HTML :**
 
 ```bash
-pytest app/tests -vvs --cov=app --cov-report=html
+ENVIRONMENT=testing pytest app/tests -vvs --cov=app --cov-report=html
 ```
 
 ---

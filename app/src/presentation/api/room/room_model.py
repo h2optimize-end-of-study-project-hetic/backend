@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from app.src.presentation.api.common.generic_model import OffsetBasePaginationMetadataModel
+from app.src.presentation.api.common.generic_model import OffsetBasePaginationMetadataModel, PaginationMetadataModel
 
 
 class RoomBaseModel(BaseModel):
@@ -64,3 +64,33 @@ class RoomModelResponse(RoomBaseModel):
 class PaginatedListRoomModelResponse(BaseModel):
     data: list[RoomModelResponse]
     metadata: OffsetBasePaginationMetadataModel
+
+
+
+class Tag(BaseModel) :
+    id: int
+    name: str = Field(..., min_length=3, max_length=255, title="Tag name", description="The name must be between 3 and 255 characters long",)
+    source_address: str = Field(..., min_length=3, title="Source address", description="The source address must be at least 3 characters long")
+    description: str | None = Field(default=None, title="Tag description", description="Optional description of the tag")
+    created_at: datetime | None
+    updated_at: datetime | None
+
+class LinkRoomTag(BaseModel):
+    id: int
+    tag: Tag
+    start_at: datetime | None = Field(default=None, title="Start availability", description="When the room is available from")
+    end_at: datetime | None = Field(default=None, title="End availability", description="When the room is available until")
+    created_at: datetime | None
+    updated_at: datetime | None
+
+class RoomWithTagModelResponse(RoomBaseModel):
+    id: int
+    start_at: datetime | None = None
+    end_at: datetime | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    tags: list[LinkRoomTag] | None = None 
+
+class PaginatedListRoomWithTagModelResponse(BaseModel):
+    data: list[RoomWithTagModelResponse]
+    metadata: PaginationMetadataModel

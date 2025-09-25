@@ -69,6 +69,14 @@ class Settings(BaseSettings):
 
     @computed_field
     @property
+    def postgres_db(self) -> str:
+        """Retourne le nom de la base selon l'environnement."""
+        if self.ENVIRONMENT == "testing":
+            return f"{self.POSTGRES_DB}_test"
+        return self.POSTGRES_DB
+
+    @computed_field
+    @property
     def database_url(self) -> str:
         return str(
             PostgresDsn.build(
@@ -77,7 +85,7 @@ class Settings(BaseSettings):
                 password=self.POSTGRES_PASSWORD,
                 host=self.POSTGRES_HOST,
                 port=self.POSTGRES_PORT,
-                path=self.POSTGRES_DB,
+                path=self.postgres_db, 
         ))
     
     @computed_field

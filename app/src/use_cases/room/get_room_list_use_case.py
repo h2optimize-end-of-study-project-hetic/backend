@@ -21,11 +21,8 @@ class RoomListResult:
 class GetRoomListUseCase:
     def __init__(self, room_repository: RoomRepository):
         self.room_repository = room_repository
-
-    def execute(self, offset: int | None = 0, limit: int | None = 20) -> RoomListResult:
-        limit = limit or 20
-        offset = offset or 0
-
+    
+    def execute(self, offset: int | None = None, limit: int | None = None) -> RoomListResult:
         rooms = self.room_repository.select_rooms(offset, limit)
         total = self.room_repository.count_all_rooms()
 
